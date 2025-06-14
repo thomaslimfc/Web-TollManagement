@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Details</title>
+</head>
+<body>
+  <h2>Admin Info</h2>
+  <div id="adminDetails">Loading...</div>
+
+  <!-- Firebase Initialization Script -->
+  <script src="../../lib/firebase_init.js"></script>
+
+  <!-- Firestore Data Read -->
+  <script>
+    window.initializeFirebase()
+      .then(({ db }) => {
+        const docRef = db.collection('admins').doc('admin_001');
+
+        docRef.get()
+          .then((doc) => {
+            if (doc.exists) {
+              const data = doc.data();
+              document.getElementById("adminDetails").innerHTML = `
+                <p><strong>Name:</strong> ${data.name}</p>
+                <p><strong>Email:</strong> ${data.email}</p>
+                <p><strong>Username:</strong> ${data.username}</p>
+                <p><strong>Role:</strong> ${data.role}</p>
+              `;
+            } else {
+              document.getElementById("adminDetails").textContent = "No admin found.";
+            }
+          })
+          .catch((error) => {
+            console.error("Error getting document:", error);
+            document.getElementById("adminDetails").textContent = "Error loading admin data.";
+          });
+      })
+      .catch(err => {
+        console.error("Firebase init error:", err);
+        document.getElementById("adminDetails").textContent = "Initialization failed.";
+      });
+  </script>
+</body>
+</html>

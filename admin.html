@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Details</title>
+  <script type="module" src="/components/master-layout.js"></script>
+  <script type="module" src="/lib/firebase_init.js"></script>
+</head>
+<body>
+  <master-layout>
+    <h2>Admin Info</h2>
+    <div id="adminDetails">Loading...</div>
+    
+    <script type="module">
+      import { db } from '/lib/firebase_init.js';
+      
+      async function loadAdmin() {
+        try {
+          const doc = await db.collection('admins').doc('admin_001').get();
+          const container = document.getElementById('adminDetails');
+          
+          if (doc.exists) {
+            const data = doc.data();
+            container.innerHTML = `
+              <p><strong>Name:</strong> ${data.name}</p>
+              <p><strong>Email:</strong> ${data.email}</p>
+              <p><strong>Username:</strong> ${data.username}</p>
+              <p><strong>Role:</strong> ${data.role}</p>
+            `;
+          } else {
+            container.textContent = "Admin not found.";
+          }
+        } catch (error) {
+          console.error("Firestore error:", error);
+          document.getElementById('adminDetails').textContent = "Error loading data.";
+        }
+      }
+      
+      document.addEventListener('DOMContentLoaded', loadAdmin);
+    </script>
+  </master-layout>
+</body>
+</html>

@@ -1,0 +1,8 @@
+Tools like Eleventy (11ty), Jekyll, or Hugo can process templates at build time.
+
+npm install -g @11ty/eleventy
+npm fund
+
+...
+
+
