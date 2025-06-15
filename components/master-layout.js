@@ -205,7 +205,6 @@ class MasterLayout extends HTMLElement {
       <div class="sidebar" id="sidebar">
         <nav class="main-nav">
           <ul>
-            <li><a href="#" class="active"><i class="bi bi-speedometer2"></i> &nbsp; Dashboard</a></li>
             <li><a href="#"><i class="bi bi-people"></i> &nbsp; User Management</a></li>
             <li><a href="#"><i class="bi bi-cash-coin"></i> &nbsp; Toll Rates</a></li>
             <li><a href="#"><i class="bi bi-car-front"></i> &nbsp; License Plate Entry/Exit</a></li>
