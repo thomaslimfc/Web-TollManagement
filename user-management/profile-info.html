@@ -2,275 +2,232 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>My Profile</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Profile</title>
 
-    <link rel="stylesheet" href="../lib/master-layout.css">
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="../lib/master-layout.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
 </head>
 
 <body>
-    <!-- Top Navigation -->
-    <header class="navbar navbar-expand-lg navbar-dark bg-light fixed-top">
-        <div class="container-fluid">
-            <button class="navbar-toggler sidebar-toggler d-lg-none me-2" type="button" style="display: none;">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+  <!-- Top Navigation -->
+  <header class="navbar navbar-expand-lg navbar-dark bg-light fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">
+        <img src="../images/plus-logo.png" alt="PLUS HIGHWAYS" height="40" />
+      </a>
 
-            <a class="navbar-brand" href="#">
-                <img src="../images/plus-logo.png" alt="PLUS HIGHWAYS" height="40">
-            </a>
-
-            <div class="ms-auto d-flex align-items-center">
-                <div class="dropdown">
-                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
-                        id="dropdownUser" data-bs-toggle="dropdown">
-                        <img src="../images/profile-icon.png" alt="Profile" width="32" height="32"
-                            class="rounded-circle me-2">
-                        <span>Admin</span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="profile-info.html">Profile</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li><a class="dropdown-item" href="#">Sign out</a></li>
-                    </ul>
-                </div>
-            </div>
+      <div class="ms-auto d-flex align-items-center">
+        <div class="dropdown">
+          <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
+            id="dropdownUser" data-bs-toggle="dropdown">
+            <img src="../images/profile-icon.png" alt="Profile" width="32" height="32" class="rounded-circle me-2" />
+            <span>Admin</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="profile-info.html">Profile</a></li>
+            <li><hr class="dropdown-divider" /></li>
+            <li><a class="dropdown-item" href="#">Sign out</a></li>
+          </ul>
         </div>
-    </header>
-
-    <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-        <ul class="nav flex-column">
-            <li class="nav-item">
-                <a class="nav-link" href="../user-management/user-management.html">
-                    <i class="bi bi-people"></i> User Management
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="../toll-rates/toll-rates.html">
-                    <i class="bi bi-cash-coin"></i> Toll Rates
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="../license-plate-entry-exit/license-plate-entry-exit.html">
-                    <i class="bi bi-car-front"></i> License Plate Entry/Exit
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="../cctv-streaming/cctv-streaming.html">
-                    <i class="bi bi-camera-video"></i> CCTV Streaming
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="../weather-data/weather-data.html">
-                    <i class="bi bi-cloud-sun"></i> Weather Data
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="../emergency-alerts/emergency-alerts.html">
-                    <i class="bi bi-exclamation-triangle"></i> Emergency Alerts
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="../congestion-alerts/congestion-alerts.html">
-                    <i class="bi bi-cone"></i> Congestion Alerts
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="../sos-emergency/sos-emergency.html">
-                    <i class="bi bi-life-preserver"></i> SOS Emergency
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="../vehicle-verifications/vehicle-verifications.html">
-                    <i class="bi bi-shield-check"></i> Vehicle Verifications
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="../inquiry-reply/inquiry-reply.html">
-                    <i class="bi bi-chat-left-text"></i> Inquiry Reply
-                </a>
-            </li>
-        </ul>
+      </div>
     </div>
+  </header>
 
-    <!-- Main Content -->
-    <div class="main-content" id="mainContent">
-        <h1>Profile Information</h1>
-        <p>Welcome to the PLUS HIGHWAYS administration portal</p>
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <ul class="nav flex-column">
+      <li class="nav-item"><a class="nav-link" href="../user-management/user-management.html"><i class="bi bi-people"></i> User Management</a></li>
+      <li class="nav-item"><a class="nav-link" href="../toll-rates/toll-rates.html"><i class="bi bi-cash-coin"></i> Toll Rates</a></li>
+      <li class="nav-item"><a class="nav-link" href="../license-plate-entry-exit/license-plate-entry-exit.html"><i class="bi bi-car-front"></i> License Plate Entry/Exit</a></li>
+      <li class="nav-item"><a class="nav-link" href="../cctv-streaming/cctv-streaming.html"><i class="bi bi-camera-video"></i> CCTV Streaming</a></li>
+      <li class="nav-item"><a class="nav-link" href="../weather-data/weather-data.html"><i class="bi bi-cloud-sun"></i> Weather Data</a></li>
+      <li class="nav-item"><a class="nav-link" href="../emergency-alerts/emergency-alerts.html"><i class="bi bi-exclamation-triangle"></i> Emergency Alerts</a></li>
+      <li class="nav-item"><a class="nav-link" href="../congestion-alerts/congestion-alerts.html"><i class="bi bi-cone"></i> Congestion Alerts</a></li>
+      <li class="nav-item"><a class="nav-link" href="../sos-emergency/sos-emergency.html"><i class="bi bi-life-preserver"></i> SOS Emergency</a></li>
+      <li class="nav-item"><a class="nav-link" href="../vehicle-verifications/vehicle-verifications.html"><i class="bi bi-shield-check"></i> Vehicle Verifications</a></li>
+      <li class="nav-item"><a class="nav-link" href="../inquiry-reply/inquiry-reply.html"><i class="bi bi-chat-left-text"></i> Inquiry Reply</a></li>
+    </ul>
+  </div>
 
-        <form>
-            <div class="form-group row">
-                <label for="staticEmail" class="col-sm-2 col-form-label">Email</label>
-                <div class="col-sm-10">
-                    <input type="text" readonly class="form-control-plaintext" id="staticEmail"
-                        value="email@example.com">
-                </div>
-            </div>
+  <!-- Main Content -->
+  <div class="main-content" id="mainContent">
+    <h1>Profile Information</h1>
+    <p>Welcome to the PLUS HIGHWAYS administration portal</p>
 
-            <div class="form-group row">
-                <label for="inputFullName" class="col-sm-2 col-form-label">Full Name</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" id="inputFullName" placeholder="Full Name">
-                </div>
-            </div>
-
-            <div class="form-group row">
-                <label for="inputGender" class="col-sm-2 col-form-label">Gender</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" id="inputGender" placeholder="Gender">
-                </div>
-            </div>
-
-            <div class="form-group row">
-                <label for="inputBranch" class="col-sm-2 col-form-label">Branch</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" id="inputBranch" placeholder="Branch">
-                </div>
-            </div>
-
-            <div class="form-group row">
-                <label for="inputPassword" class="col-sm-2 col-form-label">Password</label>
-                <div class="col-sm-10">
-                    <input type="password" class="form-control" id="inputPassword" placeholder="Password">
-                </div>
-            </div>
-
-            <div class="form-group row">
-                <label for="inputSuperUserPassword" class="col-sm-2 col-form-label">Superuser Password</label>
-                <div class="col-sm-10">
-                    <input type="password" class="form-control" id="inputSuperuserPassword"
-                        placeholder="Superuser Password">
-                </div>
-            </div>
-
-            <!-- <input class="btn btn-primary" type="submit" value="Submit"> -->
-            <div class="mt-3">
-                <button id="toggleEditBtn" class="btn btn-primary">Edit Profile</button>
-                <button id="toggleSaveBtn" class="btn btn-success">Save Changes Profile</button>
-            </div>
-        </form>
-
-        <!-- Your page content will go here -->
-        <div class="container-fluid">
-            <!-- Content rows/columns -->
+    <form>
+      <!-- Email (always read-only) -->
+      <div class="form-group row">
+        <label for="staticEmail" class="col-sm-2 col-form-label">Email</label>
+        <div class="col-sm-10">
+          <input type="text" readonly class="form-control-plaintext" id="staticEmail" value="email@example.com" />
         </div>
-    </div>
+      </div>
+      <div style="padding-bottom: 10px"></div>
 
-<script type="module">
-  import { initializeFirebase } from '/lib/firebase_init.js';
+      <!-- Full Name -->
+      <div class="form-group row">
+        <label for="inputFullName" class="col-sm-2 col-form-label">Full Name</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="inputFullName" placeholder="Full Name" disabled />
+        </div>
+      </div>
+      <div style="padding-bottom: 10px"></div>
 
-  document.addEventListener('DOMContentLoaded', async () => {
-    const toggleEditBtn = document.getElementById('toggleEditBtn');
-    const formInputs = [
-      'inputFullName',
-      'inputGender',
-      'inputBranch',
-      'inputPassword',
-      'inputSuperuserPassword'
-    ];
-    const form = document.querySelector('form');
+      <!-- Gender -->
+      <div class="form-group row">
+        <label class="col-sm-2 col-form-label">Gender</label>
+        <div class="col-sm-10 d-flex align-items-center">
+          <div class="form-check me-3">
+            <input class="form-check-input" type="radio" name="gender" id="genderMale" value="Male" disabled />
+            <label class="form-check-label" for="genderMale">Male</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="gender" id="genderFemale" value="Female" disabled />
+            <label class="form-check-label" for="genderFemale">Female</label>
+          </div>
+        </div>
+      </div>
+      <div style="padding-bottom: 10px"></div>
 
-    // Disable form fields initially (View Mode)
-    function setFormDisabled(disabled) {
-      formInputs.forEach(id => {
-        document.getElementById(id).disabled = disabled;
-      });
-    }
+      <!-- Branch -->
+      <div class="form-group row">
+        <label for="inputBranch" class="col-sm-2 col-form-label">Branch</label>
+        <div class="col-sm-10">
+          <select class="form-select" id="inputBranch" disabled>
+            <option selected disabled>Select Branch</option>
+          </select>
+        </div>
+      </div>
+      <div style="padding-bottom: 10px"></div>
 
-    // Fetch admin data and fill form
-    async function loadAdminData() {
-      try {
-        const { db } = await initializeFirebase();
-        const doc = await db.collection('admins').doc('admin_001').get();
+      <!-- Buttons -->
+      <div class="mt-3">
+        <button id="toggleEditBtn" class="btn btn-primary">Edit Profile</button>
+        <button id="toggleSaveBtn" class="btn btn-success">Save Changes</button>
+      </div>
+    </form>
+  </div>
 
-        if (doc.exists) {
+  <!-- Firebase + Logic -->
+  <script type="module">
+    import { initializeFirebase } from '/lib/firebase_init.js';
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const toggleEditBtn = document.getElementById('toggleEditBtn');
+      const toggleSaveBtn = document.getElementById('toggleSaveBtn');
+
+      const inputFullName = document.getElementById('inputFullName');
+      const inputBranch = document.getElementById('inputBranch');
+      const emailField = document.getElementById('staticEmail');
+      const genderRadios = document.getElementsByName('gender');
+
+      const branches = ['KL North', 'Penang South', 'Johor Center', 'Ipoh Main'];
+
+      let firebaseDataLoaded = false;
+
+      // Initial visibility
+      toggleSaveBtn.style.display = 'none';
+
+      function setInputsDisabled(disabled) {
+        inputFullName.disabled = disabled;
+        inputBranch.disabled = disabled;
+        genderRadios.forEach(r => r.disabled = disabled);
+      }
+
+      async function loadAdminDataOnce() {
+        if (firebaseDataLoaded) return;
+
+        try {
+          const { db } = await initializeFirebase();
+          const docRef = db.collection('admins').doc('admin_001');
+          const doc = await docRef.get();
+
+          if (!doc.exists) {
+            alert("Admin not found.");
+            return;
+          }
+
           const data = doc.data();
+          emailField.value = data.emailAddress || '';
+          inputFullName.value = data.fullName || '';
 
-          document.getElementById('staticEmail').value = data.emailAddress || '';
-          document.getElementById('inputFullName').value = data.fullName || '';
-          document.getElementById('inputGender').value = data.gender || '';
-          document.getElementById('inputBranch').value = data.branch || '';
-          document.getElementById('inputPassword').value = data.password || '';
-          document.getElementById('inputSuperuserPassword').value = data.superPassword || '';
+          // Gender
+          if (data.gender === 'Male') {
+            document.getElementById('genderMale').checked = true;
+          } else if (data.gender === 'Female') {
+            document.getElementById('genderFemale').checked = true;
+          }
 
-          setFormDisabled(true); // default view mode
-          toggleEditBtn.textContent = "Edit Profile";
-        } else {
-          alert("Admin not found.");
+          // Branch dropdown
+          inputBranch.innerHTML = branches.map(b =>
+            `<option value="${b}" ${b === data.branch ? 'selected' : ''}>${b}</option>`).join('');
+
+          setInputsDisabled(true);
+          firebaseDataLoaded = true;
+        } catch (err) {
+          console.error("Failed to load data:", err);
+          alert("Could not load profile.");
         }
-      } catch (error) {
-        console.error("Error fetching admin data:", error);
-        alert("Failed to load admin data.");
       }
-    }
 
-    // Save admin changes
-    async function saveChanges() {
-      try {
-        const { db } = await initializeFirebase();
-        const updatedData = {
-          fullName: document.getElementById('inputFullName').value,
-          gender: document.getElementById('inputGender').value,
-          branch: document.getElementById('inputBranch').value,
-          password: document.getElementById('inputPassword').value,
-          superPassword: document.getElementById('inputSuperuserPassword').value,
-        };
+      async function saveAdminData() {
+        const selectedGender = [...genderRadios].find(r => r.checked)?.value || '';
 
-        await db.collection('admins').doc('admin_001').update(updatedData);
-        alert("Profile updated successfully.");
-        setFormDisabled(true);
-        toggleEditBtn.textContent = "Edit Profile";
-      } catch (error) {
-        console.error("Error updating admin data:", error);
-        alert("Failed to save changes.");
+        try {
+          const { db } = await initializeFirebase();
+          const docRef = db.collection('admins').doc('admin_001');
+          await docRef.update({
+            fullName: inputFullName.value,
+            gender: selectedGender,
+            branch: inputBranch.value,
+          });
+
+          alert("Profile updated.");
+          setInputsDisabled(true);
+          toggleEditBtn.style.display = 'inline-block';
+          toggleSaveBtn.style.display = 'none';
+        } catch (err) {
+          console.error("Failed to save:", err);
+          alert("Error saving changes.");
+        }
       }
-    }
 
-    // Handle edit/save toggle
-    toggleEditBtn.addEventListener('click', async () => {
-      if (toggleEditBtn.textContent === "Edit Profile") {
-        setFormDisabled(false);
-        toggleEditBtn.textContent = "Save Changes";
-      } else {
-        await saveChanges();
-      }
+      toggleEditBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        setInputsDisabled(false);
+        toggleEditBtn.style.display = 'none';
+        toggleSaveBtn.style.display = 'inline-block';
+      });
+
+      toggleSaveBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        await saveAdminData();
+      });
+
+      await loadAdminDataOnce();
+    });
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.querySelector('.sidebar-toggler')?.addEventListener('click', function () {
+      document.getElementById('sidebar').classList.toggle('show');
     });
 
-    await loadAdminData();
-  });
-</script>
+    document.addEventListener('click', function (event) {
+      const sidebar = document.getElementById('sidebar');
+      const toggler = document.querySelector('.sidebar-toggler');
 
-
-    <!-- Bootstrap JS Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-        // Toggle sidebar on mobile
-        document.querySelector('.sidebar-toggler').addEventListener('click', function () {
-            document.getElementById('sidebar').classList.toggle('show');
-        });
-
-        // Close sidebar when clicking outside on mobile
-        document.addEventListener('click', function (event) {
-            const sidebar = document.getElementById('sidebar');
-            const toggler = document.querySelector('.sidebar-toggler');
-
-            if (window.innerWidth < 992 &&
-                !sidebar.contains(event.target) &&
-                !toggler.contains(event.target)) {
-                sidebar.classList.remove('show');
-            }
-        });
-    </script>
+      if (window.innerWidth < 992 &&
+        !sidebar.contains(event.target) &&
+        !toggler.contains(event.target)) {
+        sidebar.classList.remove('show');
+      }
+    });
+  </script>
 </body>
 
 </html>
