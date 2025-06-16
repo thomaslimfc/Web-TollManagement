@@ -1,133 +1,349 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>PLUS HIGHWAYS Admin Portal</title>
+    <title>Admin Acc Reg</title>
 
-    <link rel="stylesheet" href="/lib/master-layout.css">
+    <link rel="stylesheet" href="../lib/master-layout.css">
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
+
 <body>
-<!-- Top Navigation -->
-<header class="navbar navbar-expand-lg navbar-dark bg-light fixed-top">
-    <div class="container-fluid">
-        <button class="navbar-toggler sidebar-toggler d-lg-none me-2" type="button" style="display: none;">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+    <!-- Top Navigation -->
+    <header class="navbar navbar-expand-lg navbar-dark bg-light fixed-top">
+        <div class="container-fluid">
+            <button class="navbar-toggler sidebar-toggler d-lg-none me-2" type="button" style="display: none;">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-        <a class="navbar-brand" href="#">
-            <img src="/images/plus-logo.png" alt="PLUS HIGHWAYS" height="40">
-        </a>
+            <a class="navbar-brand" href="#">
+                <img src="../images/plus-logo.png" alt="PLUS HIGHWAYS" height="40">
+            </a>
 
-        <div class="ms-auto d-flex align-items-center">
-            <div class="dropdown">
-                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser" data-bs-toggle="dropdown">
-                    <img src="/images/profile-icon.png" alt="Profile" width="32" height="32" class="rounded-circle me-2">
-                    <span>Admin</span>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="#">Profile</a></li>
-                    <li><a class="dropdown-item" href="#">Settings</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="#">Sign out</a></li>
-                </ul>
+            <div class="ms-auto d-flex align-items-center">
+                <div class="dropdown">
+                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
+                        id="dropdownUser" data-bs-toggle="dropdown">
+                        <img src="../images/profile-icon.png" alt="Profile" width="32" height="32"
+                            class="rounded-circle me-2">
+                        <span>Admin</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#">Profile</a></li>
+                        <li><a class="dropdown-item" href="#">Settings</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="#">Sign out</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
+    </header>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link active" href="../user-management/user-management.html">
+                    <i class="bi bi-people"></i> User Management
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../toll-rates/toll-rates.html">
+                    <i class="bi bi-cash-coin"></i> Toll Rates
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../license-plate-entry-exit/license-plate-entry-exit.html">
+                    <i class="bi bi-car-front"></i> License Plate Entry/Exit
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../cctv-streaming/cctv-streaming.html">
+                    <i class="bi bi-camera-video"></i> CCTV Streaming
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../weather-data/weather-data.html">
+                    <i class="bi bi-cloud-sun"></i> Weather Data
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../emergency-alerts/emergency-alerts.html">
+                    <i class="bi bi-exclamation-triangle"></i> Emergency Alerts
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../congestion-alerts/congestion-alerts.html">
+                    <i class="bi bi-cone"></i> Congestion Alerts
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../sos-emergency/sos-emergency.html">
+                    <i class="bi bi-life-preserver"></i> SOS Emergency
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../vehicle-verifications/vehicle-verifications.html">
+                    <i class="bi bi-shield-check"></i> Vehicle Verifications
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../inquiry-reply/inquiry-reply.html">
+                    <i class="bi bi-chat-left-text"></i> Inquiry Reply
+                </a>
+            </li>
+        </ul>
     </div>
-</header>
 
-<!-- Sidebar -->
-<div class="sidebar" id="sidebar">
-    <ul class="nav flex-column">
-        <li class="nav-item">
-            <a class="nav-link active" href="../user-management/user-management.html">
-                <i class="bi bi-people"></i> User Management
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="../toll-rates/toll-rates.html">
-                <i class="bi bi-cash-coin"></i> Toll Rates
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="../license-plate-entry-exit/license-plate-entry-exit.html">
-                <i class="bi bi-car-front"></i> License Plate Entry/Exit
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="../cctv-streaming/cctv-streaming.html">
-                <i class="bi bi-camera-video"></i> CCTV Streaming
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="../weather-data/weather-data.html">
-                <i class="bi bi-cloud-sun"></i> Weather Data
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="../emergency-alerts/emergency-alerts.html">
-                <i class="bi bi-exclamation-triangle"></i> Emergency Alerts
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="../congestion-alerts/congestion-alerts.html">
-                <i class="bi bi-cone"></i> Congestion Alerts
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="../sos-emergency/sos-emergency.html">
-                <i class="bi bi-life-preserver"></i> SOS Emergency
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="../vehicle-verifications/vehicle-verifications.html">
-                <i class="bi bi-shield-check"></i> Vehicle Verifications
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="../inquiry-reply/inquiry-reply.html">
-                <i class="bi bi-chat-left-text"></i> Inquiry Reply
-            </a>
-        </li>
-    </ul>
-</div>
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <h1>Admin Account Registration</h1>
+        <p>Add a new admin account for new employee.</p>
+        <br>
+        
+        <form>
+            <div class="form-group row">
+                <label for="inputEmailAddress" class="col-sm-2 col-form-label">Email Address</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="inputEmailAddress" placeholder="tayss@plus.com"
+                        required>
+                </div>
+            </div>
+            <div style="padding-bottom: 10px;"></div>
 
-<!-- Main Content -->
-<div class="main-content" id="mainContent">
-    <h1>Admin Account Registration</h1>
-    <p>Welcome to the PLUS HIGHWAYS administration portal</p>
+            <div class="form-group row">
+                <label for="inputFullName" class="col-sm-2 col-form-label">Full Name</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="inputFullName" placeholder="Tay Shu Shiang" required>
+                </div>
+            </div>
+            <div style="padding-bottom: 10px;"></div>
 
-    <!-- Your page content will go here -->
-    <div class="container-fluid">
-        <!-- Content rows/columns -->
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Gender</label>
+                <div class="col-sm-10 d-flex align-items-center">
+                    <div class="form-check me-3">
+                        <input class="form-check-input" type="radio" name="gender" id="genderMale" value="Male"
+                            required>
+                        <label class="form-check-label" for="genderMale">Male</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="gender" id="genderFemale" value="Female"
+                            required>
+                        <label class="form-check-label" for="genderFemale">Female</label>
+                    </div>
+                </div>
+            </div>
+            <div style="padding-bottom: 10px;"></div>
+
+            <div class="form-group row">
+                <label for="inputBranch" class="col-sm-2 col-form-label">Branch</label>
+                <div class="col-sm-10">
+                    <select class="form-select" id="inputBranch" required>
+                        <option selected disabled>Select Branch</option>
+                    </select>
+                </div>
+            </div>
+            <div style="padding-bottom: 10px;"></div>
+
+            <div class="form-group row">
+                <label for="inputPassword" class="col-sm-2 col-form-label">Password</label>
+                <div class="col-sm-10">
+                    <input type="password" class="form-control" id="inputPassword" placeholder="Password" required>
+                </div>
+            </div>
+            <div style="padding-bottom: 10px;"></div>
+
+            <div class="form-group row">
+                <label for="inputSuperUserPassword" class="col-sm-2 col-form-label">Superuser Password</label>
+                <div class="col-sm-10">
+                    <input type="password" class="form-control" id="inputSuperuserPassword"
+                        placeholder="Superuser Password" required>
+                </div>
+            </div>
+            <div style="padding-bottom: 10px;"></div>
+
+            <!-- <input class="btn btn-primary" type="submit" value="Submit"> -->
+            <div class="mt-3">
+                <button id="registerAdminBtn" class="btn btn-success">Register Admin</button>
+            </div>
+        </form>
+
+        <!-- Your page content will go here -->
+        <div class="container-fluid">
+            <!-- Content rows/columns -->
+        </div>
     </div>
-</div>
 
-<!-- Bootstrap JS Bundle with Popper -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { initializeFirebase } from '/lib/firebase_init.js';
 
-<script>
-    // Toggle sidebar on mobile
-    document.querySelector('.sidebar-toggler').addEventListener('click', function () {
-        document.getElementById('sidebar').classList.toggle('show');
-    });
+        document.addEventListener('DOMContentLoaded', async () => {
+            const registerBtn = document.getElementById('registerAdminBtn');
+            const formInputs = [
+                'inputEmailAddress',
+                'inputFullName',
+                'inputGender',
+                'inputBranch',
+                'inputPassword',
+            ];
 
-    // Close sidebar when clicking outside on mobile
-    document.addEventListener('click', function (event) {
-        const sidebar = document.getElementById('sidebar');
-        const toggler = document.querySelector('.sidebar-toggler');
+            function setFormEnabled() {
+                formInputs.forEach(id => {
+                    document.getElementById(id).disabled = false;
+                });
+            }
 
-        if (window.innerWidth < 992 &&
-            !sidebar.contains(event.target) &&
-            !toggler.contains(event.target)) {
-            sidebar.classList.remove('show');
-        }
-    });
-</script>
+            async function loadBranchOptions() {
+                try {
+                    const { db } = await initializeFirebase();
+                    const snapshot = await db.collection("tollBooth").get();
+
+                    const uniqueLocations = new Set();
+                    snapshot.forEach(doc => {
+                        const location = doc.data().location;
+                        if (location) uniqueLocations.add(location);
+                    });
+
+                    const branchSelect = document.getElementById("inputBranch");
+                    uniqueLocations.forEach(location => {
+                        const option = document.createElement("option");
+                        option.value = location;
+                        option.textContent = location;
+                        branchSelect.appendChild(option);
+                    });
+                } catch (error) {
+                    console.error("Error loading branch options:", error);
+                    alert("Failed to load branch list.");
+                }
+            }
+
+            async function registerAdmin() {
+                const superPasswordInput = document.getElementById("inputSuperuserPassword").value;
+
+                try {
+                    const { db } = await initializeFirebase();
+
+                    // 1. Validate superuser password
+                    const superDoc = await db.collection('security').doc('superuser').get();
+                    if (!superDoc.exists) {
+                        alert("Superuser credential not set in database.");
+                        return;
+                    }
+                    const storedPassword = superDoc.data().password;
+                    if (superPasswordInput !== storedPassword) {
+                        alert("Invalid superuser password.");
+                        return;
+                    }
+
+                    // 2. Collect values
+                    const email = document.getElementById('inputEmailAddress').value.trim();
+                    const fullName = document.getElementById('inputFullName').value.trim();
+                    const gender = document.querySelector('input[name="gender"]:checked')?.value || "";
+                    const branch = document.getElementById('inputBranch').value;
+                    const password = document.getElementById('inputPassword').value;
+
+                    // 3. Validation rules
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    const nameRegex = /^[A-Za-z\s]+$/;
+                    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{10,}$/;
+
+                    if (!email || !emailRegex.test(email)) {
+                        alert("Please enter a valid email address.");
+                        return;
+                    }
+
+                    if (!fullName || !nameRegex.test(fullName)) {
+                        alert("Full Name must contain only alphabets and spaces.");
+                        return;
+                    }
+
+                    if (!gender) {
+                        alert("Please select a gender.");
+                        return;
+                    }
+
+                    if (!branch || branch === "Select Branch") {
+                        alert("Please select a valid branch.");
+                        return;
+                    }
+
+                    if (!password || !passwordRegex.test(password)) {
+                        alert("Password must be at least 10 characters long and include a symbol, number, uppercase, and lowercase letter.");
+                        return;
+                    }
+
+                    // 4. Check if email already exists
+                    const existingDoc = await db.collection('admins').doc(email).get();
+                    if (existingDoc.exists) {
+                        alert("An admin with this email already exists.");
+                        return;
+                    }
+
+                    // 5. Store admin data
+                    const adminData = {
+                        emailAddress: email,
+                        fullName,
+                        gender,
+                        branch,
+                        password,
+                    };
+
+                    await db.collection('admins').doc(email).set(adminData);
+                    alert("Admin registered successfully.");
+
+                    // Reset form
+                    ['inputEmailAddress', 'inputFullName', 'inputPassword', 'inputSuperuserPassword'].forEach(id => {
+                        document.getElementById(id).value = '';
+                    });
+                    document.querySelectorAll('input[name="gender"]').forEach(r => r.checked = false);
+                    document.getElementById('inputBranch').selectedIndex = 0;
+
+                } catch (error) {
+                    console.error("Error registering admin:", error);
+                    alert("Failed to register admin.");
+                }
+            }
+
+            registerBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                await registerAdmin();
+            });
+
+            await loadBranchOptions();
+            setFormEnabled();
+        });
+    </script>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Toggle sidebar on mobile
+        document.querySelector('.sidebar-toggler').addEventListener('click', function () {
+            document.getElementById('sidebar').classList.toggle('show');
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function (event) {
+            const sidebar = document.getElementById('sidebar');
+            const toggler = document.querySelector('.sidebar-toggler');
+
+            if (window.innerWidth < 992 &&
+                !sidebar.contains(event.target) &&
+                !toggler.contains(event.target)) {
+                sidebar.classList.remove('show');
+            }
+        });
+    </script>
 </body>
+
 </html>
