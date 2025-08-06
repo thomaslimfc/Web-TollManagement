@@ -4,7 +4,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>My Profile</title>
+  <title>PLUS — My Profile</title>
+  <link rel="icon" type="image/x-icon" href="../images/plus-logo.ico">
 
   <link rel="stylesheet" href="../lib/master-layout.css" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" />
@@ -28,7 +29,9 @@
           </a>
           <ul class="dropdown-menu dropdown-menu-end">
             <li><a class="dropdown-item" href="profile-info.html">Profile</a></li>
-            <li><hr class="dropdown-divider" /></li>
+            <li>
+              <hr class="dropdown-divider" />
+            </li>
             <li><a class="dropdown-item" href="#">Sign out</a></li>
           </ul>
         </div>
@@ -39,16 +42,26 @@
   <!-- Sidebar -->
   <div class="sidebar" id="sidebar">
     <ul class="nav flex-column">
-      <li class="nav-item"><a class="nav-link" href="../user-management/user-management.html"><i class="bi bi-people"></i> User Management</a></li>
-      <li class="nav-item"><a class="nav-link" href="../toll-rates/toll-rates.html"><i class="bi bi-cash-coin"></i> Toll Rates</a></li>
-      <li class="nav-item"><a class="nav-link" href="../license-plate-entry-exit/license-plate-entry-exit.html"><i class="bi bi-car-front"></i> License Plate Entry/Exit</a></li>
-      <li class="nav-item"><a class="nav-link" href="../cctv-streaming/cctv-streaming.html"><i class="bi bi-camera-video"></i> CCTV Streaming</a></li>
-      <li class="nav-item"><a class="nav-link" href="../weather-data/weather-data.html"><i class="bi bi-cloud-sun"></i> Weather Data</a></li>
-      <li class="nav-item"><a class="nav-link" href="../emergency-alerts/emergency-alerts.html"><i class="bi bi-exclamation-triangle"></i> Emergency Alerts</a></li>
-      <li class="nav-item"><a class="nav-link" href="../congestion-alerts/congestion-alerts.html"><i class="bi bi-cone"></i> Congestion Alerts</a></li>
-      <li class="nav-item"><a class="nav-link" href="../sos-emergency/sos-emergency.html"><i class="bi bi-life-preserver"></i> SOS Emergency</a></li>
-      <li class="nav-item"><a class="nav-link" href="../vehicle-verifications/vehicle-verifications.html"><i class="bi bi-shield-check"></i> Vehicle Verifications</a></li>
-      <li class="nav-item"><a class="nav-link" href="../inquiry-reply/inquiry-reply.html"><i class="bi bi-chat-left-text"></i> Inquiry Reply</a></li>
+      <li class="nav-item"><a class="nav-link" href="../user-management/user-management.html"><i
+            class="bi bi-people"></i> User Management</a></li>
+      <li class="nav-item"><a class="nav-link" href="../toll-rates/toll-rates.html"><i class="bi bi-cash-coin"></i> Toll
+          Rates</a></li>
+      <li class="nav-item"><a class="nav-link" href="../license-plate-entry-exit/license-plate-entry-exit.html"><i
+            class="bi bi-car-front"></i> License Plate Entry/Exit</a></li>
+      <li class="nav-item"><a class="nav-link" href="../cctv-streaming/cctv-streaming.html"><i
+            class="bi bi-camera-video"></i> CCTV Streaming</a></li>
+      <li class="nav-item"><a class="nav-link" href="../weather-data/weather-data.html"><i class="bi bi-cloud-sun"></i>
+          Weather Data</a></li>
+      <li class="nav-item"><a class="nav-link" href="../emergency-alerts/emergency-alerts.html"><i
+            class="bi bi-exclamation-triangle"></i> Emergency Alerts</a></li>
+      <li class="nav-item"><a class="nav-link" href="../congestion-alerts/congestion-alerts.html"><i
+            class="bi bi-cone"></i> Congestion Alerts</a></li>
+      <li class="nav-item"><a class="nav-link" href="../sos-emergency/sos-emergency.html"><i
+            class="bi bi-life-preserver"></i> SOS Emergency</a></li>
+      <li class="nav-item"><a class="nav-link" href="../vehicle-verifications/vehicle-verifications.html"><i
+            class="bi bi-shield-check"></i> Vehicle Verifications</a></li>
+      <li class="nav-item"><a class="nav-link" href="../inquiry-reply/inquiry-reply.html"><i
+            class="bi bi-chat-left-text"></i> Inquiry Reply</a></li>
     </ul>
   </div>
 
@@ -61,8 +74,8 @@
       <!-- Email (always read-only) -->
       <div class="form-group row">
         <label for="staticEmail" class="col-sm-2 col-form-label">Email</label>
-        <div class="col-sm-10">
-          <input type="text" readonly class="form-control-plaintext" id="staticEmail" value="email@example.com" />
+        <div class="col-sm-10" style="width: 250px;">
+          <input type="text" readonly class="form-control-plaintext" id="staticEmail" value="" />
         </div>
       </div>
       <div style="padding-bottom: 10px"></div>
@@ -70,8 +83,8 @@
       <!-- Full Name -->
       <div class="form-group row">
         <label for="inputFullName" class="col-sm-2 col-form-label">Full Name</label>
-        <div class="col-sm-10">
-          <input type="text" class="form-control" id="inputFullName" placeholder="Full Name" disabled />
+        <div class="col-sm-10" style="width: 250px;">
+          <input type="text" class="form-control" id="inputFullName" placeholder="" disabled />
         </div>
       </div>
       <div style="padding-bottom: 10px"></div>
@@ -95,7 +108,7 @@
       <!-- Branch -->
       <div class="form-group row">
         <label for="inputBranch" class="col-sm-2 col-form-label">Branch</label>
-        <div class="col-sm-10">
+        <div class="col-sm-10" style="width: 250px;">
           <select class="form-select" id="inputBranch" disabled>
             <option selected disabled>Select Branch</option>
           </select>
@@ -124,17 +137,40 @@
       const emailField = document.getElementById('staticEmail');
       const genderRadios = document.getElementsByName('gender');
 
-      const branches = ['KL North', 'Penang South', 'Johor Center', 'Ipoh Main'];
-
       let firebaseDataLoaded = false;
 
-      // Initial visibility
       toggleSaveBtn.style.display = 'none';
 
       function setInputsDisabled(disabled) {
         inputFullName.disabled = disabled;
         inputBranch.disabled = disabled;
         genderRadios.forEach(r => r.disabled = disabled);
+      }
+
+      async function loadBranchOptions(selectedBranch = '') {
+        try {
+          const { db } = await initializeFirebase();
+          const snapshot = await db.collection("tollBooth").get();
+
+          const uniqueLocations = new Set();
+          snapshot.forEach(doc => {
+            const location = doc.data().location;
+            if (location) uniqueLocations.add(location);
+          });
+
+          // Clear and populate select
+          inputBranch.innerHTML = `<option disabled ${selectedBranch ? '' : 'selected'}>Select Branch</option>`;
+          [...uniqueLocations].sort().forEach(location => {
+            const option = document.createElement("option");
+            option.value = location;
+            option.textContent = location;
+            if (location === selectedBranch) option.selected = true;
+            inputBranch.appendChild(option);
+          });
+        } catch (error) {
+          console.error("Error loading branch options:", error);
+          alert("Failed to load branch list.");
+        }
       }
 
       async function loadAdminDataOnce() {
@@ -154,16 +190,13 @@
           emailField.value = data.emailAddress || '';
           inputFullName.value = data.fullName || '';
 
-          // Gender
           if (data.gender === 'Male') {
             document.getElementById('genderMale').checked = true;
           } else if (data.gender === 'Female') {
             document.getElementById('genderFemale').checked = true;
           }
 
-          // Branch dropdown
-          inputBranch.innerHTML = branches.map(b =>
-            `<option value="${b}" ${b === data.branch ? 'selected' : ''}>${b}</option>`).join('');
+          await loadBranchOptions(data.branch);
 
           setInputsDisabled(true);
           firebaseDataLoaded = true;
@@ -175,14 +208,23 @@
 
       async function saveAdminData() {
         const selectedGender = [...genderRadios].find(r => r.checked)?.value || '';
+        const fullName = inputFullName.value.trim();
+        const branch = inputBranch.value;
+
+        // Validation for Full Name
+        if (!fullName) {
+          alert("Full Name is required.");
+          inputFullName.focus();
+          return;
+        }
 
         try {
           const { db } = await initializeFirebase();
           const docRef = db.collection('admins').doc('admin_001');
           await docRef.update({
-            fullName: inputFullName.value,
+            fullName: fullName,
             gender: selectedGender,
-            branch: inputBranch.value,
+            branch: branch,
           });
 
           alert("Profile updated.");
@@ -210,6 +252,7 @@
       await loadAdminDataOnce();
     });
   </script>
+
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
   <script>
