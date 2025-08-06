@@ -1,45 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Admin Details</title>
-  <script type="module" src="/components/master-layout.js"></script>
-  <script type="module" src="lib/firebase_init.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <meta charset="UTF-8">
+  <title>My Simple Page</title>
 </head>
 <body>
-  <master-layout>
-    <h2>Admin Info</h2>
-    <div id="adminDetails">Loadsing...</div>
-    
-<script type="module">
-  import { initializeFirebase } from './lib/firebase_init.js';
-
-  document.addEventListener('DOMContentLoaded', async () => {
-    try {
-      const { db } = await initializeFirebase();
-
-      const doc = await db.collection('admins').doc('admin_001').get();
-      const container = document.getElementById('adminDetails');
-
-      if (doc.exists) {
-        const data = doc.data();
-        container.innerHTML = `
-          <p><strong>Name:</strong> ${data.fullName}</p>
-          <p><strong>Email:</strong> ${data.emailAddress}</p>
-          <p><strong>Username:</strong> ${data.username}</p>
-          <p><strong>Role:</strong> ${data.role}</p>
-        `;
-      } else {
-        container.textContent = "Admin not found.";
-      }
-
-    } catch (error) {
-      console.error("Error initializing Firebase or fetching data:", error);
-      document.getElementById('adminDetails').textContent = "Error loading data.";
-    }
-  });
-</script>
-
-  </master-layout>
+  <h1>Hello, World!</h1>
+  <p>This is my first GitHub Page.</p>
 </body>
 </html>
