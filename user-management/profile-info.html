@@ -126,7 +126,9 @@
 
   <!-- Firebase + Logic -->
   <script type="module">
-    import { initializeFirebase } from '/lib/firebase_init.js';
+    console.log("Loading admin data...");
+
+    import { initializeFirebase } from '../lib/firebase_init.js';
 
     document.addEventListener('DOMContentLoaded', async () => {
       const toggleEditBtn = document.getElementById('toggleEditBtn');
@@ -180,6 +182,7 @@
           const { db } = await initializeFirebase();
           const docRef = db.collection('admins').doc('admin_001');
           const doc = await docRef.get();
+          console.log("Admin doc data:", doc.data());
 
           if (!doc.exists) {
             alert("Admin not found.");
