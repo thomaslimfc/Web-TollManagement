@@ -64,7 +64,7 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link active" href="../weather-data/weather-data.html">
+            <a class="nav-link" href="../weather-data/weather-data.html">
                 <i class="bi bi-cloud-sun"></i> Weather Data
             </a>
         </li>
@@ -94,23 +94,118 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="../data-management/data-management.html">
-                <i class="bi bi-table"></i> Data Management
+            <a class="nav-link active" href="../data-manager/data-manager.html">
+                <i class="bi bi-table"></i> Data Manager
             </a>
         </li>
-    </ul>
-</div>
+        </ul>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content" id="mainContent">
+            <h1>Data Manager</h1>
+            <p>Maintain some CRUDs of certain variable.</p>
+        
+            <!-- Your page content will go here -->
+            <div class="container-fluid">
+                <!-- Content rows/columns -->
+        
+                <table class="table table-bordered table-striped w-auto" id="branchTable">
+                    <thead>
+                        <tr>
+                            <th width="200px">Branch Name</th>
+                            <th width="200px">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        <script>
+            import { initializeFirebase } from '/lib/firebase_init.js';
+        
+            async function loadBranchTable() {
+                try {
+                    const { db } = await initializeFirebase();
+                    const snapshot = await db.collection("tollBooth").get();
 
-<!-- Main Content -->
-<div class="main-content" id="mainContent">
-    <h1>CCTV Streaming</h1>
-    <p>Welcome to the PLUS HIGHWAYS administration portal</p>
+                    const uniqueLocations = new Map(); // store docId with location
+                    snapshot.forEach(doc => {
+                        const location = doc.data().location;
+                        if (location) uniqueLocations.set(doc.id, location);
+                    });
 
-    <!-- Your page content will go here -->
-    <div class="container-fluid">
-        <!-- Content rows/columns -->
-    </div>
-</div>
+                    const tableBody = document.querySelector("#branchTable tbody");
+                    tableBody.innerHTML = ""; // clear table first
+
+                    uniqueLocations.forEach((location, docId) => {
+                        const row = document.createElement("tr");
+
+                        const nameCell = document.createElement("td");
+                        nameCell.textContent = location;
+
+                        const actionCell = document.createElement("td");
+                        const deleteBtn = document.createElement("button");
+                        deleteBtn.textContent = "Delete";
+                        deleteBtn.onclick = () => deleteBranch(docId);
+
+                        actionCell.appendChild(deleteBtn);
+                        row.appendChild(nameCell);
+                        row.appendChild(actionCell);
+
+                        tableBody.appendChild(row);
+                    });
+                } catch (error) {
+                    // console.error("Error loading branch list:", error);
+                    // alert("Failed to load branch list.");
+                }
+            }
+
+            async function deleteBranch(docId) {
+                if (!confirm("Are you sure you want to delete this branch?")) return;
+
+                try {
+                    const { db } = await initializeFirebase();
+                    await db.collection("tollBooth").doc(docId).delete();
+                    alert("Branch deleted successfully.");
+                    loadBranchTable(); // refresh table
+                } catch (error) {
+                    console.error("Error deleting branch:", error);
+                    alert("Failed to delete branch.");
+                }
+            }
+
+            // Call when page loads
+            loadBranchTable();
+                    
+            async function deleteBranch(locationName) {
+                if (!confirm(`Are you sure you want to delete branch "${locationName}"?`)) return;
+
+                try {
+                    const { db } = await initializeFirebase();
+                    const snapshot = await db.collection("tollBooth")
+                        .where("location", "==", locationName)
+                        .get();
+
+                    const batch = db.batch();
+                    snapshot.forEach(doc => {
+                        batch.delete(doc.ref);
+                    });
+
+                    await batch.commit();
+                    alert(`Branch "${locationName}" deleted successfully.`);
+                    loadBranchOptions(); // refresh table & dropdown
+                } catch (error) {
+                    console.error("Error deleting branch:", error);
+                    alert("Failed to delete branch.");
+                }
+            }
+
+            // Call on page load
+            loadBranchOptions();
+
+
+        </script>
 
 <!-- Bootstrap JS Bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
