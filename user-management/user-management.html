@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>PLUS — Admin Acc Reg</title>
+    <title>PLUS — Staff Acc Reg</title>
     <link rel="icon" type="image/x-icon" href="../images/plus-logo.ico">
 
     <link rel="stylesheet" href="../lib/master-layout.css">
@@ -33,7 +33,7 @@
                         id="dropdownUser" data-bs-toggle="dropdown">
                         <img src="../images/profile-icon.png" alt="Profile" width="32" height="32"
                             class="rounded-circle me-2">
-                        <span>Admin</span>
+                        <span>Staff</span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li><a class="dropdown-item" href="profile-info.html">Profile</a></li>
@@ -110,8 +110,8 @@
 
     <!-- Main Content -->
     <div class="main-content" id="mainContent">
-        <h1>Admin Account Registration</h1>
-        <p>Add a new admin account for new employee.</p>
+        <h1>Staff Account Registration</h1>
+        <p>Add a new staff account for new employee.</p>
         <br>
 
         <form>
@@ -178,7 +178,7 @@
 
             <!-- <input class="btn btn-primary" type="submit" value="Submit"> -->
             <div class="mt-3">
-                <button id="registerAdminBtn" class="btn btn-success">Register Admin</button>
+                <button id="registerStaffBtn" class="btn btn-success">Register Staff</button>
             </div>
         </form>
 
@@ -192,7 +192,7 @@
         import { initializeFirebase } from '/lib/firebase_init.js';
 
         document.addEventListener('DOMContentLoaded', async () => {
-            const registerBtn = document.getElementById('registerAdminBtn');
+            const registerBtn = document.getElementById('registerStaffBtn');
             const formInputs = [
                 'inputEmailAddress',
                 'inputFullName',
@@ -231,7 +231,7 @@
                 }
             }
 
-            async function registerAdmin() {
+            async function registerStaff() {
                 const superPasswordInput = document.getElementById("inputSuperuserPassword").value;
 
                 try {
@@ -286,24 +286,56 @@
                         return;
                     }
 
-                    // 4. Check if email already exists
-                    const existingDoc = await db.collection('admins').doc(email).get();
-                    if (existingDoc.exists) {
-                        alert("An admin with this email already exists.");
+                    // 4. Check email uniqueness
+                    const existingQuery = await db.collection('staff')
+                        .where('emailAddress', '==', email)
+                        .get();
+
+                        if (!existingQuery.empty) {
+                        alert("A staff member with this email already exists.");
                         return;
                     }
 
-                    // 5. Store admin data
-                    const adminData = {
-                        emailAddress: email,
+                    // 5. Generate Staff ID
+                    let newStaffIDString = "";
+
+                    const snapshot = await db.collection('staff').limit(1).get();
+
+                    if (snapshot.empty) {
+                        newStaffIDString = "SID00001";
+                    } else {
+                        const latestStaffIdDoc = await db.collection('staff')
+                            .orderBy('staffID', 'desc')
+                            .limit(1)
+                            .get();
+
+                        let newStaffID = 1;
+
+                        if (!latestStaffIdDoc.empty) {
+                            const latestID = latestStaffIdDoc.docs[0].data().staffID;
+                            const numericPart = parseInt(latestID.replace("SID", ""));
+                            newStaffID = numericPart + 1;
+                        }
+
+                        newStaffIDString = "SID" + newStaffID.toString().padStart(5, '0');
+                    }
+
+                    // 6. Store staff data
+                    let profilePicturePath = "default";
+
+                    const staffData = {
+                        staffID: newStaffIDString,
+                        // positionID
                         fullName,
-                        gender,
+                        emailAddress: email,
+                        passwordHash: password,
                         branch,
-                        password,
+                        gender,
+                        profilePicturePath
                     };
 
-                    await db.collection('admins').doc(email).set(adminData);
-                    alert("Admin registered successfully.");
+                    await db.collection('staff').doc(newStaffIDString).set(staffData);
+                    alert("Staff registered successfully.");
 
                     // Reset form
                     ['inputEmailAddress', 'inputFullName', 'inputPassword', 'inputSuperuserPassword'].forEach(id => {
@@ -313,14 +345,14 @@
                     document.getElementById('inputBranch').selectedIndex = 0;
 
                 } catch (error) {
-                    console.error("Error registering admin:", error);
-                    alert("Failed to register admin.");
+                    console.error("Error registering staff:", error);
+                    alert("Failed to register staff.");
                 }
             }
 
             registerBtn.addEventListener('click', async (e) => {
                 e.preventDefault();
-                await registerAdmin();
+                await registerStaff();
             });
 
             await loadBranchOptions();
