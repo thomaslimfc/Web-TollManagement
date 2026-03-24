@@ -98,29 +98,58 @@
                 <i class="bi bi-table"></i> Data Manager
             </a>
         </li>
-        </ul>
-        </div>
+    </ul>
+</div>
         
-        <!-- Main Content -->
-        <div class="main-content" id="mainContent">
-            <h1>Data Manager</h1>
-            <p>Maintain some CRUDs of certain variable.</p>
-        
-            <!-- Your page content will go here -->
-            <div class="container-fluid">
-                <!-- Content rows/columns -->
-        
-                <table class="table table-bordered table-striped w-auto" id="branchTable">
-                    <thead>
-                        <tr>
-                            <th width="200px">Branch Name</th>
-                            <th width="200px">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </div>
+<!-- Main Content -->
+<div class="main-content" id="mainContent">
+    <h1>Data Manager</h1>
+    <p>Maintain some CRUDs of certain variable.</p>
+
+    <!-- Your page content will go here -->
+    <div class="container-fluid">
+        <!-- Content rows/columns -->
+
+        <table class="table table-bordered table-striped w-auto" id="branchTable">
+            <thead>
+                <tr>
+                    <th width="200px">Branch Name</th>
+                    <th width="200px">Action</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>   
+           
+    <div class="container mt-4">
+        <h5 class="mb-3">Weather Data</h5>
+        <table class="table table-bordered table-striped w-auto">
+            <tr>
+                <th scope="row" width="200px">Temperature (&deg;C)</th>
+                <td id="outputTemperature" width="200px"></td>
+            </tr>
+            <tr>
+                <th scope=" row">Humidity</th>
+                <td id="outputHumidity"></td>
+            </tr>
+            <tr>
+                <th scope="row">Rain</th>
+                <td id="outputRain"></td>
+            </tr>
+            <tr>
+                <th scope="row">Light Intensity</th>
+                <td id="outputLightIntensityTemperature"></td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+        <br>
+
+
+        <br>
+
+
         <script>
             import { initializeFirebase } from '/lib/firebase_init.js';
         

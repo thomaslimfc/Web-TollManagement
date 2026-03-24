@@ -100,15 +100,51 @@
         </li>
     </ul>
 </div>
-
 <!-- Main Content -->
 <div class="main-content" id="mainContent">
     <h1>Toll Rates</h1>
-    <p>Welcome to the PLUS HIGHWAYS administration portal</p>
+    <p>Maintain toll rates for different vehicle types and routes.</p>
 
     <!-- Your page content will go here -->
     <div class="container-fluid">
         <!-- Content rows/columns -->
+
+        <table class="table table-bordered table-striped w-auto" id="branchTable">
+            <thead>
+                <tr>
+                    <th width="200px">Tariff ID</th>
+                    <th width="200px">Booth ID</th>
+                    <th width="200px">Vehicle Type</th>
+                    <th width="200px">Tariff Rate</th>
+                    <th width="200px">Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>   
+
+    <br><br><br><br><br>
+           
+    <div class="container mt-4">
+        <h5 class="mb-3">Weather Data</h5>
+        <table class="table table-bordered table-striped w-auto">
+            <tr>
+                <th scope="row" width="200px">Temperature (&deg;C)</th>
+                <td id="outputTemperature" width="200px"></td>
+            </tr>
+            <tr>
+                <th scope=" row">Humidity</th>
+                <td id="outputHumidity"></td>
+            </tr>
+            <tr>
+                <th scope="row">Rain</th>
+                <td id="outputRain"></td>
+            </tr>
+            <tr>
+                <th scope="row">Light Intensity</th>
+                <td id="outputLightIntensityTemperature"></td>
+            </tr>
+        </table>
     </div>
 </div>
 
