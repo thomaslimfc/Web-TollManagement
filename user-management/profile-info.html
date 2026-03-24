@@ -25,7 +25,7 @@
           <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
             id="dropdownUser" data-bs-toggle="dropdown">
             <img src="../images/profile-icon.png" alt="Profile" width="32" height="32" class="rounded-circle me-2" />
-            <span>Admin</span>
+            <span>Staff</span>
           </a>
           <ul class="dropdown-menu dropdown-menu-end">
             <li><a class="dropdown-item" href="profile-info.html">Profile</a></li>
@@ -71,9 +71,18 @@
     <p>Welcome to the PLUS HIGHWAYS administration portal</p>
 
     <form>
-      <!-- Email (always read-only) -->
+      <!-- Staff ID (always read-only) -->
       <div class="form-group row">
-        <label for="staticEmail" class="col-sm-2 col-form-label">Email</label>
+        <label for="staticStaffID" class="col-sm-2 col-form-label">Staff ID</label>
+        <div class="col-sm-10" style="width: 250px;">
+          <input type="text" readonly class="form-control-plaintext" id="staticStaffID" value="" style="font-weight: bold;"/>
+        </div>
+      </div>
+      <div style="padding-bottom: 10px"></div>
+
+      <!-- Email Address (always read-only) -->
+      <div class="form-group row">
+        <label for="staticEmail" class="col-sm-2 col-form-label">Email Address</label>
         <div class="col-sm-10" style="width: 250px;">
           <input type="text" readonly class="form-control-plaintext" id="staticEmail" value="" />
         </div>
@@ -116,17 +125,30 @@
       </div>
       <div style="padding-bottom: 10px"></div>
 
-      <!-- Buttons -->
+      <!-- Edit/Save Buttons -->
       <div class="mt-3">
         <button id="toggleEditBtn" class="btn btn-primary">Edit Profile</button>
         <button id="toggleSaveBtn" class="btn btn-success">Save Changes</button>
       </div>
+
+      <!-- Reset Password Buttons -->
+      <div class="mt-3">
+        <button id="toggleResetPasswordBtn" class="btn btn-warning">Reset Password</button>
+      </div>
     </form>
+
+    <br><br>
+
+    <p>change profile picture</p>
+    <p>reset password</p>
+    <p>otp whatsapp</p>
+
+
   </div>
 
   <!-- Firebase + Logic -->
   <script type="module">
-    console.log("Loading admin data...");
+    console.log("Loading staff data...");
 
     import { initializeFirebase } from '../lib/firebase_init.js';
 
@@ -134,10 +156,11 @@
       const toggleEditBtn = document.getElementById('toggleEditBtn');
       const toggleSaveBtn = document.getElementById('toggleSaveBtn');
 
-      const inputFullName = document.getElementById('inputFullName');
-      const inputBranch = document.getElementById('inputBranch');
+      const staffIdField = document.getElementById('staticStaffID');
       const emailField = document.getElementById('staticEmail');
+      const inputFullName = document.getElementById('inputFullName');
       const genderRadios = document.getElementsByName('gender');
+      const inputBranch = document.getElementById('inputBranch');
 
       let firebaseDataLoaded = false;
 
@@ -175,21 +198,22 @@
         }
       }
 
-      async function loadAdminDataOnce() {
+      async function loadStaffDataOnce() {
         if (firebaseDataLoaded) return;
 
         try {
           const { db } = await initializeFirebase();
-          const docRef = db.collection('admins').doc('admin_001');
+          const docRef = db.collection('staff').doc('SID00001');
           const doc = await docRef.get();
-          console.log("Admin doc data:", doc.data());
+          console.log("Staff doc data:", doc.data());
 
           if (!doc.exists) {
-            alert("Admin not found.");
+            alert("Staff not found.");
             return;
           }
 
           const data = doc.data();
+          staffIdField.value = data.staffID || '';
           emailField.value = data.emailAddress || '';
           inputFullName.value = data.fullName || '';
 
@@ -209,7 +233,7 @@
         }
       }
 
-      async function saveAdminData() {
+      async function saveStaffData() {
         const selectedGender = [...genderRadios].find(r => r.checked)?.value || '';
         const fullName = inputFullName.value.trim();
         const branch = inputBranch.value;
@@ -223,7 +247,7 @@
 
         try {
           const { db } = await initializeFirebase();
-          const docRef = db.collection('admins').doc('admin_001');
+          const docRef = db.collection('staff').doc('SID00001');
           await docRef.update({
             fullName: fullName,
             gender: selectedGender,
@@ -234,6 +258,7 @@
           setInputsDisabled(true);
           toggleEditBtn.style.display = 'inline-block';
           toggleSaveBtn.style.display = 'none';
+          toggleResetPasswordBtn.style.display = 'inline-block';
         } catch (err) {
           console.error("Failed to save:", err);
           alert("Error saving changes.");
@@ -245,14 +270,15 @@
         setInputsDisabled(false);
         toggleEditBtn.style.display = 'none';
         toggleSaveBtn.style.display = 'inline-block';
+        toggleResetPasswordBtn.style.display = 'none';
       });
 
       toggleSaveBtn.addEventListener('click', async (e) => {
         e.preventDefault();
-        await saveAdminData();
+        await saveStaffData();
       });
 
-      await loadAdminDataOnce();
+      await loadStaffDataOnce();
     });
   </script>
 
