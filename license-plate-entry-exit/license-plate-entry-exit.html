@@ -233,20 +233,18 @@
 
                         // create row
                         const row = `
-                        <tr>
-                            <td>${data.transactionID || 'N/A'}</td>
-                            <td>${commuterID || 'N/A'}</td>
-                            <td>${vehicleID || 'N/A'}</td>
-                            <td>${licensePlate}</td>
-                            <td>${carMake}</td>
-                            <td>${carModel}</td>
-                            <td>${data.entryTimestamp || 'N/A'}</td>
-                            <td>${data.exitTimestamp || 'N/A'}</td>
-                            <td>${data.amountCharged || 'N/A'}</td>
-                        </tr>
-                    `;
-
-                        // tableBody.innerHTML += row;
+                            <tr>
+                                <td>${data.transactionID || 'N/A'}</td>
+                                <td>${commuterID || 'N/A'}</td>
+                                <td>${vehicleID || 'N/A'}</td>
+                                <td>${licensePlate}</td>
+                                <td>${carMake}</td>
+                                <td>${carModel}</td>
+                                <td>${data.entryTimestamp || 'N/A'}</td>
+                                <td>${data.exitTimestamp || 'N/A'}</td>
+                                <td>${data.amountCharged || 'N/A'}</td>
+                            </tr>
+                        `;
 
                         const rows = [];
 
@@ -292,85 +290,6 @@
                     alert(error.message);
                 }
             }
-
-            // async function searchBoothID() {
-            //     // const outputLaneCount = document.getElementById('outputLaneCount');
-            //     const outputTransactionID = document.getElementById('outputTransactionID');
-            //     const outputCommuterID = document.getElementById('outputCommuterID');
-            //     const outputVehicleID = document.getElementById('outputVehicleID');
-            //     const outputLicensePlate = document.getElementById('outputLicensePlate');
-            //     const outputCarMake = document.getElementById('outputCarMake');
-            //     const outputCarModel = document.getElementById('outputCarModel');
-            //     const outputEntryTimestamp = document.getElementById('outputEntryTimestamp');
-            //     const outputExitTimestamp = document.getElementById('outputExitTimestamp');
-
-            //     try {
-            //         const { db } = await initializeFirebase();
-            //         const boothID = document.getElementById('inputBoothID').value;
-
-            //         const doc = await db.collection('tollBooth').doc(boothID).get();
-
-            //         if (!doc.exists) {
-            //             alert("Booth not found");
-            //             return;
-            //         }
-
-            //         const data = doc.data();
-            //         // outputLaneCount.textContent = data.laneCount || 'N/A';
-
-            //         // 1. Get latest transaction
-            //         const querySnapshotTollTransaction = await db.collection('tollTransaction')
-            //             .where('boothID', '==', boothID)
-            //             .orderBy('entryTimestamp', 'desc')
-            //             .limit(1)
-            //             .get();
-
-            //         // if (querySnapshotTollTransaction.empty) {
-            //         //     outputVehicleID.textContent = 'No vehicle found';
-            //         //     return;
-            //         // }
-
-            //         const dataTollTransaction = querySnapshotTollTransaction.docs[0].data();
-
-            //         const commuterID = dataTollTransaction.commuterID;
-            //         const vehicleID = dataTollTransaction.vehicleID;
-
-            //         outputTransactionID.textContent = dataTollTransaction.transactionID || 'N/A';
-            //         outputCommuterID.textContent = commuterID || 'N/A';
-            //         outputVehicleID.textContent = vehicleID || 'N/A';
-            //         outputEntryTimestamp.textContent = dataTollTransaction.entryTimestamp || 'N/A';
-            //         outputExitTimestamp.textContent = dataTollTransaction.exitTimestamp || 'N/A';
-
-            //         // 2. Get commuter
-            //         const querySnapshotCommuter = await db.collection('commuter')
-            //             .where('commuterID', '==', commuterID)
-            //             .limit(1)
-            //             .get();
-
-            //         if (!querySnapshotCommuter.empty) {
-            //             const dataCommuter = querySnapshotCommuter.docs[0].data();
-            //             // outputCommuterID.textContent = dataCommuter.commuterID || 'N/A';
-            //         }
-
-            //         // 3. Get vehicle
-            //         const querySnapshotVehicle = await db.collection('vehicle')
-            //             .where('vehicleID', '==', vehicleID)
-            //             .limit(1)
-            //             .get();
-
-            //         if (!querySnapshotVehicle.empty) {
-            //             const dataVehicle = querySnapshotVehicle.docs[0].data();
-
-            //             outputLicensePlate.textContent = dataVehicle.licensePlate || 'N/A';
-            //             outputCarMake.textContent = dataVehicle.carMake || 'N/A';
-            //             outputCarModel.textContent = dataVehicle.carModel || 'N/A';
-            //         }
-
-            //     } catch (error) {
-            //         console.error("Error loading records:", error);
-            //         alert("Failed to load license plate entry/exit records.");
-            //     }
-            // }
 
             searchBtn.addEventListener('click', async (e) => {
                 e.preventDefault();
