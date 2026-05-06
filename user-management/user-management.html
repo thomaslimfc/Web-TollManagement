@@ -178,15 +178,167 @@
 
             <!-- <input class="btn btn-primary" type="submit" value="Submit"> -->
             <div class="mt-3">
-                <button id="registerStaffBtn" class="btn btn-success">Register Staff</button>
+                <button id="registerStaffBtn" class="btn btn-primary">Register</button>
             </div>
         </form>
 
-        <!-- Your page content will go here -->
-        <div class="container-fluid">
-            <!-- Content rows/columns -->
-        </div>
+        <br>
+        <hr>
+
+        <h1>Staff Position Assignation</h1>
+        <p>Assign a new position/role for existing employees.</p>
+        <br>
+
+        <form>
+            <div class="form-group row">
+                <label for="inputStaffID" class="col-sm-2 col-form-label">Staff ID</label>
+                <div class="col-sm-10" style="width: 250px;">
+                    <input type="text" class="form-control" id="inputStaffID" placeholder="Enter Staff ID" required>
+                </div>
+            </div>
+            <div class="mt-3">
+                <button id="searchPositionBtn" class="btn btn-success">Search</button>
+            </div>
+            <div style="padding-bottom: 10px;"></div>
+            <div style="padding-bottom: 10px;"></div>
+
+            <div class="form-group row">
+                <label for="inputPosition" class="col-sm-2 col-form-label">Position</label>
+                <div class="col-sm-10" style="width: 250px;">
+                    <select class="form-select" id="inputPosition" required>
+                        <option selected disabled>Select Position</option>
+                    </select>
+                </div>
+            </div>
+            <div style="padding-bottom: 10px;"></div>
+            <div class="form-group row">
+                <label for="inputSuperUserPassword2" class="col-sm-2 col-form-label">Superuser Password</label>
+                <div class="col-sm-10" style="width: 250px;">
+                    <input type="password" class="form-control" id="inputSuperuserPassword"
+                        placeholder="Superuser Password" required>
+                </div>
+            </div>
+            <div style="padding-bottom: 10px;"></div>
+            <div class="mt-3">
+                <button id="assignPositionBtn" class="btn btn-primary">Assign</button>
+            </div>
+            <div style="padding-bottom: 10px;"></div>
+            
+            <br>
+        </form>
+        
+
+
+
+
+
+
+
+
+
+
     </div>
+
+    <script type="module">
+    import { initializeFirebase } from '/lib/firebase_init.js';
+
+    document.addEventListener('DOMContentLoaded', async () => {
+
+        const searchBtn = document.getElementById("searchPositionBtn");
+        const assignBtn = document.getElementById("assignPositionBtn");
+        const staffInput = document.getElementById("inputStaffID");
+        const positionSelect = document.getElementById("inputPosition");
+
+        let currentStaffDocID = null;
+
+        // 🔍 SEARCH STAFF + LOAD POSITIONS
+        searchBtn.addEventListener("click", async (e) => {
+            e.preventDefault();
+
+            const staffID = staffInput.value.trim();
+
+            if (!staffID) {
+                alert("Please enter Staff ID");
+                return;
+            }
+
+            try {
+                const { db } = await initializeFirebase();
+
+                // 1️⃣ Get staff
+                const staffDoc = await db.collection("staff").doc(staffID).get();
+
+                if (!staffDoc.exists) {
+                    alert("Staff not found");
+                    return;
+                }
+
+                currentStaffDocID = staffID;
+                const staffData = staffDoc.data();
+                const currentPositionID = staffData.positionID;
+
+                // 2️⃣ Load all positions
+                const positionSnapshot = await db.collection("position").get();
+
+                // Clear dropdown
+                positionSelect.innerHTML = '<option disabled>Select Position</option>';
+
+                positionSnapshot.forEach(doc => {
+                    const data = doc.data();
+
+                    const option = document.createElement("option");
+                    option.value = data.positionID;
+                    option.textContent = data.positionName;
+
+                    // 3️⃣ Auto-select current position
+                    if (data.positionID === currentPositionID) {
+                        option.selected = true;
+                    }
+
+                    positionSelect.appendChild(option);
+                });
+
+                alert("Staff found. You can now assign position.");
+
+            } catch (error) {
+                console.error(error);
+                alert("Error searching staff");
+            }
+        });
+
+        // ✅ ASSIGN POSITION
+        assignBtn.addEventListener("click", async (e) => {
+            e.preventDefault();
+
+            if (!currentStaffDocID) {
+                alert("Please search staff first");
+                return;
+            }
+
+            const selectedPositionID = positionSelect.value;
+
+            if (!selectedPositionID) {
+                alert("Please select a position");
+                return;
+            }
+
+            try {
+                const { db } = await initializeFirebase();
+
+                await db.collection("staff").doc(currentStaffDocID).update({
+                    positionID: selectedPositionID
+                });
+
+                alert("Position updated successfully");
+
+            } catch (error) {
+                console.error(error);
+                alert("Failed to assign position");
+            }
+        });
+
+    });
+    </script>
 
     <script type="module">
         import { initializeFirebase } from '/lib/firebase_init.js';
