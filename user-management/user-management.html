@@ -96,6 +96,11 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link" href="../revenue-management/revenue-management.html">
+                    <i class="bi bi-graph-up-arrow"></i> Revenue Management
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" href="../inquiry-reply/inquiry-reply.html">
                     <i class="bi bi-chat-left-text"></i> Inquiry Reply
                 </a>
@@ -223,10 +228,10 @@
                 <button id="assignPositionBtn" class="btn btn-primary">Assign</button>
             </div>
             <div style="padding-bottom: 10px;"></div>
-            
+
             <br>
         </form>
-        
+
 
 
 
@@ -240,104 +245,104 @@
     </div>
 
     <script type="module">
-    import { initializeFirebase } from '/lib/firebase_init.js';
+        import { initializeFirebase } from '/lib/firebase_init.js';
 
-    document.addEventListener('DOMContentLoaded', async () => {
+        document.addEventListener('DOMContentLoaded', async () => {
 
-        const searchBtn = document.getElementById("searchPositionBtn");
-        const assignBtn = document.getElementById("assignPositionBtn");
-        const staffInput = document.getElementById("inputStaffID");
-        const positionSelect = document.getElementById("inputPosition");
+            const searchBtn = document.getElementById("searchPositionBtn");
+            const assignBtn = document.getElementById("assignPositionBtn");
+            const staffInput = document.getElementById("inputStaffID");
+            const positionSelect = document.getElementById("inputPosition");
 
-        let currentStaffDocID = null;
+            let currentStaffDocID = null;
 
-        // 🔍 SEARCH STAFF + LOAD POSITIONS
-        searchBtn.addEventListener("click", async (e) => {
-            e.preventDefault();
+            // 🔍 SEARCH STAFF + LOAD POSITIONS
+            searchBtn.addEventListener("click", async (e) => {
+                e.preventDefault();
 
-            const staffID = staffInput.value.trim();
+                const staffID = staffInput.value.trim();
 
-            if (!staffID) {
-                alert("Please enter Staff ID");
-                return;
-            }
-
-            try {
-                const { db } = await initializeFirebase();
-
-                // 1️⃣ Get staff
-                const staffDoc = await db.collection("staff").doc(staffID).get();
-
-                if (!staffDoc.exists) {
-                    alert("Staff not found");
+                if (!staffID) {
+                    alert("Please enter Staff ID");
                     return;
                 }
 
-                currentStaffDocID = staffID;
-                const staffData = staffDoc.data();
-                const currentPositionID = staffData.positionID;
+                try {
+                    const { db } = await initializeFirebase();
 
-                // 2️⃣ Load all positions
-                const positionSnapshot = await db.collection("position").get();
+                    // 1️⃣ Get staff
+                    const staffDoc = await db.collection("staff").doc(staffID).get();
 
-                // Clear dropdown
-                positionSelect.innerHTML = '<option disabled>Select Position</option>';
-
-                positionSnapshot.forEach(doc => {
-                    const data = doc.data();
-
-                    const option = document.createElement("option");
-                    option.value = data.positionID;
-                    option.textContent = data.positionName;
-
-                    // 3️⃣ Auto-select current position
-                    if (data.positionID === currentPositionID) {
-                        option.selected = true;
+                    if (!staffDoc.exists) {
+                        alert("Staff not found");
+                        return;
                     }
 
-                    positionSelect.appendChild(option);
-                });
+                    currentStaffDocID = staffID;
+                    const staffData = staffDoc.data();
+                    const currentPositionID = staffData.positionID;
 
-                alert("Staff found. You can now assign position.");
+                    // 2️⃣ Load all positions
+                    const positionSnapshot = await db.collection("position").get();
 
-            } catch (error) {
-                console.error(error);
-                alert("Error searching staff");
-            }
+                    // Clear dropdown
+                    positionSelect.innerHTML = '<option disabled>Select Position</option>';
+
+                    positionSnapshot.forEach(doc => {
+                        const data = doc.data();
+
+                        const option = document.createElement("option");
+                        option.value = data.positionID;
+                        option.textContent = data.positionName;
+
+                        // 3️⃣ Auto-select current position
+                        if (data.positionID === currentPositionID) {
+                            option.selected = true;
+                        }
+
+                        positionSelect.appendChild(option);
+                    });
+
+                    alert("Staff found. You can now assign position.");
+
+                } catch (error) {
+                    console.error(error);
+                    alert("Error searching staff");
+                }
+            });
+
+            // ✅ ASSIGN POSITION
+            assignBtn.addEventListener("click", async (e) => {
+                e.preventDefault();
+
+                if (!currentStaffDocID) {
+                    alert("Please search staff first");
+                    return;
+                }
+
+                const selectedPositionID = positionSelect.value;
+
+                if (!selectedPositionID) {
+                    alert("Please select a position");
+                    return;
+                }
+
+                try {
+                    const { db } = await initializeFirebase();
+
+                    await db.collection("staff").doc(currentStaffDocID).update({
+                        positionID: selectedPositionID
+                    });
+
+                    alert("Position updated successfully");
+
+                } catch (error) {
+                    console.error(error);
+                    alert("Failed to assign position");
+                }
+            });
+
         });
-
-        // ✅ ASSIGN POSITION
-        assignBtn.addEventListener("click", async (e) => {
-            e.preventDefault();
-
-            if (!currentStaffDocID) {
-                alert("Please search staff first");
-                return;
-            }
-
-            const selectedPositionID = positionSelect.value;
-
-            if (!selectedPositionID) {
-                alert("Please select a position");
-                return;
-            }
-
-            try {
-                const { db } = await initializeFirebase();
-
-                await db.collection("staff").doc(currentStaffDocID).update({
-                    positionID: selectedPositionID
-                });
-
-                alert("Position updated successfully");
-
-            } catch (error) {
-                console.error(error);
-                alert("Failed to assign position");
-            }
-        });
-
-    });
     </script>
 
     <script type="module">
@@ -443,7 +448,7 @@
                         .where('emailAddress', '==', email)
                         .get();
 
-                        if (!existingQuery.empty) {
+                    if (!existingQuery.empty) {
                         alert("A staff member with this email already exists.");
                         return;
                     }

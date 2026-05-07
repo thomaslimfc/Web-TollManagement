@@ -96,6 +96,11 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link" href="../revenue-management/revenue-management.html">
+                    <i class="bi bi-graph-up-arrow"></i> Revenue Management
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" href="../inquiry-reply/inquiry-reply.html">
                     <i class="bi bi-chat-left-text"></i> Inquiry Reply
                 </a>
@@ -261,13 +266,12 @@
                                 <td>${v.carModel || 'N/A'}</td>
                                 <td>${v.manufacturingYear || 'N/A'}</td>
                                 <td>
-                                    ${
-                                        v.uploadedDocument
-                                        ? `<a href="/vehicle-verifications/VehicleOwnershipCertificate/${v.licensePlate}.pdf" target="_blank" class="btn btn-sm btn-primary">
+                                    ${v.uploadedDocument
+                                ? `<a href="/vehicle-verifications/VehicleOwnershipCertificate/${v.licensePlate}.pdf" target="_blank" class="btn btn-sm btn-primary">
                                             <i class="bi bi-file-earmark-pdf"></i> View Geran
                                            </a>`
-                                        : `<span class="text-muted">No Document</span>`
-                                    }
+                                : `<span class="text-muted">No Document</span>`
+                            }
                                 </td>
                                 <td>
                                     <button class="btn btn-warning btn-sm approveBtn" data-id="${docId}">
@@ -308,7 +312,7 @@
 
                         alert("Vehicle Approved");
                         loadPendingVehicles();
-                        
+
                         location.reload();
                     }
 
@@ -385,13 +389,12 @@
                                 <td>${v.carModel || 'N/A'}</td>
                                 <td>${v.manufacturingYear || 'N/A'}</td>
                                 <td>
-                                    ${
-                                        v.uploadedDocument
-                                        ? `<a href="/vehicle-verifications/VehicleOwnershipCertificate/${v.licensePlate}.pdf" target="_blank" class="btn btn-sm btn-danger">
+                                    ${v.uploadedDocument
+                                ? `<a href="/vehicle-verifications/VehicleOwnershipCertificate/${v.licensePlate}.pdf" target="_blank" class="btn btn-sm btn-danger">
                                             <i class="bi bi-file-earmark-pdf"></i> View Geran
                                            </a>`
-                                        : `<span class="text-muted">No Document</span>`
-                                    }
+                                : `<span class="text-muted">No Document</span>`
+                            }
                                 </td>
                             </tr>
                         `;
@@ -440,13 +443,12 @@
                                 <td>${v.carModel || 'N/A'}</td>
                                 <td>${v.manufacturingYear || 'N/A'}</td>
                                 <td>
-                                    ${
-                                        v.uploadedDocument
-                                        ? `<a href="/vehicle-verifications/VehicleOwnershipCertificate/${v.licensePlate}.pdf" target="_blank" class="btn btn-sm btn-success">
+                                    ${v.uploadedDocument
+                                ? `<a href="/vehicle-verifications/VehicleOwnershipCertificate/${v.licensePlate}.pdf" target="_blank" class="btn btn-sm btn-success">
                                             <i class="bi bi-file-earmark-pdf"></i> View Geran
                                            </a>`
-                                        : `<span class="text-muted">No Document</span>`
-                                    }
+                                : `<span class="text-muted">No Document</span>`
+                            }
                                 </td>
                             </tr>
                         `;
