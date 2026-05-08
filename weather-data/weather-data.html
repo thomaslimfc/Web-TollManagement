@@ -118,51 +118,53 @@
         <p>Check the latest dynamic speed limit based on real-time weather conditions.</p>
         <br>
 
-        <div class="form-group row">
-            <label for="inputLocation" class="col-sm-2 col-form-label">Location</label>
-            <div class="col-sm-10" style="width: 250px;">
-                <select class="form-select" id="inputLocation" required>
-                    <option selected disabled>Select Location</option>
-                </select>
+        <div class="container-fluid">
+            <div class="form-group row">
+                <label for="inputLocation" class="col-sm-2 col-form-label">Location</label>
+                <div class="col-sm-10" style="width: 250px;">
+                    <select class="form-select" id="inputLocation" required>
+                        <option selected disabled>Select Location</option>
+                    </select>
+                </div>
             </div>
-        </div>
 
-        <div class="mt-3">
-            <button id="searchBtn" class="btn btn-success">Search</button>
-        </div>
-        <br>
-        <br>
-
-        <div class="form-group row">
-            <h5 class="mb-3">Weather Data</h5>
-            <div class="container-fluid">
-                <table class="table table-bordered table-striped w-auto">
-                    <tr>
-                        <th scope="row" width="200px">Temperature (&deg;C)</th>
-                        <td id="outputTemperature" width="200px"></td>
-                    </tr>
-                    <tr>
-                        <th scope=" row">Humidity</th>
-                        <td id="outputHumidity"></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Rain</th>
-                        <td id="outputRain"></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Light Intensity</th>
-                        <td id="outputLightIntensityTemperature"></td>
-                    </tr>
-                </table>
+            <div class="mt-3">
+                <button id="searchBtn" class="btn btn-success">Search</button>
             </div>
-        </div>
-        <br>
+            <br>
+            <br>
 
-        <div class="form-group row">
-            <h5 class="mb-3">Speed Limit</h5>
-            <p>Based on the current weather conditions, the speed limit is:</p>
-            <div class="alert alert-info" role="alert" style="margin-left: 10px; width: 300px;">
-                <strong>Speed Limit: </strong><span id="outputSpeedLimit"></span>
+            <div class="form-group row">
+                <h5 class="mb-3">Weather Data</h5>
+                <div class="container-fluid">
+                    <table class="table table-bordered table-striped w-auto">
+                        <tr>
+                            <th scope="row" width="200px">Temperature (&deg;C)</th>
+                            <td id="outputTemperature" width="200px"></td>
+                        </tr>
+                        <tr>
+                            <th scope=" row">Humidity</th>
+                            <td id="outputHumidity"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Rain</th>
+                            <td id="outputRain"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Light Intensity</th>
+                            <td id="outputLightIntensityTemperature"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <br>
+
+            <div class="form-group row">
+                <h5 class="mb-3">Speed Limit</h5>
+                <p>Based on the current weather conditions, the speed limit is:</p>
+                <div class="alert alert-info" role="alert" style="margin-left: 10px; width: 300px;">
+                    <strong>Speed Limit: </strong><span id="outputSpeedLimit"></span>
+                </div>
             </div>
         </div>
 
