@@ -221,6 +221,68 @@
         });
     </script>
 
+    <script>
+
+    // =====================================
+    // EXCEL STYLE COLUMN FILTER
+    // =====================================
+
+    document.addEventListener('DOMContentLoaded', () => {
+
+        const filters =
+            document.querySelectorAll('.table-filter');
+
+        filters.forEach(filter => {
+
+            filter.addEventListener('keyup', filterTable);
+
+        });
+
+        function filterTable() {
+
+            const rows =
+                document.querySelectorAll(
+                    '#pendingTableBody tr'
+                );
+
+            rows.forEach(row => {
+
+                let showRow = true;
+
+                filters.forEach(filter => {
+
+                    const columnIndex =
+                        filter.dataset.column;
+
+                    const filterValue =
+                        filter.value
+                            .toLowerCase()
+                            .trim();
+
+                    const cellText =
+                        row.cells[columnIndex]
+                            ?.innerText
+                            .toLowerCase() || "";
+
+                    if (
+                        filterValue !== "" &&
+                        !cellText.includes(filterValue)
+                    ) {
+                        showRow = false;
+                    }
+
+                });
+
+                row.style.display =
+                    showRow ? "" : "none";
+
+            });
+        }
+
+    });
+
+</script>
+
     <script type="module">
         import { initializeFirebase } from '/lib/firebase_init.js';
 
@@ -231,69 +293,102 @@
             // =========================
             // LOAD PENDING VEHICLES
             // =========================
-            async function loadPendingVehicles() {
+async function loadPendingVehicles() {
+
+    try {
+
+        const { db } = await initializeFirebase();
+
+        tableBody.innerHTML = "";
+
+        const snapshot = await db.collection('vehicle')
+            .where('verificationStatus', '==', 'Pending')
+            .get();
+
+        if (snapshot.empty) {
+            tableBody.innerHTML =
+                `<tr><td colspan="11">No pending record(s) found</td></tr>`;
+            return;
+        }
+
+        // run all commuter fetches together
+        const rowsArray = await Promise.all(
+
+            snapshot.docs.map(async (doc) => {
+
+                const v = doc.data();
+                const docId = doc.id;
+
+                let icNo = 'N/A';
+                let commuterName = 'N/A';
+
                 try {
-                    const { db } = await initializeFirebase();
 
-                    // clear table first (prevent duplicates)
-                    tableBody.innerHTML = "";
-
-                    // 🔥 only get Pending
-                    const snapshot = await db.collection('vehicle')
-                        .where('verificationStatus', '==', 'Pending')
+                    const commuterDoc = await db.collection('commuter')
+                        .doc(v.commuterID)
                         .get();
 
-                    if (snapshot.empty) {
-                        tableBody.innerHTML = `<tr><td colspan="11">No pending record(s) found</td></tr>`;
-                        return;
+                    if (commuterDoc.exists) {
+
+                        const commuterData = commuterDoc.data();
+
+                        icNo = commuterData.icNo || 'N/A';
+                        commuterName = commuterData.fullName || 'N/A';
                     }
 
-                    let rows = "";
-
-                    snapshot.forEach(doc => {
-                        const v = doc.data();
-                        const docId = doc.id;
-
-                        rows += `
-                            <tr>
-                                <td>${v.commuterID || 'N/A'}</td>
-                                <td>${v.vehicleID || 'N/A'}</td>
-                                <td>${v.vehicleType || 'N/A'}</td>
-                                <td>${v.licensePlate || 'N/A'}</td>
-                                <td>${v.icNo || 'N/A'}</td>
-                                <td>${v.commuterName || 'N/A'}</td>
-                                <td>${v.carMake || 'N/A'}</td>
-                                <td>${v.carModel || 'N/A'}</td>
-                                <td>${v.manufacturingYear || 'N/A'}</td>
-                                <td>
-                                    <a href="/vehicle-verifications/VehicleOwnershipCertificate/${v.licensePlate}.pdf"
-                                       target="_blank"
-                                       class="btn btn-sm btn-primary">
-                                
-                                       <i class="bi bi-file-earmark-pdf"></i>
-                                       View Geran
-                                    </a>
-                                </td>
-                                <td>
-                                    <button class="btn btn-warning btn-sm approveBtn" data-id="${docId}">
-                                        ✔
-                                    </button>
-                                    <button class="btn btn-warning btn-sm rejectBtn" data-id="${docId}">
-                                        ✖
-                                    </button>
-                                </td>
-                            </tr>
-                        `;
-                    });
-
-                    // render once (no duplication)
-                    tableBody.innerHTML = rows;
-
-                } catch (error) {
-                    console.error("Error loading vehicles:", error);
-                    alert(error.message);
+                } catch (err) {
+                    console.error("Commuter fetch error:", err);
                 }
-            }
+
+                return `
+                    <tr>
+                        <td>${v.commuterID || 'N/A'}</td>
+                        <td>${v.vehicleID || 'N/A'}</td>
+                        <td>${v.vehicleType || 'N/A'}</td>
+                        <td>${v.licensePlate || 'N/A'}</td>
+                        <td>${icNo}</td>
+                        <td>${commuterName}</td>
+                        <td>${v.carMake || 'N/A'}</td>
+                        <td>${v.carModel || 'N/A'}</td>
+                        <td>${v.manufacturingYear || 'N/A'}</td>
+
+                        <td>
+                            <a href="/vehicle-verifications/VehicleOwnershipCertificate/${v.licensePlate}.pdf"
+                               target="_blank"
+                               class="btn btn-sm btn-primary">
+
+                               <i class="bi bi-file-earmark-pdf"></i>
+                               View Geran
+                            </a>
+                        </td>
+
+                        <td>
+                            <button class="btn btn-warning btn-sm approveBtn"
+                                    data-id="${docId}">
+                                ✔
+                            </button>
+
+                            <button class="btn btn-warning btn-sm rejectBtn"
+                                    data-id="${docId}">
+                                ✖
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            })
+        );
+
+        // join all rows once
+        tableBody.innerHTML = rowsArray.join("");
+
+    } catch (error) {
+
+        console.error("Error loading vehicles:", error);
+
+        tableBody.innerHTML =
+            `<tr><td colspan="11">Error loading data</td></tr>`;
+    }
+}
 
             // =========================
             // APPROVE / REJECT HANDLER
