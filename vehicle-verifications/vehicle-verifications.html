@@ -195,7 +195,7 @@
                     </thead>
                     <tbody id="verifiedTableBody"></tbody>
                 </table>
-            </div>            
+            </div>
         </div>
     </div>
 
@@ -266,12 +266,13 @@
                                 <td>${v.carModel || 'N/A'}</td>
                                 <td>${v.manufacturingYear || 'N/A'}</td>
                                 <td>
-                                    ${v.uploadedDocument
-                                ? `<a href="/vehicle-verifications/VehicleOwnershipCertificate/${v.licensePlate}.pdf" target="_blank" class="btn btn-sm btn-primary">
-                                            <i class="bi bi-file-earmark-pdf"></i> View Geran
-                                           </a>`
-                                : `<span class="text-muted">No Document</span>`
-                            }
+                                    <a href="/vehicle-verifications/VehicleOwnershipCertificate/${v.licensePlate}.pdf"
+                                       target="_blank"
+                                       class="btn btn-sm btn-primary">
+                                
+                                       <i class="bi bi-file-earmark-pdf"></i>
+                                       View Geran
+                                    </a>
                                 </td>
                                 <td>
                                     <button class="btn btn-warning btn-sm approveBtn" data-id="${docId}">
@@ -389,12 +390,13 @@
                                 <td>${v.carModel || 'N/A'}</td>
                                 <td>${v.manufacturingYear || 'N/A'}</td>
                                 <td>
-                                    ${v.uploadedDocument
-                                ? `<a href="/vehicle-verifications/VehicleOwnershipCertificate/${v.licensePlate}.pdf" target="_blank" class="btn btn-sm btn-danger">
-                                            <i class="bi bi-file-earmark-pdf"></i> View Geran
-                                           </a>`
-                                : `<span class="text-muted">No Document</span>`
-                            }
+                                    <a href="/vehicle-verifications/VehicleOwnershipCertificate/${v.licensePlate}.pdf"
+                                       target="_blank"
+                                       class="btn btn-sm btn-danger">
+                                
+                                       <i class="bi bi-file-earmark-pdf"></i>
+                                       View Geran
+                                    </a>
                                 </td>
                             </tr>
                         `;
@@ -443,12 +445,13 @@
                                 <td>${v.carModel || 'N/A'}</td>
                                 <td>${v.manufacturingYear || 'N/A'}</td>
                                 <td>
-                                    ${v.uploadedDocument
-                                ? `<a href="/vehicle-verifications/VehicleOwnershipCertificate/${v.licensePlate}.pdf" target="_blank" class="btn btn-sm btn-success">
-                                            <i class="bi bi-file-earmark-pdf"></i> View Geran
-                                           </a>`
-                                : `<span class="text-muted">No Document</span>`
-                            }
+                                    <a href="/vehicle-verifications/VehicleOwnershipCertificate/${v.licensePlate}.pdf"
+                                       target="_blank"
+                                       class="btn btn-sm btn-success">
+                                
+                                       <i class="bi bi-file-earmark-pdf"></i>
+                                       View Geran
+                                    </a>
                                 </td>
                             </tr>
                         `;
