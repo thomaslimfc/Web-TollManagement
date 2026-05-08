@@ -223,65 +223,65 @@
 
     <script>
 
-    // =====================================
-    // EXCEL STYLE COLUMN FILTER
-    // =====================================
+        // =====================================
+        // EXCEL STYLE COLUMN FILTER
+        // =====================================
 
-    document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', () => {
 
-        const filters =
-            document.querySelectorAll('.table-filter');
+            const filters =
+                document.querySelectorAll('.table-filter');
 
-        filters.forEach(filter => {
+            filters.forEach(filter => {
 
-            filter.addEventListener('keyup', filterTable);
+                filter.addEventListener('keyup', filterTable);
+
+            });
+
+            function filterTable() {
+
+                const rows =
+                    document.querySelectorAll(
+                        '#pendingTableBody tr'
+                    );
+
+                rows.forEach(row => {
+
+                    let showRow = true;
+
+                    filters.forEach(filter => {
+
+                        const columnIndex =
+                            filter.dataset.column;
+
+                        const filterValue =
+                            filter.value
+                                .toLowerCase()
+                                .trim();
+
+                        const cellText =
+                            row.cells[columnIndex]
+                                ?.innerText
+                                .toLowerCase() || "";
+
+                        if (
+                            filterValue !== "" &&
+                            !cellText.includes(filterValue)
+                        ) {
+                            showRow = false;
+                        }
+
+                    });
+
+                    row.style.display =
+                        showRow ? "" : "none";
+
+                });
+            }
 
         });
 
-        function filterTable() {
-
-            const rows =
-                document.querySelectorAll(
-                    '#pendingTableBody tr'
-                );
-
-            rows.forEach(row => {
-
-                let showRow = true;
-
-                filters.forEach(filter => {
-
-                    const columnIndex =
-                        filter.dataset.column;
-
-                    const filterValue =
-                        filter.value
-                            .toLowerCase()
-                            .trim();
-
-                    const cellText =
-                        row.cells[columnIndex]
-                            ?.innerText
-                            .toLowerCase() || "";
-
-                    if (
-                        filterValue !== "" &&
-                        !cellText.includes(filterValue)
-                    ) {
-                        showRow = false;
-                    }
-
-                });
-
-                row.style.display =
-                    showRow ? "" : "none";
-
-            });
-        }
-
-    });
-
-</script>
+    </script>
 
     <script type="module">
         import { initializeFirebase } from '/lib/firebase_init.js';
@@ -293,54 +293,54 @@
             // =========================
             // LOAD PENDING VEHICLES
             // =========================
-async function loadPendingVehicles() {
-
-    try {
-
-        const { db } = await initializeFirebase();
-
-        tableBody.innerHTML = "";
-
-        const snapshot = await db.collection('vehicle')
-            .where('verificationStatus', '==', 'Pending')
-            .get();
-
-        if (snapshot.empty) {
-            tableBody.innerHTML =
-                `<tr><td colspan="11">No pending record(s) found</td></tr>`;
-            return;
-        }
-
-        // run all commuter fetches together
-        const rowsArray = await Promise.all(
-
-            snapshot.docs.map(async (doc) => {
-
-                const v = doc.data();
-                const docId = doc.id;
-
-                let icNo = 'N/A';
-                let commuterName = 'N/A';
+            async function loadPendingVehicles() {
 
                 try {
 
-                    const commuterDoc = await db.collection('commuter')
-                        .doc(v.commuterID)
+                    const { db } = await initializeFirebase();
+
+                    tableBody.innerHTML = "";
+
+                    const snapshot = await db.collection('vehicle')
+                        .where('verificationStatus', '==', 'Pending')
                         .get();
 
-                    if (commuterDoc.exists) {
-
-                        const commuterData = commuterDoc.data();
-
-                        icNo = commuterData.icNo || 'N/A';
-                        commuterName = commuterData.fullName || 'N/A';
+                    if (snapshot.empty) {
+                        tableBody.innerHTML =
+                            `<tr><td colspan="11">No pending record(s) found</td></tr>`;
+                        return;
                     }
 
-                } catch (err) {
-                    console.error("Commuter fetch error:", err);
-                }
+                    // run all commuter fetches together
+                    const rowsArray = await Promise.all(
 
-                return `
+                        snapshot.docs.map(async (doc) => {
+
+                            const v = doc.data();
+                            const docId = doc.id;
+
+                            let icNo = 'N/A';
+                            let commuterName = 'N/A';
+
+                            try {
+
+                                const commuterDoc = await db.collection('commuter')
+                                    .doc(v.commuterID)
+                                    .get();
+
+                                if (commuterDoc.exists) {
+
+                                    const commuterData = commuterDoc.data();
+
+                                    icNo = commuterData.icNo || 'N/A';
+                                    commuterName = commuterData.fullName || 'N/A';
+                                }
+
+                            } catch (err) {
+                                console.error("Commuter fetch error:", err);
+                            }
+
+                            return `
                     <tr>
                         <td>${v.commuterID || 'N/A'}</td>
                         <td>${v.vehicleID || 'N/A'}</td>
@@ -375,20 +375,20 @@ async function loadPendingVehicles() {
                         </td>
                     </tr>
                 `;
-            })
-        );
+                        })
+                    );
 
-        // join all rows once
-        tableBody.innerHTML = rowsArray.join("");
+                    // join all rows once
+                    tableBody.innerHTML = rowsArray.join("");
 
-    } catch (error) {
+                } catch (error) {
 
-        console.error("Error loading vehicles:", error);
+                    console.error("Error loading vehicles:", error);
 
-        tableBody.innerHTML =
-            `<tr><td colspan="11">Error loading data</td></tr>`;
-    }
-}
+                    tableBody.innerHTML =
+                        `<tr><td colspan="11">Error loading data</td></tr>`;
+                }
+            }
 
             // =========================
             // APPROVE / REJECT HANDLER
