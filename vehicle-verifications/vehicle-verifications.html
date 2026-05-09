@@ -115,6 +115,13 @@
 
     <!-- Main Content -->
     <div class="main-content" id="mainContent">
+
+
+
+        /* ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡
+        . .PENDING APPLICATION REVIEW (Section 1)
+        ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡ */
+
         <h1>Pending Application Review ⏳</h1>
         <p>Review submitted documentation to approve or reject new vehicle registration requests.</p>
 
@@ -144,6 +151,12 @@
         <br>
         <hr>
 
+
+
+        /* ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡
+    . . . . . . REJECTED APPLICATIONS ARCHIVE (Section 2)
+        ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡ */
+
         <h1>Rejected Applications Archive ❌</h1>
         <p>Manage a list of declined registrations and view specific reasons for rejection, such as incomplete or
             invalid information.</p>
@@ -172,6 +185,12 @@
 
         <br>
         <hr>
+
+
+
+        /* ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡
+    . . . . . . VERIFIED VEHICLE DIRECTORY (Section 3)
+        ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡ */
 
         <h1>Verified Vehicle Directory ✅</h1>
         <p>Access the comprehensive database of successfully authenticated vehicles and authorized drivers.</p>
@@ -221,67 +240,11 @@
         });
     </script>
 
-    <script>
 
-        // =====================================
-        // EXCEL STYLE COLUMN FILTER
-        // =====================================
 
-        document.addEventListener('DOMContentLoaded', () => {
-
-            const filters =
-                document.querySelectorAll('.table-filter');
-
-            filters.forEach(filter => {
-
-                filter.addEventListener('keyup', filterTable);
-
-            });
-
-            function filterTable() {
-
-                const rows =
-                    document.querySelectorAll(
-                        '#pendingTableBody tr'
-                    );
-
-                rows.forEach(row => {
-
-                    let showRow = true;
-
-                    filters.forEach(filter => {
-
-                        const columnIndex =
-                            filter.dataset.column;
-
-                        const filterValue =
-                            filter.value
-                                .toLowerCase()
-                                .trim();
-
-                        const cellText =
-                            row.cells[columnIndex]
-                                ?.innerText
-                                .toLowerCase() || "";
-
-                        if (
-                            filterValue !== "" &&
-                            !cellText.includes(filterValue)
-                        ) {
-                            showRow = false;
-                        }
-
-                    });
-
-                    row.style.display =
-                        showRow ? "" : "none";
-
-                });
-            }
-
-        });
-
-    </script>
+    /* ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡
+    . . . . . . JAVASCRIPT - PENDING APPLICATION REVIEW (Section 1)
+    ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡ */
 
     <script type="module">
         import { initializeFirebase } from '/lib/firebase_init.js';
@@ -290,9 +253,7 @@
 
             const tableBody = document.getElementById('pendingTableBody');
 
-            // =========================
-            // LOAD PENDING VEHICLES
-            // =========================
+            // ══════〔 LOAD PENDING VEHICLES 〕══════
             async function loadPendingVehicles() {
 
                 try {
@@ -390,14 +351,12 @@
                 }
             }
 
-            // =========================
-            // APPROVE / REJECT HANDLER
-            // =========================
+            // ══════〔 APPROVE / REJECT HANDLER 〕══════
             document.addEventListener('click', async (e) => {
                 try {
                     const { db } = await initializeFirebase();
 
-                    // ✅ APPROVE
+                    // ══════〔 ✅ APPROVE 〕══════
                     if (e.target.classList.contains('approveBtn')) {
                         const id = e.target.dataset.id;
 
@@ -412,7 +371,7 @@
                         location.reload();
                     }
 
-                    // ❌ REJECT
+                    // ══════〔 ❌ REJECT 〕══════
                     if (e.target.classList.contains('rejectBtn')) {
                         const id = e.target.dataset.id;
 
@@ -433,13 +392,16 @@
                 }
             });
 
-            // =========================
-            // AUTO LOAD ON PAGE OPEN
-            // =========================
+            // ══════〔 AUTO LOAD ON PAGE OPEN 〕══════
             await loadPendingVehicles();
-
         });
     </script>
+
+
+
+    /* ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡
+    . . . . . . JAVASCRIPT - REJECTED APPLICATION ARCHIVE (Section 2) & VERIFIED VEHICLE DIRECTORY (Section 3)
+    ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡ */
 
     <!-- Display records only for Rejected and Verified -->
     <script type="module">
@@ -450,9 +412,7 @@
             const rejectedTable = document.getElementById('rejectedTableBody');
             const verifiedTable = document.getElementById('verifiedTableBody');
 
-            // =========================
-            // LOAD REJECTED
-            // =========================
+            // ══════〔 LOAD REJECTED RECORDS 〕══════
             async function loadRejected() {
                 try {
                     const { db } = await initializeFirebase();
@@ -505,9 +465,7 @@
                 }
             }
 
-            // =========================
-            // LOAD VERIFIED
-            // =========================
+            // ══════〔 LOAD VERIFIED RECORDS 〕══════
             async function loadVerified() {
                 try {
                     const { db } = await initializeFirebase();
@@ -560,12 +518,9 @@
                 }
             }
 
-            // =========================
-            // INITIAL LOAD
-            // =========================
+            // ══════〔 INITIAL LOAD 〕══════
             await loadRejected();
             await loadVerified();
-
         });
     </script>
 </body>
