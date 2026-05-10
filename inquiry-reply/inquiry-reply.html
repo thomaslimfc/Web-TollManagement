@@ -114,7 +114,14 @@
 
     <!-- Main Content -->
     <div class="main-content" id="mainContent">
-        <h1>Inquiry Reply</h1>
+
+
+
+        <!-- ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡
+        . . . . . . PENDING INQUIRY REPLY (Section 1)
+        ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡ -->
+
+        <h1>Pending Inquiry Reply</h1>
         <p>Review commuter inquiries and manage responses to improve user experience and service quality.</p>
 
         <div class="container-fluid">
@@ -140,12 +147,13 @@
 
 
 
-        <!-- ⚡════════════════════════════════════════════════════════════⚡
-        . . . . . . REPLIED INQUIRY DIRECTORY
-        ⚡════════════════════════════════════════════════════════════⚡ -->
+        <!-- ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡
+        . . . . . . REPLIED INQUIRY DIRECTORY (Section 2)
+        ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡ -->
 
         <h1>Replied Inquiry Directory</h1>
-        <p>Review commuter inquiries and manage responses to improve user experience and service quality.</p>
+        <p>Refer back a centralized repository of resolved commuter queries to track response consistency and provide a
+            historical reference for service improvements.</p>
 
         <div class="container-fluid">
             <table class="table table-bordered table-striped w-auto">
@@ -158,22 +166,40 @@
                         <th scope="row" width="150px">License Plate</th>
                         <th scope="row" width="150px">Commuter Name</th>
                         <th scope="row" width="150px">Description</th>
+                        <th scope="row" width="150px">Response</th>
                     </tr>
                 </thead>
-                <tbody id="pendingTableBody"></tbody>
+                <tbody id="repliedTableBody"></tbody>
             </table>
         </div>
-        <!-- Your page content will go here -->
-        <div class="container-fluid">
-            <!-- Content rows/columns -->
-
-        </div>
-
     </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Toggle sidebar on mobile
+        document.querySelector('.sidebar-toggler').addEventListener('click', function () {
+            document.getElementById('sidebar').classList.toggle('show');
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function (event) {
+            const sidebar = document.getElementById('sidebar');
+            const toggler = document.querySelector('.sidebar-toggler');
+
+            if (window.innerWidth < 992 &&
+                !sidebar.contains(event.target) &&
+                !toggler.contains(event.target)) {
+                sidebar.classList.remove('show');
+            }
+        });
+    </script>
+
 
 
     <!-- ⚡════════════════════════════════════════════════════════════⚡
-    . . . . . . REPLY MODAL of INQUIRY REPLY
+    . . . . . . REPLY MODAL of PENDING INQUIRY REPLY (Section 1)
     ⚡════════════════════════════════════════════════════════════⚡ -->
 
     <div class="modal fade" id="replyModal" tabindex="-1" aria-hidden="true" style="margin-top: 10%;">
@@ -214,71 +240,7 @@
 
 
     <!-- ⚡════════════════════════════════════════════════════════════⚡
-    . . . . . . REPLY MODAL of REPLIED INQUIRY DIRECTORY
-    ⚡════════════════════════════════════════════════════════════⚡ -->
-
-    <div class="modal fade" id="replyModal" tabindex="-1" aria-hidden="true" style="margin-top: ;">
-        <div class="modal-dialog">
-            <div class="modal-content">
-
-                <div class="modal-header">
-                    <h5 class="modal-title">Reply to Inquiry</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-
-                <div class="modal-body">
-
-                    <input type="hidden" id="selectedInquiryId">
-
-                    <div class="mb-3">
-                        <label class="form-label">Reply Description</label>
-                        <textarea class="form-control" id="replyText" rows="4"
-                            placeholder="Enter your reply..."></textarea>
-                    </div>
-
-                </div>
-
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" data-bs-dismiss="modal">
-                        Cancel
-                    </button>
-
-                    <button class="btn btn-primary" id="submitReplyBtn">
-                        Submit
-                    </button>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
-
-    <!-- Bootstrap JS Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-        // Toggle sidebar on mobile
-        document.querySelector('.sidebar-toggler').addEventListener('click', function () {
-            document.getElementById('sidebar').classList.toggle('show');
-        });
-
-        // Close sidebar when clicking outside on mobile
-        document.addEventListener('click', function (event) {
-            const sidebar = document.getElementById('sidebar');
-            const toggler = document.querySelector('.sidebar-toggler');
-
-            if (window.innerWidth < 992 &&
-                !sidebar.contains(event.target) &&
-                !toggler.contains(event.target)) {
-                sidebar.classList.remove('show');
-            }
-        });
-    </script>
-
-
-
-    <!-- ⚡════════════════════════════════════════════════════════════⚡
-    . . . . . . REPLY MODAL of REPLIED INQUIRY DIRECTORY
+    . . . . . . JAVASCRIPT - PENDING INQUIRY REPLY (Section 1)
     ⚡════════════════════════════════════════════════════════════⚡ -->
 
     <script type="module">
@@ -288,7 +250,7 @@
 
             const tableBody = document.getElementById('pendingTableBody');
 
-            // ══════〔 LOAD INQUIRIES 〕══════
+            // ══════〔 LOAD PENDING INQUIRIES 〕══════
             async function loadPendingInquiry() {
 
                 try {
@@ -297,16 +259,18 @@
 
                     tableBody.innerHTML = "";
 
-                    // ══════〔 GET ALL INQUIRIES 〕══════
-                    const inquirySnapshot = await db.collection('inquiryReply').get();
+                    // ══════〔 GET ALL PENDING INQUIRIES 〕══════
+                    const inquirySnapshot = await db.collection('inquiryReply')
+                        .where('status', '==', 'Pending')
+                        .get();
 
                     if (inquirySnapshot.empty) {
 
                         tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="8">No inquiry record(s) found</td>
-                    </tr>
-                `;
+                            <tr>
+                                <td colspan="8">No inquiry record(s) found</td>
+                            </tr>
+                        `;
                         return;
                     }
 
@@ -319,7 +283,7 @@
                             const inquiry = doc.data();
 
                             const commuterID = inquiry.commuterID || 'N/A';
-                            const description = inquiry.description || 'N/A';
+                            const description = inquiry.inquiryDesc || 'N/A';
                             const inquiryID = doc.id || 'N/A';
 
                             let commuterName = 'N/A';
@@ -379,7 +343,7 @@
                             <td>${vehicleType}</td>
                             <td>${licensePlate}</td>
                             <td>${commuterName}</td>
-                            <td>${inquiry.reply}</td>
+                            <td>${inquiry.inquiryDesc}</td>
                             <td>
                                 <button class="btn btn-primary btn-sm replyBtn"
                                     data-id="${doc.id}">
@@ -416,8 +380,9 @@
 
 
     <!-- ⚡════════════════════════════════════════════════════════════⚡
-    . . . . . . JAVASCRIPT - REPLIED INQUIRY DIRECTORY
+    . . . . . . JAVASCRIPT - REPLY MODAL FOR PENDING INQUIRY REPLY (Section 1)
     ⚡════════════════════════════════════════════════════════════⚡ -->
+
     <script type="module">
         import { initializeFirebase } from '/lib/firebase_init.js';
         let selectedInquiryId = null;
@@ -466,8 +431,143 @@
             } catch (error) {
                 console.error(error);
             }
+            await loadPendingInquiry();
         });
     </script>
+
+
+
+    <!-- ⚡════════════════════════════════════════════════════════════⚡
+    . . . . . . JAVASCRIPT - REPLIED INQUIRY DIRECTORY (Section 2)
+    ⚡════════════════════════════════════════════════════════════⚡ -->
+
+    <script type="module">
+        import { initializeFirebase } from '/lib/firebase_init.js';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+
+            const tableBody = document.getElementById('repliedTableBody');
+
+            // ══════〔 LOAD REPLIED INQUIRIES 〕══════
+            async function loadRepliedInquiry() {
+
+                try {
+
+                    const { db } = await initializeFirebase();
+
+                    tableBody.innerHTML = "";
+
+                    // ══════〔 GET ALL REPLIED INQUIRIES 〕══════
+                    const inquirySnapshot = await db.collection('inquiryReply')
+                        .where('status', '==', 'Replied')
+                        .get();
+
+                    if (inquirySnapshot.empty) {
+
+                        tableBody.innerHTML = `
+                            <tr>
+                                <td colspan="7">No inquiry record(s) found</td>
+                            </tr>
+                        `;
+                        return;
+                    }
+
+                    // ══════〔 BUILD ROWS〕══════
+
+                    const rows = await Promise.all(
+
+                        inquirySnapshot.docs.map(async (doc) => {
+
+                            const inquiry = doc.data();
+
+                            const commuterID = inquiry.commuterID || 'N/A';
+                            const description = inquiry.inquiryDesc || 'N/A';
+                            const inquiryID = doc.id || 'N/A';
+
+                            let commuterName = 'N/A';
+                            let vehicleID = 'N/A';
+                            let vehicleType = 'N/A';
+                            let licensePlate = 'N/A';
+
+                            // =========================
+                            // COMMUTER DATA
+                            // =========================
+                            try {
+
+                                const commuterDoc = await db.collection('commuter')
+                                    .doc(commuterID)
+                                    .get();
+
+                                if (commuterDoc.exists) {
+
+                                    const data = commuterDoc.data();
+
+                                    icNo = data.icNo || 'N/A';
+                                    commuterName = data.fullName || 'N/A';
+                                }
+
+                            } catch (err) {
+                                console.error("Commuter fetch error:", err);
+                            }
+
+                            // ══════〔 VEHICLE DATA 〕══════
+                            try {
+
+                                const vehicleSnapshot = await db.collection('vehicle')
+                                    .where('commuterID', '==', commuterID)
+                                    .limit(1)
+                                    .get();
+
+                                if (!vehicleSnapshot.empty) {
+
+                                    const v = vehicleSnapshot.docs[0].data();
+
+                                    vehicleID = v.vehicleID || 'N/A';
+                                    vehicleType = v.vehicleType || 'N/A';
+                                    licensePlate = v.licensePlate || 'N/A';
+                                }
+
+                            } catch (err) {
+                                console.error("Vehicle fetch error:", err);
+                            }
+
+
+                            // ══════〔 TABLE ROW 〕══════
+                            return `
+                                <tr>
+                                    <td>${inquiryID}</td>
+                                    <td>${commuterID}</td>
+                                    <td>${vehicleID}</td>
+                                    <td>${vehicleType}</td>
+                                    <td>${licensePlate}</td>
+                                    <td>${commuterName}</td>
+                                    <td>${inquiry.inquiryDesc}</td>
+                                    <td>${inquiry.responseDesc}</td>
+                                </tr>
+                            `;
+                        })
+                    );
+
+                    tableBody.innerHTML = rows.join("");
+
+                } catch (error) {
+
+                    console.error("Error loading inquiries:", error);
+
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="7">Error loading data</td>
+                        </tr>
+                    `;
+                }
+            }
+
+            await loadRepliedInquiry();
+        });
+
+    </script>
+
+
 </body>
 
 </html>
