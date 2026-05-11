@@ -115,11 +115,9 @@
     <!-- Main Content -->
     <div class="main-content" id="mainContent">
 
-
-
         <!-- ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡
         . . . . . . PENDING INQUIRY REPLY (Section 1)
-        ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡ -->
+        . . .⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡ -->
 
         <h1>Pending Inquiry Reply</h1>
         <p>Review commuter inquiries and manage responses to improve user experience and service quality.</p>
@@ -149,7 +147,7 @@
 
         <!-- ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡
         . . . . . . REPLIED INQUIRY DIRECTORY (Section 2)
-        ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡ -->
+        . . .⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡ -->
 
         <h1>Replied Inquiry Directory</h1>
         <p>Refer back a centralized repository of resolved commuter queries to track response consistency and provide a
@@ -174,33 +172,11 @@
         </div>
     </div>
 
-    <!-- Bootstrap JS Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-        // Toggle sidebar on mobile
-        document.querySelector('.sidebar-toggler').addEventListener('click', function () {
-            document.getElementById('sidebar').classList.toggle('show');
-        });
-
-        // Close sidebar when clicking outside on mobile
-        document.addEventListener('click', function (event) {
-            const sidebar = document.getElementById('sidebar');
-            const toggler = document.querySelector('.sidebar-toggler');
-
-            if (window.innerWidth < 992 &&
-                !sidebar.contains(event.target) &&
-                !toggler.contains(event.target)) {
-                sidebar.classList.remove('show');
-            }
-        });
-    </script>
 
 
-
-    <!-- ⚡════════════════════════════════════════════════════════════⚡
+    <!-- ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡
     . . . . . . REPLY MODAL of PENDING INQUIRY REPLY (Section 1)
-    ⚡════════════════════════════════════════════════════════════⚡ -->
+    . . .⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡ -->
 
     <div class="modal fade" id="replyModal" tabindex="-1" aria-hidden="true" style="margin-top: 10%;">
         <div class="modal-dialog">
@@ -239,9 +215,9 @@
 
 
 
-    <!-- ⚡════════════════════════════════════════════════════════════⚡
+    <!-- ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡
     . . . . . . JAVASCRIPT - PENDING INQUIRY REPLY (Section 1)
-    ⚡════════════════════════════════════════════════════════════⚡ -->
+    . . .⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡ -->
 
     <script type="module">
         import { initializeFirebase } from '/lib/firebase_init.js';
@@ -274,7 +250,7 @@
                         return;
                     }
 
-                    // ══════〔 BUILD ROWS〕══════
+                    // ══════〔 BUILD ROWS 〕══════
 
                     const rows = await Promise.all(
 
@@ -291,9 +267,7 @@
                             let vehicleType = 'N/A';
                             let licensePlate = 'N/A';
 
-                            // =========================
-                            // COMMUTER DATA
-                            // =========================
+                            // ══════〔 COMMUTER DATA 〕══════
                             try {
 
                                 const commuterDoc = await db.collection('commuter')
@@ -369,19 +343,15 @@
                 }
             }
 
-            // =========================
-            // AUTO LOAD
-            // =========================
             await loadPendingInquiry();
-
         });
     </script>
 
 
 
-    <!-- ⚡════════════════════════════════════════════════════════════⚡
-    . . . . . . JAVASCRIPT - REPLY MODAL FOR PENDING INQUIRY REPLY (Section 1)
-    ⚡════════════════════════════════════════════════════════════⚡ -->
+    <!-- ⚡════════════════════════════════════════════════════════════════════════════════⚡
+    . . . . . . REPLY MODAL of PENDING INQUIRY REPLY (Section 1)
+    . . .⚡════════════════════════════════════════════════════════════════════════════════⚡ -->
 
     <script type="module">
         import { initializeFirebase } from '/lib/firebase_init.js';
@@ -437,9 +407,9 @@
 
 
 
-    <!-- ⚡════════════════════════════════════════════════════════════⚡
+    <!-- ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡
     . . . . . . JAVASCRIPT - REPLIED INQUIRY DIRECTORY (Section 2)
-    ⚡════════════════════════════════════════════════════════════⚡ -->
+    . . .⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡ -->
 
     <script type="module">
         import { initializeFirebase } from '/lib/firebase_init.js';
@@ -472,8 +442,7 @@
                         return;
                     }
 
-                    // ══════〔 BUILD ROWS〕══════
-
+                    // ══════〔 BUILD ROWS 〕══════
                     const rows = await Promise.all(
 
                         inquirySnapshot.docs.map(async (doc) => {
@@ -489,9 +458,7 @@
                             let vehicleType = 'N/A';
                             let licensePlate = 'N/A';
 
-                            // =========================
-                            // COMMUTER DATA
-                            // =========================
+                            // ══════〔 COMMUTER ROWS 〕══════
                             try {
 
                                 const commuterDoc = await db.collection('commuter')
@@ -567,7 +534,27 @@
 
     </script>
 
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 
+    <script>
+        // Toggle sidebar on mobile
+        document.querySelector('.sidebar-toggler').addEventListener('click', function () {
+            document.getElementById('sidebar').classList.toggle('show');
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function (event) {
+            const sidebar = document.getElementById('sidebar');
+            const toggler = document.querySelector('.sidebar-toggler');
+
+            if (window.innerWidth < 992 &&
+                !sidebar.contains(event.target) &&
+                !toggler.contains(event.target)) {
+                sidebar.classList.remove('show');
+            }
+        });
+    </script>
 </body>
 
 </html>
