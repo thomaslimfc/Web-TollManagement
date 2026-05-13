@@ -218,28 +218,6 @@
         </div>
     </div>
 
-    <!-- Bootstrap JS Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-        // Toggle sidebar on mobile
-        document.querySelector('.sidebar-toggler').addEventListener('click', function () {
-            document.getElementById('sidebar').classList.toggle('show');
-        });
-
-        // Close sidebar when clicking outside on mobile
-        document.addEventListener('click', function (event) {
-            const sidebar = document.getElementById('sidebar');
-            const toggler = document.querySelector('.sidebar-toggler');
-
-            if (window.innerWidth < 992 &&
-                !sidebar.contains(event.target) &&
-                !toggler.contains(event.target)) {
-                sidebar.classList.remove('show');
-            }
-        });
-    </script>
-
 
 
     <!-- ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡
@@ -521,6 +499,33 @@
             // ══════〔 INITIAL LOAD 〕══════
             await loadRejected();
             await loadVerified();
+        });
+    </script>
+
+
+
+    <!-- ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡
+    . . . . . . Bootstrap JS Bundle with Popper
+    . . .⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡ -->
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Toggle sidebar on mobile
+        document.querySelector('.sidebar-toggler').addEventListener('click', function () {
+            document.getElementById('sidebar').classList.toggle('show');
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function (event) {
+            const sidebar = document.getElementById('sidebar');
+            const toggler = document.querySelector('.sidebar-toggler');
+
+            if (window.innerWidth < 992 &&
+                !sidebar.contains(event.target) &&
+                !toggler.contains(event.target)) {
+                sidebar.classList.remove('show');
+            }
         });
     </script>
 </body>
