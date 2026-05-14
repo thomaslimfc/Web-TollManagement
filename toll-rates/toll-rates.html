@@ -293,7 +293,13 @@
                     <div class="mb-3">
                         <label class="form-label">Tariff Rate (MYR)</label>
 
-                        <input type="number" step="0.01" class="form-control" id="createTariffRate">
+                        <input type="number" 
+                            step="0.01"
+                            min="0"
+                            value="0.00"
+                            placeholder="Enter tariff rate"
+                            class="form-control"
+                            id="createTariffRate">
                     </div>
 
                 </div>
@@ -316,8 +322,9 @@
     </div>
 
 
+
     <!-- ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡
-    . . . . . . JAVASCRIPT - TOLL TARIFF DIRECTORY SYSTEM
+    . . . . . . JAVASCRIPT - TOLL TARIFF DIRECTORY SYSTEM (Section 1 & 2)
     . . .⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡ -->
 
     <script type="module">
@@ -334,125 +341,108 @@
             let selectedEditId = null;
             let selectedDeleteId = null;
 
+            // ══════〔 LOAD TOLL TARIFF TABLE 〕══════
 
+            async function loadTollTariffTable() {
 
+                try {
 
-            // ════════════════════════════════════════
-// ══════〔 LOAD TOLL TARIFF TABLE 〕══════
-// ════════════════════════════════════════
+                    tableBody.innerHTML = "";
 
-async function loadTollTariffTable() {
+                    const snapshot =
+                        await db.collection('tollTariff').get();
 
-    try {
+                    // No records
+                    if (snapshot.empty) {
 
-        tableBody.innerHTML = "";
+                        tableBody.innerHTML = `
+                            <tr>
+                                <td colspan="5">
+                                    No toll tariff record(s) found
+                                </td>
+                            </tr>
+                        `;
 
-        const snapshot =
-            await db.collection('tollTariff').get();
+                        return;
+                    }
 
-        // No records
-        if (snapshot.empty) {
+                    let rows = "";
 
-            tableBody.innerHTML = `
-                <tr>
-                    <td colspan="5">
-                        No toll tariff record(s) found
-                    </td>
-                </tr>
-            `;
+                    // ══════〔 LOOP DOCUMENTS 〕══════
+                    for (const doc of snapshot.docs) {
 
-            return;
-        }
+                        const data = doc.data();
 
-        let rows = "";
+                        // ══════〔 FORMAT DATA 〕══════
+                        const tariffID =
+                            data.tariffID || doc.id || 'N/A';
 
+                        const location =
+                            data.location || 'N/A';
 
+                        const vehicleType =
+                            data.vehicleType || 'N/A';
 
-        // ══════〔 LOOP DOCUMENTS 〕══════
-        for (const doc of snapshot.docs) {
+                        const tariffRate =
+                            data.tariffRate != null
+                                ? `MYR ${Number(data.tariffRate).toFixed(2)}`
+                                : 'N/A';
 
-            const data = doc.data();
+                        // ══════〔 BUILD TABLE ROW 〕══════
+                        rows += `
+                            <tr>
+                            
+                                <td>${tariffID}</td>
+                            
+                                <td>${location}</td>
+                            
+                                <td>${vehicleType}</td>
+                            
+                                <td>${tariffRate}</td>
+                            
+                                <td>
+                                
+                                    <button
+                                        class="btn btn-sm btn-primary editBtn"
+                                        style="width: 68px; margin: 1%;"
+                                        data-id="${doc.id}">
+                                        Edit
+                                    </button>
+                                 
+                                    <button
+                                        class="btn btn-sm btn-danger deleteBtn"
+                                        style="width: 68px; margin: 1%;"
+                                        data-id="${doc.id}">
+                                        Delete
+                                    </button>
+                                 
+                                </td>
+                             
+                            </tr>
+                        `;
+                    }
 
+                    // ══════〔 DISPLAY TABLE 〕══════
+                    tableBody.innerHTML = rows;
 
+                } catch (error) {
 
-            // ══════〔 FORMAT DATA 〕══════
-            const tariffID =
-                data.tariffID || doc.id || 'N/A';
+                    console.error(
+                        "Error loading toll tariff table:",
+                        error
+                    );
 
-            const location =
-                data.location || 'N/A';
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="5">
+                                Error loading data
+                            </td>
+                        </tr>
+                    `;
+                }
+            }
 
-            const vehicleType =
-                data.vehicleType || 'N/A';
-
-            const tariffRate =
-                data.tariffRate != null
-                    ? `MYR ${Number(data.tariffRate).toFixed(2)}`
-                    : 'N/A';
-
-
-
-            // ══════〔 BUILD TABLE ROW 〕══════
-            rows += `
-                <tr>
-
-                    <td>${tariffID}</td>
-
-                    <td>${location}</td>
-
-                    <td>${vehicleType}</td>
-
-                    <td>${tariffRate}</td>
-
-                    <td>
-
-                        <button
-                            class="btn btn-sm btn-primary editBtn"
-                            style="width: 68px; margin: 1%;"
-                            data-id="${doc.id}">
-                            Edit
-                        </button>
-
-                        <button
-                            class="btn btn-sm btn-danger deleteBtn"
-                            style="width: 68px; margin: 1%;"
-                            data-id="${doc.id}">
-                            Delete
-                        </button>
-
-                    </td>
-
-                </tr>
-            `;
-        }
-
-
-
-        // ══════〔 DISPLAY TABLE 〕══════
-        tableBody.innerHTML = rows;
-
-    } catch (error) {
-
-        console.error(
-            "Error loading toll tariff table:",
-            error
-        );
-
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="5">
-                    Error loading data
-                </td>
-            </tr>
-        `;
-    }
-}
-
-
-
-            // ════════════════════════════════════════
             // ══════〔 GENERATE NEXT TARIFF ID 〕══════
-            // ════════════════════════════════════════
 
             async function generateNextTariffID() {
 
@@ -479,11 +469,7 @@ async function loadTollTariffTable() {
                 return nextID;
             }
 
-
-
-            // ════════════════════════════════════════
             // ══════〔 LOAD LOCATION DROPDOWN 〕══════
-            // ════════════════════════════════════════
 
             async function loadLocationDropdown() {
 
@@ -521,43 +507,98 @@ async function loadTollTariffTable() {
                 });
             }
 
+            // ══════〔 LOCATION CHANGE EVENT 〕══════
 
+            document.getElementById('createLocation')
+                .addEventListener('change', async (e) => {
 
-            // ════════════════════════════════════════
+                    const selectedLocation =
+                        e.target.value;
+
+                    await loadVehicleTypeDropdown(
+                        selectedLocation
+                    );
+                });
+
             // ══════〔 LOAD VEHICLE TYPES 〕══════
-            // ════════════════════════════════════════
 
-            async function loadVehicleTypeDropdown() {
+            async function loadVehicleTypeDropdown(selectedLocation = "") {
 
                 const vehicleDropdown =
                     document.getElementById('createVehicleType');
 
-                vehicleDropdown.innerHTML = `
-                <option value="">
-                    -- Select Vehicle Type --
-                </option>
-            `;
+                vehicleDropdown.innerHTML = "";
 
-                const snapshot =
+                let availableCount = 0;
+
+                // ══════〔 GET ALL VEHICLE TYPES 〕══════
+                const vehicleSnapshot =
                     await db.collection('vehicleType').get();
 
-                snapshot.forEach((doc) => {
+                // ══════〔 GET EXISTING TARIFFS 〕══════
+                const tariffSnapshot =
+                    await db.collection('tollTariff')
+                        .where('location', '==', selectedLocation)
+                        .get();
+
+                // ══════〔 STORE USED VEHICLE TYPES 〕══════
+                const usedVehicleTypes = new Set();
+
+                tariffSnapshot.forEach((doc) => {
+
+                    const tariff = doc.data();
+
+                    if (tariff.vehicleType) {
+
+                        usedVehicleTypes.add(
+                            tariff.vehicleType
+                        );
+                    }
+                });
+
+                vehicleSnapshot.forEach((doc) => {
 
                     const vehicle = doc.data();
 
+                    // Skip duplicate vehicle type
+                    if (
+                        usedVehicleTypes.has(vehicle.description)
+                    ) {
+                        return;
+                    }
+
+                    availableCount++;
+
                     vehicleDropdown.innerHTML += `
-                    <option value="${vehicle.description}">
-                        ${vehicle.description}
-                    </option>
-                `;
+                        <option value="${vehicle.description}">
+                            ${vehicle.description}
+                        </option>
+                    `;
                 });
+
+                // ══════〔 NO AVAILABLE VEHICLE TYPES 〕══════
+                if (availableCount === 0) {
+
+                    vehicleDropdown.innerHTML = `
+                        <option value="">
+                            N/A
+                        </option>
+                    `;
+                }
+                else {
+
+                    vehicleDropdown.insertAdjacentHTML(
+                        'afterbegin',
+                        `
+                            <option value="">
+                                -- Select Vehicle Type --
+                            </option>
+                        `
+                    );
+                }
             }
 
-
-
-            // ════════════════════════════════════════
             // ══════〔 OPEN CREATE MODAL 〕══════
-            // ════════════════════════════════════════
 
             document.getElementById('createBtn')
                 .addEventListener('click', async () => {
@@ -573,7 +614,13 @@ async function loadTollTariffTable() {
 
                         await loadLocationDropdown();
 
-                        await loadVehicleTypeDropdown();
+                        document.getElementById(
+                            'createVehicleType'
+                                ).innerHTML = `
+                                    <option value="">
+                                        -- Select Vehicle Type --
+                                    </option>
+                    `;
 
                         const modal =
                             new bootstrap.Modal(
@@ -591,11 +638,7 @@ async function loadTollTariffTable() {
                     }
                 });
 
-
-
-            // ════════════════════════════════════════
             // ══════〔 CREATE NEW TARIFF 〕══════
-            // ════════════════════════════════════════
 
             document.getElementById('submitCreateBtn')
                 .addEventListener('click', async () => {
@@ -634,7 +677,7 @@ async function loadTollTariffTable() {
                                 location: location,
                                 vehicleType: vehicleType,
                                 tariffRate: Number(tariffRate)
-                        });
+                            });
 
                         // Close Modal
                         bootstrap.Modal.getInstance(
@@ -651,13 +694,12 @@ async function loadTollTariffTable() {
                             error
                         );
                     }
+
+                    // ══════〔 INITIAL LOAD 〕══════
+                    await loadTollTariffTable();
                 });
 
-
-
-            // ════════════════════════════════════════
             // ══════〔 OPEN EDIT MODAL 〕══════
-            // ════════════════════════════════════════
 
             document.addEventListener('click', async (e) => {
 
@@ -705,11 +747,7 @@ async function loadTollTariffTable() {
                 }
             });
 
-
-
-            // ════════════════════════════════════════
             // ══════〔 SAVE EDIT CHANGES 〕══════
-            // ════════════════════════════════════════
 
             document.getElementById('submitEditBtn')
                 .addEventListener('click', async () => {
@@ -731,6 +769,7 @@ async function loadTollTariffTable() {
                             document.getElementById('editModal')
                         ).hide();
 
+                        // ══════〔 INITIAL LOAD 〕══════
                         await loadTollTariffTable();
 
                     } catch (error) {
@@ -742,11 +781,7 @@ async function loadTollTariffTable() {
                     }
                 });
 
-
-
-            // ════════════════════════════════════════
             // ══════〔 OPEN DELETE MODAL 〕══════
-            // ════════════════════════════════════════
 
             document.addEventListener('click', (e) => {
 
@@ -764,11 +799,7 @@ async function loadTollTariffTable() {
                 }
             });
 
-
-
-            // ════════════════════════════════════════
             // ══════〔 DELETE TARIFF 〕══════
-            // ════════════════════════════════════════
 
             document.getElementById('confirmDeleteBtn')
                 .addEventListener('click', async () => {
@@ -794,12 +825,7 @@ async function loadTollTariffTable() {
                     }
                 });
 
-
-
-            // ════════════════════════════════════════
             // ══════〔 INITIAL LOAD 〕══════
-            // ════════════════════════════════════════
-
             await loadTollTariffTable();
 
         });
