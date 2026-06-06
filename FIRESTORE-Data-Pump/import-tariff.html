@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,15 +15,18 @@
             padding-top: 30px;
             padding-bottom: 50px;
         }
+
         .card {
             border: none;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             border-radius: 10px;
         }
+
         .table-responsive {
             max-height: 500px;
             overflow-y: auto;
         }
+
         thead th {
             position: sticky;
             top: 0;
@@ -32,16 +36,19 @@
         }
     </style>
 </head>
+
 <body>
 
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-xl-10">
-                
+
                 <div class="d-flex align-items-center justify-content-between mb-4 border-bottom pb-3">
                     <div>
-                        <h1 class="h3 mb-1"><i class="bi bi-database-fill-up text-primary me-2"></i>Toll Tariff Database Migration</h1>
-                        <p class="text-muted mb-0">Review parsed spreadsheet items and batch-import them directly into Google Firestore.</p>
+                        <h1 class="h3 mb-1"><i class="bi bi-database-fill-up text-primary me-2"></i>Toll Tariff Database
+                            Migration</h1>
+                        <p class="text-muted mb-0">Review parsed spreadsheet items and batch-import them directly into
+                            Google Firestore.</p>
                     </div>
                     <div>
                         <button id="importBtn" class="btn btn-primary btn-lg shadow-sm">
@@ -54,7 +61,8 @@
 
                 <div class="card">
                     <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
-                        <h5 class="mb-0 card-title h6"><i class="bi bi-table me-2"></i>Data Payload Preview (<span id="payloadCount">0</span> records)</h5>
+                        <h5 class="mb-0 card-title h6"><i class="bi bi-table me-2"></i>Data Payload Preview (<span
+                                id="payloadCount">0</span> records)</h5>
                         <span class="badge bg-primary">Target Collection: tollTariff</span>
                     </div>
                     <div class="card-body p-0">
@@ -71,7 +79,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="previewTableBody">
-                                    </tbody>
+                                </tbody>
                             </table>
                         </div>
                     </div>
@@ -99,33 +107,171 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Complete 25-record production matrix
         const tariffData = [
-            { documentID: "TID00001", fromTollLocationID: "TLID00001", tariffID: "TID00001", tariffRate: 5.60, toLocationID: "TLID00001", vehicleTypeID: "VTID00001" },
-            { documentID: "TID00002", fromTollLocationID: "TLID00001", tariffID: "TID00002", tariffRate: 1.50, toLocationID: "TLID00002", vehicleTypeID: "VTID00001" },
-            { documentID: "TID00003", fromTollLocationID: "TLID00001", tariffID: "TID00003", tariffRate: 0.00, toLocationID: "TLID00003", vehicleTypeID: "VTID00001" },
-            { documentID: "TID00004", fromTollLocationID: "TLID00001", tariffID: "TID00004", tariffRate: 4.30, toLocationID: "TLID00004", vehicleTypeID: "VTID00001" },
-            { documentID: "TID00005", fromTollLocationID: "TLID00001", tariffID: "TID00005", tariffRate: 1.20, toLocationID: "TLID00005", vehicleTypeID: "VTID00001" },
-            { documentID: "TID00006", fromTollLocationID: "TLID00001", tariffID: "TID00006", tariffRate: 9.60, toLocationID: "TLID00001", vehicleTypeID: "VTID00002" },
-            { documentID: "TID00007", fromTollLocationID: "TLID00001", tariffID: "TID00007", tariffRate: 2.30, toLocationID: "TLID00002", vehicleTypeID: "VTID00002" },
-            { documentID: "TID00008", fromTollLocationID: "TLID00001", tariffID: "TID00008", tariffRate: 0.00, toLocationID: "TLID00003", vehicleTypeID: "VTID00002" },
-            { documentID: "TID00009", fromTollLocationID: "TLID00001", tariffID: "TID00009", tariffRate: 6.40, toLocationID: "TLID00004", vehicleTypeID: "VTID00002" },
-            { documentID: "TID00010", fromTollLocationID: "TLID00001", tariffID: "TID00010", tariffRate: 1.80, toLocationID: "TLID00005", vehicleTypeID: "VTID00002" },
-            { documentID: "TID00011", fromTollLocationID: "TLID00001", tariffID: "TID00011", tariffRate: 36.00, toLocationID: "TLID00001", vehicleTypeID: "VTID00003" },
-            { documentID: "TID00012", fromTollLocationID: "TLID00001", tariffID: "TID00012", tariffRate: 3.10, toLocationID: "TLID00002", vehicleTypeID: "VTID00003" },
-            { documentID: "TID00013", fromTollLocationID: "TLID00001", tariffID: "TID00013", tariffRate: 0.00, toLocationID: "TLID00003", vehicleTypeID: "VTID00003" },
-            { documentID: "TID00014", fromTollLocationID: "TLID00001", tariffID: "TID00014", tariffRate: 8.60, toLocationID: "TLID00004", vehicleTypeID: "VTID00003" },
-            { documentID: "TID00015", fromTollLocationID: "TLID00001", tariffID: "TID00015", tariffRate: 2.40, toLocationID: "TLID00005", vehicleTypeID: "VTID00003" },
-            { documentID: "TID00016", fromTollLocationID: "TLID00001", tariffID: "TID00016", tariffRate: 5.60, toLocationID: "TLID00001", vehicleTypeID: "VTID00004" },
-            { documentID: "TID00017", fromTollLocationID: "TLID00001", tariffID: "TID00017", tariffRate: 0.80, toLocationID: "TLID00002", vehicleTypeID: "VTID00004" },
-            { documentID: "TID00018", fromTollLocationID: "TLID00001", tariffID: "TID00018", tariffRate: 0.00, toLocationID: "TLID00003", vehicleTypeID: "VTID00004" },
-            { documentID: "TID00019", fromTollLocationID: "TLID00001", tariffID: "TID00019", tariffRate: 2.20, toLocationID: "TLID00004", vehicleTypeID: "VTID00004" },
-            { documentID: "TID00020", fromTollLocationID: "TLID00001", tariffID: "TID00020", tariffRate: 0.60, toLocationID: "TLID00005", vehicleTypeID: "VTID00004" },
-            { documentID: "TID00021", fromTollLocationID: "TLID00001", tariffID: "TID00021", tariffRate: 5.60, toLocationID: "TLID00001", vehicleTypeID: "VTID00005" },
-            { documentID: "TID00022", fromTollLocationID: "TLID00001", tariffID: "TID00022", tariffRate: 1.20, toLocationID: "TLID00002", vehicleTypeID: "VTID00005" },
-            { documentID: "TID00023", fromTollLocationID: "TLID00001", tariffID: "TID00023", tariffRate: 0.00, toLocationID: "TLID00003", vehicleTypeID: "VTID00005" },
-            { documentID: "TID00024", fromTollLocationID: "TLID00001", tariffID: "TID00024", tariffRate: 3.40, toLocationID: "TLID00004", vehicleTypeID: "VTID00005" },
-            { documentID: "TID00025", fromTollLocationID: "TLID00001", tariffID: "TID00025", tariffRate: 1.00, toLocationID: "TLID00005", vehicleTypeID: "VTID00005" }
+            // ========================================================
+            // VEHICLE TYPE 1 (VTID00001) - COMPLETE STATION MATRIX
+            // ========================================================
+            { documentID: "TID00001", fromTollLocationID: "TLID00001", tariffID: "TID00001", tariffRate: 0.00, toTollLocationID: "TLID00001", vehicleTypeID: "VTID00001" },
+            { documentID: "TID00002", fromTollLocationID: "TLID00001", tariffID: "TID00002", tariffRate: 1.50, toTollLocationID: "TLID00002", vehicleTypeID: "VTID00001" },
+            { documentID: "TID00003", fromTollLocationID: "TLID00001", tariffID: "TID00003", tariffRate: 2.80, toTollLocationID: "TLID00003", vehicleTypeID: "VTID00001" },
+            { documentID: "TID00004", fromTollLocationID: "TLID00001", tariffID: "TID00004", tariffRate: 4.30, toTollLocationID: "TLID00004", vehicleTypeID: "VTID00001" },
+            { documentID: "TID00005", fromTollLocationID: "TLID00001", tariffID: "TID00005", tariffRate: 5.60, toTollLocationID: "TLID00005", vehicleTypeID: "VTID00001" },
+
+            { documentID: "TID00006", fromTollLocationID: "TLID00002", tariffID: "TID00006", tariffRate: 1.50, toTollLocationID: "TLID00001", vehicleTypeID: "VTID00001" },
+            { documentID: "TID00007", fromTollLocationID: "TLID00002", tariffID: "TID00007", tariffRate: 0.00, toTollLocationID: "TLID00002", vehicleTypeID: "VTID00001" },
+            { documentID: "TID00008", fromTollLocationID: "TLID00002", tariffID: "TID00008", tariffRate: 1.30, toTollLocationID: "TLID00003", vehicleTypeID: "VTID00001" },
+            { documentID: "TID00009", fromTollLocationID: "TLID00002", tariffID: "TID00009", tariffRate: 2.80, toTollLocationID: "TLID00004", vehicleTypeID: "VTID00001" },
+            { documentID: "TID00010", fromTollLocationID: "TLID00002", tariffID: "TID00010", tariffRate: 4.10, toTollLocationID: "TLID00005", vehicleTypeID: "VTID00001" },
+
+            { documentID: "TID00011", fromTollLocationID: "TLID00003", tariffID: "TID00011", tariffRate: 2.80, toTollLocationID: "TLID00001", vehicleTypeID: "VTID00001" },
+            { documentID: "TID00012", fromTollLocationID: "TLID00003", tariffID: "TID00012", tariffRate: 1.30, toTollLocationID: "TLID00002", vehicleTypeID: "VTID00001" },
+            { documentID: "TID00013", fromTollLocationID: "TLID00003", tariffID: "TID00013", tariffRate: 0.00, toTollLocationID: "TLID00003", vehicleTypeID: "VTID00001" },
+            { documentID: "TID00014", fromTollLocationID: "TLID00003", tariffID: "TID00014", tariffRate: 1.50, toTollLocationID: "TLID00004", vehicleTypeID: "VTID00001" },
+            { documentID: "TID00015", fromTollLocationID: "TLID00003", tariffID: "TID00015", tariffRate: 2.80, toTollLocationID: "TLID00005", vehicleTypeID: "VTID00001" },
+
+            { documentID: "TID00016", fromTollLocationID: "TLID00004", tariffID: "TID00016", tariffRate: 4.30, toTollLocationID: "TLID00001", vehicleTypeID: "VTID00001" },
+            { documentID: "TID00017", fromTollLocationID: "TLID00004", tariffID: "TID00017", tariffRate: 2.80, toTollLocationID: "TLID00002", vehicleTypeID: "VTID00001" },
+            { documentID: "TID00018", fromTollLocationID: "TLID00004", tariffID: "TID00018", tariffRate: 1.50, toTollLocationID: "TLID00003", vehicleTypeID: "VTID00001" },
+            { documentID: "TID00019", fromTollLocationID: "TLID00004", tariffID: "TID00019", tariffRate: 0.00, toTollLocationID: "TLID00004", vehicleTypeID: "VTID00001" },
+            { documentID: "TID00020", fromTollLocationID: "TLID00004", tariffID: "TID00020", tariffRate: 1.20, toTollLocationID: "TLID00005", vehicleTypeID: "VTID00001" },
+
+            { documentID: "TID00021", fromTollLocationID: "TLID00005", tariffID: "TID00021", tariffRate: 5.60, toTollLocationID: "TLID00001", vehicleTypeID: "VTID00001" },
+            { documentID: "TID00022", fromTollLocationID: "TLID00005", tariffID: "TID00022", tariffRate: 4.10, toTollLocationID: "TLID00002", vehicleTypeID: "VTID00001" },
+            { documentID: "TID00023", fromTollLocationID: "TLID00005", tariffID: "TID00023", tariffRate: 2.80, toTollLocationID: "TLID00003", vehicleTypeID: "VTID00001" },
+            { documentID: "TID00024", fromTollLocationID: "TLID00005", tariffID: "TID00024", tariffRate: 1.20, toTollLocationID: "TLID00004", vehicleTypeID: "VTID00001" },
+            { documentID: "TID00025", fromTollLocationID: "TLID00005", tariffID: "TID00025", tariffRate: 0.00, toTollLocationID: "TLID00005", vehicleTypeID: "VTID00001" },
+
+            // ========================================================
+            // VEHICLE TYPE 2 (VTID00002) - COMPLETE STATION MATRIX
+            // ========================================================
+            { documentID: "TID00026", fromTollLocationID: "TLID00001", tariffID: "TID00026", tariffRate: 0.00, toTollLocationID: "TLID00001", vehicleTypeID: "VTID00002" },
+            { documentID: "TID00027", fromTollLocationID: "TLID00001", tariffID: "TID00027", tariffRate: 2.30, toTollLocationID: "TLID00002", vehicleTypeID: "VTID00002" },
+            { documentID: "TID00028", fromTollLocationID: "TLID00001", tariffID: "TID00028", tariffRate: 4.50, toTollLocationID: "TLID00003", vehicleTypeID: "VTID00002" },
+            { documentID: "TID00029", fromTollLocationID: "TLID00001", tariffID: "TID00029", tariffRate: 6.40, toTollLocationID: "TLID00004", vehicleTypeID: "VTID00002" },
+            { documentID: "TID00030", fromTollLocationID: "TLID00001", tariffID: "TID00030", tariffRate: 9.60, toTollLocationID: "TLID00005", vehicleTypeID: "VTID00002" },
+
+            { documentID: "TID00031", fromTollLocationID: "TLID00002", tariffID: "TID00031", tariffRate: 2.30, toTollLocationID: "TLID00001", vehicleTypeID: "VTID00002" },
+            { documentID: "TID00032", fromTollLocationID: "TLID00002", tariffID: "TID00032", tariffRate: 0.00, toTollLocationID: "TLID00002", vehicleTypeID: "VTID00002" },
+            { documentID: "TID00033", fromTollLocationID: "TLID00002", tariffID: "TID00033", tariffRate: 2.20, toTollLocationID: "TLID00003", vehicleTypeID: "VTID00002" },
+            { documentID: "TID00034", fromTollLocationID: "TLID00002", tariffID: "TID00034", tariffRate: 4.10, toTollLocationID: "TLID00004", vehicleTypeID: "VTID00002" },
+            { documentID: "TID00035", fromTollLocationID: "TLID00002", tariffID: "TID00035", tariffRate: 7.30, toTollLocationID: "TLID00005", vehicleTypeID: "VTID00002" },
+
+            { documentID: "TID00036", fromTollLocationID: "TLID00003", tariffID: "TID00036", tariffRate: 4.50, toTollLocationID: "TLID00001", vehicleTypeID: "VTID00002" },
+            { documentID: "TID00037", fromTollLocationID: "TLID00003", tariffID: "TID00037", tariffRate: 2.20, toTollLocationID: "TLID00002", vehicleTypeID: "VTID00002" },
+            { documentID: "TID00038", fromTollLocationID: "TLID00003", tariffID: "TID00038", tariffRate: 0.00, toTollLocationID: "TLID00003", vehicleTypeID: "VTID00002" },
+            { documentID: "TID00039", fromTollLocationID: "TLID00003", tariffID: "TID00039", tariffRate: 1.90, toTollLocationID: "TLID00004", vehicleTypeID: "VTID00002" },
+            { documentID: "TID00040", fromTollLocationID: "TLID00003", tariffID: "TID00040", tariffRate: 5.10, toTollLocationID: "TLID00005", vehicleTypeID: "VTID00002" },
+
+            { documentID: "TID00041", fromTollLocationID: "TLID00004", tariffID: "TID00041", tariffRate: 6.40, toTollLocationID: "TLID00001", vehicleTypeID: "VTID00002" },
+            { documentID: "TID00042", fromTollLocationID: "TLID00004", tariffID: "TID00042", tariffRate: 4.10, toTollLocationID: "TLID00002", vehicleTypeID: "VTID00002" },
+            { documentID: "TID00043", fromTollLocationID: "TLID00004", tariffID: "TID00043", tariffRate: 1.90, toTollLocationID: "TLID00003", vehicleTypeID: "VTID00002" },
+            { documentID: "TID00044", fromTollLocationID: "TLID00004", tariffID: "TID00044", tariffRate: 0.00, toTollLocationID: "TLID00004", vehicleTypeID: "VTID00002" },
+            { documentID: "TID00045", fromTollLocationID: "TLID00004", tariffID: "TID00045", tariffRate: 1.80, toTollLocationID: "TLID00005", vehicleTypeID: "VTID00002" },
+
+            { documentID: "TID00046", fromTollLocationID: "TLID00005", tariffID: "TID00046", tariffRate: 9.60, toTollLocationID: "TLID00001", vehicleTypeID: "VTID00002" },
+            { documentID: "TID00047", fromTollLocationID: "TLID00005", tariffID: "TID00047", tariffRate: 7.30, toTollLocationID: "TLID00002", vehicleTypeID: "VTID00002" },
+            { documentID: "TID00048", fromTollLocationID: "TLID00005", tariffID: "TID00048", tariffRate: 5.10, toTollLocationID: "TLID00003", vehicleTypeID: "VTID00002" },
+            { documentID: "TID00049", fromTollLocationID: "TLID00005", tariffID: "TID00049", tariffRate: 1.80, toTollLocationID: "TLID00004", vehicleTypeID: "VTID00002" },
+            { documentID: "TID00050", fromTollLocationID: "TLID00005", tariffID: "TID00050", tariffRate: 0.00, toTollLocationID: "TLID00005", vehicleTypeID: "VTID00002" },
+
+            // ========================================================
+            // VEHICLE TYPE 3 (VTID00003) - COMPLETE STATION MATRIX
+            // ========================================================
+            { documentID: "TID00051", fromTollLocationID: "TLID00001", tariffID: "TID00051", tariffRate: 0.00, toTollLocationID: "TLID00001", vehicleTypeID: "VTID00003" },
+            { documentID: "TID00052", fromTollLocationID: "TLID00001", tariffID: "TID00052", tariffRate: 3.10, toTollLocationID: "TLID00002", vehicleTypeID: "VTID00003" },
+            { documentID: "TID00053", fromTollLocationID: "TLID00001", tariffID: "TID00053", tariffRate: 5.80, toTollLocationID: "TLID00003", vehicleTypeID: "VTID00003" },
+            { documentID: "TID00054", fromTollLocationID: "TLID00001", tariffID: "TID00054", tariffRate: 8.60, toTollLocationID: "TLID00004", vehicleTypeID: "VTID00003" },
+            { documentID: "TID00055", fromTollLocationID: "TLID00001", tariffID: "TID00055", tariffRate: 36.00, toTollLocationID: "TLID00005", vehicleTypeID: "VTID00003" },
+
+            { documentID: "TID00056", fromTollLocationID: "TLID00002", tariffID: "TID00056", tariffRate: 3.10, toTollLocationID: "TLID00001", vehicleTypeID: "VTID00003" },
+            { documentID: "TID00057", fromTollLocationID: "TLID00002", tariffID: "TID00057", tariffRate: 0.00, toTollLocationID: "TLID00002", vehicleTypeID: "VTID00003" },
+            { documentID: "TID00058", fromTollLocationID: "TLID00002", tariffID: "TID00058", tariffRate: 2.70, toTollLocationID: "TLID00003", vehicleTypeID: "VTID00003" },
+            { documentID: "TID00059", fromTollLocationID: "TLID00002", tariffID: "TID00059", tariffRate: 5.50, toTollLocationID: "TLID00004", vehicleTypeID: "VTID00003" },
+            { documentID: "TID00060", fromTollLocationID: "TLID00002", tariffID: "TID00060", tariffRate: 32.90, toTollLocationID: "TLID00005", vehicleTypeID: "VTID00003" },
+
+            { documentID: "TID00061", fromTollLocationID: "TLID00003", tariffID: "TID00061", tariffRate: 5.80, toTollLocationID: "TLID00001", vehicleTypeID: "VTID00003" },
+            { documentID: "TID00062", fromTollLocationID: "TLID00003", tariffID: "TID00062", tariffRate: 2.70, toTollLocationID: "TLID00002", vehicleTypeID: "VTID00003" },
+            { documentID: "TID00063", fromTollLocationID: "TLID00003", tariffID: "TID00063", tariffRate: 0.00, toTollLocationID: "TLID00003", vehicleTypeID: "VTID00003" },
+            { documentID: "TID00064", fromTollLocationID: "TLID00003", tariffID: "TID00064", tariffRate: 2.80, toTollLocationID: "TLID00004", vehicleTypeID: "VTID00003" },
+            { documentID: "TID00065", fromTollLocationID: "TLID00003", tariffID: "TID00065", tariffRate: 30.20, toTollLocationID: "TLID00005", vehicleTypeID: "VTID00003" },
+
+            { documentID: "TID00066", fromTollLocationID: "TLID00004", tariffID: "TID00066", tariffRate: 8.60, toTollLocationID: "TLID00001", vehicleTypeID: "VTID00003" },
+            { documentID: "TID00067", fromTollLocationID: "TLID00004", tariffID: "TID00067", tariffRate: 5.50, toTollLocationID: "TLID00002", vehicleTypeID: "VTID00003" },
+            { documentID: "TID00068", fromTollLocationID: "TLID00004", tariffID: "TID00068", tariffRate: 2.80, toTollLocationID: "TLID00003", vehicleTypeID: "VTID00003" },
+            { documentID: "TID00069", fromTollLocationID: "TLID00004", tariffID: "TID00069", tariffRate: 0.00, toTollLocationID: "TLID00004", vehicleTypeID: "VTID00003" },
+            { documentID: "TID00070", fromTollLocationID: "TLID00004", tariffID: "TID00070", tariffRate: 2.40, toTollLocationID: "TLID00005", vehicleTypeID: "VTID00003" },
+
+            { documentID: "TID00071", fromTollLocationID: "TLID00005", tariffID: "TID00071", tariffRate: 36.00, toTollLocationID: "TLID00001", vehicleTypeID: "VTID00003" },
+            { documentID: "TID00072", fromTollLocationID: "TLID00005", tariffID: "TID00072", tariffRate: 32.90, toTollLocationID: "TLID00002", vehicleTypeID: "VTID00003" },
+            { documentID: "TID00073", fromTollLocationID: "TLID00005", tariffID: "TID00073", tariffRate: 30.20, toTollLocationID: "TLID00003", vehicleTypeID: "VTID00003" },
+            { documentID: "TID00074", fromTollLocationID: "TLID00005", tariffID: "TID00074", tariffRate: 2.40, toTollLocationID: "TLID00004", vehicleTypeID: "VTID00003" },
+            { documentID: "TID00075", fromTollLocationID: "TLID00005", tariffID: "TID00075", tariffRate: 0.00, toTollLocationID: "TLID00005", vehicleTypeID: "VTID00003" },
+
+            // ========================================================
+            // VEHICLE TYPE 4 (VTID00004) - COMPLETE STATION MATRIX
+            // ========================================================
+            { documentID: "TID00076", fromTollLocationID: "TLID00001", tariffID: "TID00076", tariffRate: 0.00, toTollLocationID: "TLID00001", vehicleTypeID: "VTID00004" },
+            { documentID: "TID00077", fromTollLocationID: "TLID00001", tariffID: "TID00077", tariffRate: 0.80, toTollLocationID: "TLID00002", vehicleTypeID: "VTID00004" },
+            { documentID: "TID00078", fromTollLocationID: "TLID00001", tariffID: "TID00078", tariffRate: 1.50, toTollLocationID: "TLID00003", vehicleTypeID: "VTID00004" },
+            { documentID: "TID00079", fromTollLocationID: "TLID00001", tariffID: "TID00079", tariffRate: 2.20, toTollLocationID: "TLID00004", vehicleTypeID: "VTID00004" },
+            { documentID: "TID00080", fromTollLocationID: "TLID00001", tariffID: "TID00080", tariffRate: 5.60, toTollLocationID: "TLID00005", vehicleTypeID: "VTID00004" },
+
+            { documentID: "TID00081", fromTollLocationID: "TLID00002", tariffID: "TID00081", tariffRate: 0.80, toTollLocationID: "TLID00001", vehicleTypeID: "VTID00004" },
+            { documentID: "TID00082", fromTollLocationID: "TLID00002", tariffID: "TID00082", tariffRate: 0.00, toTollLocationID: "TLID00002", vehicleTypeID: "VTID00004" },
+            { documentID: "TID00083", fromTollLocationID: "TLID00002", tariffID: "TID00083", tariffRate: 0.70, toTollLocationID: "TLID00003", vehicleTypeID: "VTID00004" },
+            { documentID: "TID00084", fromTollLocationID: "TLID00002", tariffID: "TID00084", tariffRate: 1.40, toTollLocationID: "TLID00004", vehicleTypeID: "VTID00004" },
+            { documentID: "TID00085", fromTollLocationID: "TLID00002", tariffID: "TID00085", tariffRate: 4.80, toTollLocationID: "TLID00005", vehicleTypeID: "VTID00004" },
+
+            { documentID: "TID00086", fromTollLocationID: "TLID00003", tariffID: "TID00086", tariffRate: 1.50, toTollLocationID: "TLID00001", vehicleTypeID: "VTID00004" },
+            { documentID: "TID00087", fromTollLocationID: "TLID00003", tariffID: "TID00087", tariffRate: 0.70, toTollLocationID: "TLID00002", vehicleTypeID: "VTID00004" },
+            { documentID: "TID00088", fromTollLocationID: "TLID00003", tariffID: "TID00088", tariffRate: 0.00, toTollLocationID: "TLID00003", vehicleTypeID: "VTID00004" },
+            { documentID: "TID00089", fromTollLocationID: "TLID00003", tariffID: "TID00089", tariffRate: 0.70, toTollLocationID: "TLID00004", vehicleTypeID: "VTID00004" },
+            { documentID: "TID00090", fromTollLocationID: "TLID00003", tariffID: "TID00090", tariffRate: 4.10, toTollLocationID: "TLID00005", vehicleTypeID: "VTID00004" },
+
+            { documentID: "TID00091", fromTollLocationID: "TLID00004", tariffID: "TID00091", tariffRate: 2.20, toTollLocationID: "TLID00001", vehicleTypeID: "VTID00004" },
+            { documentID: "TID00092", fromTollLocationID: "TLID00004", tariffID: "TID00092", tariffRate: 1.40, toTollLocationID: "TLID00002", vehicleTypeID: "VTID00004" },
+            { documentID: "TID00093", fromTollLocationID: "TLID00004", tariffID: "TID00093", tariffRate: 0.70, toTollLocationID: "TLID00003", vehicleTypeID: "VTID00004" },
+            { documentID: "TID00094", fromTollLocationID: "TLID00004", tariffID: "TID00094", tariffRate: 0.00, toTollLocationID: "TLID00004", vehicleTypeID: "VTID00004" },
+            { documentID: "TID00095", fromTollLocationID: "TLID00004", tariffID: "TID00095", tariffRate: 0.60, toTollLocationID: "TLID00005", vehicleTypeID: "VTID00004" },
+
+            { documentID: "TID00096", fromTollLocationID: "TLID00005", tariffID: "TID00096", tariffRate: 5.60, toTollLocationID: "TLID00001", vehicleTypeID: "VTID00004" },
+            { documentID: "TID00097", fromTollLocationID: "TLID00005", tariffID: "TID00097", tariffRate: 4.80, toTollLocationID: "TLID00002", vehicleTypeID: "VTID00004" },
+            { documentID: "TID00098", fromTollLocationID: "TLID00005", tariffID: "TID00098", tariffRate: 4.10, toTollLocationID: "TLID00003", vehicleTypeID: "VTID00004" },
+            { documentID: "TID00099", fromTollLocationID: "TLID00005", tariffID: "TID00099", tariffRate: 0.60, toTollLocationID: "TLID00004", vehicleTypeID: "VTID00004" },
+            { documentID: "TID00100", fromTollLocationID: "TLID00005", tariffID: "TID00100", tariffRate: 0.00, toTollLocationID: "TLID00005", vehicleTypeID: "VTID00004" },
+
+            // ========================================================
+            // VEHICLE TYPE 5 (VTID00005) - COMPLETE STATION MATRIX
+            // ========================================================
+            { documentID: "TID00101", fromTollLocationID: "TLID00001", tariffID: "TID00101", tariffRate: 0.00, toTollLocationID: "TLID00001", vehicleTypeID: "VTID00005" },
+            { documentID: "TID00102", fromTollLocationID: "TLID00001", tariffID: "TID00102", tariffRate: 1.20, toTollLocationID: "TLID00002", vehicleTypeID: "VTID00005" },
+            { documentID: "TID00103", fromTollLocationID: "TLID00001", tariffID: "TID00103", tariffRate: 2.30, toTollLocationID: "TLID00003", vehicleTypeID: "VTID00005" },
+            { documentID: "TID00104", fromTollLocationID: "TLID00001", tariffID: "TID00104", tariffRate: 3.40, toTollLocationID: "TLID00004", vehicleTypeID: "VTID00005" },
+            { documentID: "TID00105", fromTollLocationID: "TLID00001", tariffID: "TID00105", tariffRate: 5.60, toTollLocationID: "TLID00005", vehicleTypeID: "VTID00005" },
+
+            { documentID: "TID00106", fromTollLocationID: "TLID00002", tariffID: "TID00106", tariffRate: 1.20, toTollLocationID: "TLID00001", vehicleTypeID: "VTID00005" },
+            { documentID: "TID00107", fromTollLocationID: "TLID00002", tariffID: "TID00107", tariffRate: 0.00, toTollLocationID: "TLID00002", vehicleTypeID: "VTID00005" },
+            { documentID: "TID00108", fromTollLocationID: "TLID00002", tariffID: "TID00108", tariffRate: 1.10, toTollLocationID: "TLID00003", vehicleTypeID: "VTID00005" },
+            { documentID: "TID00109", fromTollLocationID: "TLID00002", tariffID: "TID00109", tariffRate: 2.20, toTollLocationID: "TLID00004", vehicleTypeID: "VTID00005" },
+            { documentID: "TID00110", fromTollLocationID: "TLID00002", tariffID: "TID00110", tariffRate: 4.40, toTollLocationID: "TLID00005", vehicleTypeID: "VTID00005" },
+
+            { documentID: "TID00111", fromTollLocationID: "TLID00003", tariffID: "TID00111", tariffRate: 2.30, toTollLocationID: "TLID00001", vehicleTypeID: "VTID00005" },
+            { documentID: "TID00112", fromTollLocationID: "TLID00003", tariffID: "TID00112", tariffRate: 1.10, toTollLocationID: "TLID00002", vehicleTypeID: "VTID00005" },
+            { documentID: "TID00113", fromTollLocationID: "TLID00003", tariffID: "TID00113", tariffRate: 0.00, toTollLocationID: "TLID00003", vehicleTypeID: "VTID00005" },
+            { documentID: "TID00114", fromTollLocationID: "TLID00003", tariffID: "TID00114", tariffRate: 1.10, toTollLocationID: "TLID00004", vehicleTypeID: "VTID00005" },
+            { documentID: "TID00115", fromTollLocationID: "TLID00003", tariffID: "TID00115", tariffRate: 3.30, toTollLocationID: "TLID00005", vehicleTypeID: "VTID00005" },
+
+            { documentID: "TID00116", fromTollLocationID: "TLID00004", tariffID: "TID00116", tariffRate: 3.40, toTollLocationID: "TLID00001", vehicleTypeID: "VTID00005" },
+            { documentID: "TID00117", fromTollLocationID: "TLID00004", tariffID: "TID00117", tariffRate: 2.20, toTollLocationID: "TLID00002", vehicleTypeID: "VTID00005" },
+            { documentID: "TID00118", fromTollLocationID: "TLID00004", tariffID: "TID00118", tariffRate: 1.10, toTollLocationID: "TLID00003", vehicleTypeID: "VTID00005" },
+            { documentID: "TID00119", fromTollLocationID: "TLID00004", tariffID: "TID00119", tariffRate: 0.00, toTollLocationID: "TLID00004", vehicleTypeID: "VTID00005" },
+            { documentID: "TID00120", fromTollLocationID: "TLID00004", tariffID: "TID00120", tariffRate: 1.00, toTollLocationID: "TLID00005", vehicleTypeID: "VTID00005" },
+
+            { documentID: "TID00121", fromTollLocationID: "TLID00005", tariffID: "TID00121", tariffRate: 5.60, toTollLocationID: "TLID00001", vehicleTypeID: "VTID00005" },
+            { documentID: "TID00122", fromTollLocationID: "TLID00005", tariffID: "TID00122", tariffRate: 4.40, toTollLocationID: "TLID00002", vehicleTypeID: "VTID00005" },
+            { documentID: "TID00123", fromTollLocationID: "TLID00005", tariffID: "TID00123", tariffRate: 3.30, toTollLocationID: "TLID00003", vehicleTypeID: "VTID00005" },
+            { documentID: "TID00124", fromTollLocationID: "TLID00005", tariffID: "TID00124", tariffRate: 1.00, toTollLocationID: "TLID00004", vehicleTypeID: "VTID00005" },
+            { documentID: "TID00125", fromTollLocationID: "TLID00005", tariffID: "TID00125", tariffRate: 0.00, toTollLocationID: "TLID00125", vehicleTypeID: "VTID00005" }
         ];
 
         // UI Initialization & Counter Configuration
@@ -139,7 +285,7 @@
                 <td>${item.fromTollLocationID}</td>
                 <td><span class="badge bg-secondary">${item.tariffID}</span></td>
                 <td class="fw-bold text-dark">RM ${item.tariffRate.toFixed(2)}</td>
-                <td>${item.toLocationID}</td>
+                <td>${item.toTollLocationID}</td>
                 <td><span class="badge bg-info text-dark">${item.vehicleTypeID}</span></td>
             </tr>`;
             tableBody.innerHTML += row;
@@ -153,8 +299,8 @@
             // Toggle processing states
             btn.disabled = true;
             btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Writing Documents...`;
-            
-            msgBox.className = "alert d-none"; 
+
+            msgBox.className = "alert d-none";
             msgBox.innerText = "";
 
             try {
@@ -164,10 +310,10 @@
                 tariffData.forEach((record) => {
                     // Mapping collection collection target explicit document ID assignment
                     const docRef = doc(db, "tollTariff", record.documentID);
-                    
+
                     // Structural destructuring extraction (stripping top key data array context cleanly)
                     const { documentID, ...cleanPayload } = record;
-                    
+
                     batch.set(docRef, cleanPayload);
                 });
 
@@ -192,4 +338,5 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
