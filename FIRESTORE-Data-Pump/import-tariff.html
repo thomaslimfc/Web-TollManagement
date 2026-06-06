@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PLUS — Tariff Data Migration Utility</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 30px;
+            padding-bottom: 50px;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+        }
+        .table-responsive {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        thead th {
+            position: sticky;
+            top: 0;
+            background-color: #212529 !important;
+            color: #fff !important;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-10">
+                
+                <div class="d-flex align-items-center justify-content-between mb-4 border-bottom pb-3">
+                    <div>
+                        <h1 class="h3 mb-1"><i class="bi bi-database-fill-up text-primary me-2"></i>Toll Tariff Database Migration</h1>
+                        <p class="text-muted mb-0">Review parsed spreadsheet items and batch-import them directly into Google Firestore.</p>
+                    </div>
+                    <div>
+                        <button id="importBtn" class="btn btn-primary btn-lg shadow-sm">
+                            <i class="bi bi-cloud-arrow-up-fill me-2"></i>Run Firestore Batch Import
+                        </button>
+                    </div>
+                </div>
+
+                <div id="statusMessage" class="alert d-none mb-4" role="alert"></div>
+
+                <div class="card">
+                    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
+                        <h5 class="mb-0 card-title h6"><i class="bi bi-table me-2"></i>Data Payload Preview (<span id="payloadCount">0</span> records)</h5>
+                        <span class="badge bg-primary">Target Collection: tollTariff</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="ps-3">Target Doc ID</th>
+                                        <th scope="col">From Toll Location ID</th>
+                                        <th scope="col">Tariff ID</th>
+                                        <th scope="col">Tariff Rate (RM)</th>
+                                        <th scope="col">To Location ID</th>
+                                        <th scope="col">Vehicle Type ID</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="previewTableBody">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, writeBatch, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // ══════〔 🔴 REPLACE WITH YOUR WEB APP CONFIG DETAILS 〕══════
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "plus-370c3.firebaseapp.com",
+            projectId: "plus-370c3",
+            storageBucket: "plus-370c3.appspot.com",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize connection integrations
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Complete 25-record production matrix
+        const tariffData = [
+            { documentID: "TID00001", fromTollLocationID: "TLID00001", tariffID: "TID00001", tariffRate: 5.60, toLocationID: "TLID00001", vehicleTypeID: "VTID00001" },
+            { documentID: "TID00002", fromTollLocationID: "TLID00001", tariffID: "TID00002", tariffRate: 1.50, toLocationID: "TLID00002", vehicleTypeID: "VTID00001" },
+            { documentID: "TID00003", fromTollLocationID: "TLID00001", tariffID: "TID00003", tariffRate: 0.00, toLocationID: "TLID00003", vehicleTypeID: "VTID00001" },
+            { documentID: "TID00004", fromTollLocationID: "TLID00001", tariffID: "TID00004", tariffRate: 4.30, toLocationID: "TLID00004", vehicleTypeID: "VTID00001" },
+            { documentID: "TID00005", fromTollLocationID: "TLID00001", tariffID: "TID00005", tariffRate: 1.20, toLocationID: "TLID00005", vehicleTypeID: "VTID00001" },
+            { documentID: "TID00006", fromTollLocationID: "TLID00001", tariffID: "TID00006", tariffRate: 9.60, toLocationID: "TLID00001", vehicleTypeID: "VTID00002" },
+            { documentID: "TID00007", fromTollLocationID: "TLID00001", tariffID: "TID00007", tariffRate: 2.30, toLocationID: "TLID00002", vehicleTypeID: "VTID00002" },
+            { documentID: "TID00008", fromTollLocationID: "TLID00001", tariffID: "TID00008", tariffRate: 0.00, toLocationID: "TLID00003", vehicleTypeID: "VTID00002" },
+            { documentID: "TID00009", fromTollLocationID: "TLID00001", tariffID: "TID00009", tariffRate: 6.40, toLocationID: "TLID00004", vehicleTypeID: "VTID00002" },
+            { documentID: "TID00010", fromTollLocationID: "TLID00001", tariffID: "TID00010", tariffRate: 1.80, toLocationID: "TLID00005", vehicleTypeID: "VTID00002" },
+            { documentID: "TID00011", fromTollLocationID: "TLID00001", tariffID: "TID00011", tariffRate: 36.00, toLocationID: "TLID00001", vehicleTypeID: "VTID00003" },
+            { documentID: "TID00012", fromTollLocationID: "TLID00001", tariffID: "TID00012", tariffRate: 3.10, toLocationID: "TLID00002", vehicleTypeID: "VTID00003" },
+            { documentID: "TID00013", fromTollLocationID: "TLID00001", tariffID: "TID00013", tariffRate: 0.00, toLocationID: "TLID00003", vehicleTypeID: "VTID00003" },
+            { documentID: "TID00014", fromTollLocationID: "TLID00001", tariffID: "TID00014", tariffRate: 8.60, toLocationID: "TLID00004", vehicleTypeID: "VTID00003" },
+            { documentID: "TID00015", fromTollLocationID: "TLID00001", tariffID: "TID00015", tariffRate: 2.40, toLocationID: "TLID00005", vehicleTypeID: "VTID00003" },
+            { documentID: "TID00016", fromTollLocationID: "TLID00001", tariffID: "TID00016", tariffRate: 5.60, toLocationID: "TLID00001", vehicleTypeID: "VTID00004" },
+            { documentID: "TID00017", fromTollLocationID: "TLID00001", tariffID: "TID00017", tariffRate: 0.80, toLocationID: "TLID00002", vehicleTypeID: "VTID00004" },
+            { documentID: "TID00018", fromTollLocationID: "TLID00001", tariffID: "TID00018", tariffRate: 0.00, toLocationID: "TLID00003", vehicleTypeID: "VTID00004" },
+            { documentID: "TID00019", fromTollLocationID: "TLID00001", tariffID: "TID00019", tariffRate: 2.20, toLocationID: "TLID00004", vehicleTypeID: "VTID00004" },
+            { documentID: "TID00020", fromTollLocationID: "TLID00001", tariffID: "TID00020", tariffRate: 0.60, toLocationID: "TLID00005", vehicleTypeID: "VTID00004" },
+            { documentID: "TID00021", fromTollLocationID: "TLID00001", tariffID: "TID00021", tariffRate: 5.60, toLocationID: "TLID00001", vehicleTypeID: "VTID00005" },
+            { documentID: "TID00022", fromTollLocationID: "TLID00001", tariffID: "TID00022", tariffRate: 1.20, toLocationID: "TLID00002", vehicleTypeID: "VTID00005" },
+            { documentID: "TID00023", fromTollLocationID: "TLID00001", tariffID: "TID00023", tariffRate: 0.00, toLocationID: "TLID00003", vehicleTypeID: "VTID00005" },
+            { documentID: "TID00024", fromTollLocationID: "TLID00001", tariffID: "TID00024", tariffRate: 3.40, toLocationID: "TLID00004", vehicleTypeID: "VTID00005" },
+            { documentID: "TID00025", fromTollLocationID: "TLID00001", tariffID: "TID00025", tariffRate: 1.00, toLocationID: "TLID00005", vehicleTypeID: "VTID00005" }
+        ];
+
+        // UI Initialization & Counter Configuration
+        document.getElementById('payloadCount').innerText = tariffData.length;
+        const tableBody = document.getElementById('previewTableBody');
+
+        // Dynamically build rows into the UI view
+        tariffData.forEach(item => {
+            const row = `<tr>
+                <td class="ps-3"><code>${item.documentID}</code></td>
+                <td>${item.fromTollLocationID}</td>
+                <td><span class="badge bg-secondary">${item.tariffID}</span></td>
+                <td class="fw-bold text-dark">RM ${item.tariffRate.toFixed(2)}</td>
+                <td>${item.toLocationID}</td>
+                <td><span class="badge bg-info text-dark">${item.vehicleTypeID}</span></td>
+            </tr>`;
+            tableBody.innerHTML += row;
+        });
+
+        // Event Interceptor for writing batches
+        document.getElementById('importBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('importBtn');
+            const msgBox = document.getElementById('statusMessage');
+
+            // Toggle processing states
+            btn.disabled = true;
+            btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Writing Documents...`;
+            
+            msgBox.className = "alert d-none"; 
+            msgBox.innerText = "";
+
+            try {
+                // Instantiate clean batch controller instance
+                const batch = writeBatch(db);
+
+                tariffData.forEach((record) => {
+                    // Mapping collection collection target explicit document ID assignment
+                    const docRef = doc(db, "tollTariff", record.documentID);
+                    
+                    // Structural destructuring extraction (stripping top key data array context cleanly)
+                    const { documentID, ...cleanPayload } = record;
+                    
+                    batch.set(docRef, cleanPayload);
+                });
+
+                // Dispatch full execution batch array transaction
+                await batch.commit();
+
+                // Build out global confirmation message frame
+                msgBox.className = "alert alert-success d-block animated fadeIn";
+                msgBox.innerHTML = `<i class="bi bi-check-circle-fill me-2"></i><strong>Migration Successful!</strong> ${tariffData.length} records processed and locked into Firestore <code>tollTariff</code> collection.`;
+                btn.className = "btn btn-success btn-lg";
+                btn.innerHTML = `<i class="bi bi-cloud-check-fill me-2"></i>Completed`;
+
+            } catch (error) {
+                console.error("Firebase Error Pipeline Failure: ", error);
+                msgBox.className = "alert alert-danger d-block";
+                msgBox.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-2"></i><strong>Transaction Aborted:</strong> ${error.message}`;
+                btn.disabled = false;
+                btn.innerHTML = `<i class="bi bi-cloud-arrow-up-fill me-2"></i>Retry Batch Import`;
+            }
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
