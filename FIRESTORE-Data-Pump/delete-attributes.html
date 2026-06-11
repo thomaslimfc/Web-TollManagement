@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PLUS — Vehicle Schema Mod Utility</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 30px;
+            padding-bottom: 50px;
+        }
+
+        .card {
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+        }
+
+        .table-responsive {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        thead th {
+            position: sticky;
+            top: 0;
+            background-color: #212529 !important;
+            color: #fff !important;
+            z-index: 1;
+        }
+
+        .editable-cell {
+            border: 1px solid transparent;
+            background: transparent;
+            padding: 4px 8px;
+            border-radius: 4px;
+            width: 100%;
+            transition: all 0.2s ease;
+        }
+
+        .editable-cell:focus {
+            border-color: #86b7fe;
+            outline: 0;
+            background-color: #fff;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+
+        .doc-id-field {
+            font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            background-color: #f1f3f5;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container-fluid px-lg-5">
+        <div class="row justify-content-center">
+            <div class="col-12">
+
+                <div class="d-flex align-items-center justify-content-between mb-4 border-bottom pb-3">
+                    <div>
+                        <h1 class="h3 mb-1"><i class="bi bi-sliders text-danger me-2"></i>Vehicle Schema Modifier</h1>
+                        <p class="text-muted mb-0">Modify documents inline, or purge specific structural schema keys globally across the collection.</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button id="refreshBtn" class="btn btn-outline-secondary btn-lg shadow-sm">
+                            <i class="bi bi-arrow-clockwise"></i> Refresh
+                        </button>
+                        <button id="deleteFieldBtn" class="btn btn-danger btn-lg shadow-sm" disabled>
+                            <i class="bi bi-trash3-fill me-2"></i>Delete All vehicleType Fields
+                        </button>
+                        <button id="saveBtn" class="btn btn-success btn-lg shadow-sm" disabled>
+                            <i class="bi bi-cloud-check-fill me-2"></i>Save Changes to Firestore
+                        </button>
+                    </div>
+                </div>
+
+                <div id="statusMessage" class="alert d-none mb-4" role="alert"></div>
+
+                <div class="card">
+                    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
+                        <h5 class="mb-0 card-title h6"><i class="bi bi-table me-2"></i>Workspace Matrix Preview (<span id="payloadCount">0</span> records)</h5>
+                        <span class="badge bg-danger">Target Collection: vehicle</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0" id="editorTable">
+                                <thead id="tableHeader"></thead>
+                                <tbody id="previewTableBody">
+                                    <tr>
+                                        <td class="text-center text-muted py-5">
+                                            <div class="spinner-border spinner-border-sm me-2" role="status"></div> Reading cloud cluster configurations...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, writeBatch, doc, updateDoc, deleteField } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // ══════〔 🔴 REPLACE WITH YOUR WEB APP CONFIG DETAILS 〕══════
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "plus-370c3.firebaseapp.com",
+            projectId: "plus-370c3",
+            storageBucket: "plus-370c3.appspot.com",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize connection integrations
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Runtime Global Tracking Arrays
+        let localSnapshotData = []; 
+        let globalFieldsList = [];
+
+        // Fetch database items and construct dynamic input grid columns
+        async function fetchAndBuildTable() {
+            const saveBtn = document.getElementById('saveBtn');
+            const deleteFieldBtn = document.getElementById('deleteFieldBtn');
+            const tableHead = document.getElementById('tableHeader');
+            const tableBody = document.getElementById('previewTableBody');
+            const counter = document.getElementById('payloadCount');
+
+            saveBtn.disabled = true;
+            deleteFieldBtn.disabled = true;
+            tableBody.innerHTML = `<tr><td class="text-center py-5 text-muted"><div class="spinner-border spinner-border-sm me-2" role="status"></div>Downloading fresh dataset references...</td></tr>`;
+
+            try {
+                const querySnapshot = await getDocs(collection(db, "vehicle"));
+                localSnapshotData = [];
+                let fieldsSet = new Set();
+
+                querySnapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    Object.keys(data).forEach(key => fieldsSet.add(key));
+                    localSnapshotData.push({
+                        id: docSnap.id,
+                        originalId: docSnap.id,
+                        fields: data
+                    });
+                });
+
+                globalFieldsList = Array.from(fieldsSet);
+                counter.innerText = localSnapshotData.length;
+
+                if (localSnapshotData.length === 0) {
+                    tableHead.innerHTML = '';
+                    tableBody.innerHTML = `<tr><td class="text-center py-5 text-muted">No records found inside the "vehicle" collection.</td></tr>`;
+                    return;
+                }
+
+                // Assemble Table Headers dynamically
+                let headerRow = `<tr><th scope="col" class="ps-3" style="width: 250px;">Document ID (Key)</th>`;
+                globalFieldsList.forEach(field => {
+                    // Visually highlight vehicleType if it is found in the columns list
+                    if (field === 'vehicleType') {
+                        headerRow += `<th scope="col" class="table-danger text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i>vehicleType</th>`;
+                    } else {
+                        headerRow += `<th scope="col">${field}</th>`;
+                    }
+                });
+                headerRow += `</tr>`;
+                tableHead.innerHTML = headerRow;
+
+                // Render functional input cell components
+                tableBody.innerHTML = "";
+                localSnapshotData.forEach((record, index) => {
+                    let tr = document.createElement('tr');
+                    
+                    // Column Cell 1: Editable Document ID Key
+                    let tdId = document.createElement('td');
+                    tdId.className = "ps-3";
+                    tdId.innerHTML = `<input type="text" class="form-control form-control-sm doc-id-field editable-cell" data-row="${index}" data-type="doc-id" value="${record.id}">`;
+                    tr.appendChild(tdId);
+
+                    // Document Data Payload Field Columns
+                    globalFieldsList.forEach(field => {
+                        let tdField = document.createElement('td');
+                        if (field === 'vehicleType') tdField.className = "table-danger-subtle";
+                        
+                        let currentVal = record.fields[field] !== undefined ? record.fields[field] : '';
+                        let displayedString = typeof currentVal === 'object' ? JSON.stringify(currentVal) : currentVal;
+
+                        tdField.innerHTML = `<input type="text" class="editable-cell" data-row="${index}" data-field="${field}" value="${displayedString}">`;
+                        tr.appendChild(tdField);
+                    });
+
+                    tableBody.appendChild(tr);
+                });
+
+                setupInputEventListeners();
+                saveBtn.disabled = false;
+                deleteFieldBtn.disabled = false;
+
+            } catch (err) {
+                console.error("Pipeline read failure: ", err);
+                document.getElementById('statusMessage').className = "alert alert-danger d-block";
+                document.getElementById('statusMessage').innerText = "Failed to synchronize table data: " + err.message;
+            }
+        }
+
+        // Handle inline cell structural adjustments
+        function setupInputEventListeners() {
+            const table = document.getElementById('editorTable');
+            table.querySelectorAll('input').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    const rowIndex = e.target.getAttribute('data-row');
+                    const fieldName = e.target.getAttribute('data-field');
+                    const isDocId = e.target.getAttribute('data-type') === 'doc-id';
+                    const value = e.target.value;
+
+                    if (isDocId) {
+                        localSnapshotData[rowIndex].id = value;
+                    } else {
+                        let preparedVal = value;
+                        if(value !== '' && !isNaN(value)) {
+                            preparedVal = Number(value);
+                        } else if (value.toLowerCase() === 'true') {
+                            preparedVal = true;
+                        } else if (value.toLowerCase() === 'false') {
+                            preparedVal = false;
+                        }
+                        localSnapshotData[rowIndex].fields[fieldName] = preparedVal;
+                    }
+                });
+            });
+        }
+
+        // Inline manual edits batch processor
+        document.getElementById('saveBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('saveBtn');
+            const msgBox = document.getElementById('statusMessage');
+
+            btn.disabled = true;
+            btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Saving...`;
+            msgBox.className = "alert d-none";
+
+            try {
+                const batch = writeBatch(db);
+                for (const record of localSnapshotData) {
+                    if (record.id !== record.originalId) {
+                        batch.delete(doc(db, "vehicle", record.originalId));
+                    }
+                    batch.set(doc(db, "vehicle", record.id), record.fields);
+                }
+                await batch.commit();
+
+                msgBox.className = "alert alert-success d-block";
+                msgBox.innerHTML = `<i class="bi bi-check-circle-fill me-2"></i><strong>Changes Saved!</strong> Inline changes pushed to Firestore.`;
+                await fetchAndBuildTable();
+
+            } catch (error) {
+                msgBox.className = "alert alert-danger d-block";
+                msgBox.innerHTML = `<strong>Error saving modifications:</strong> ${error.message}`;
+                btn.disabled = false;
+                btn.innerHTML = `<i class="bi bi-cloud-check-fill me-2"></i>Retry Changes Save`;
+            }
+        });
+
+        // ══════〔 🗑️ STRIP "vehicleType" FIELD GLOBALLY ACROSS ALL DOCUMENTS 〕══════
+        document.getElementById('deleteFieldBtn').addEventListener('click', async () => {
+            if (!confirm("Are you absolutely sure you want to completely drop and delete the 'vehicleType' column attribute field from ALL documents inside Firestore? This action is permanent.")) {
+                return;
+            }
+
+            const btn = document.getElementById('deleteFieldBtn');
+            const msgBox = document.getElementById('statusMessage');
+
+            btn.disabled = true;
+            btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Purging Field Keys...`;
+            msgBox.className = "alert d-none";
+
+            try {
+                // Instantiating a clean database modification batch pipeline
+                const batch = writeBatch(db);
+                let targetedCount = 0;
+
+                localSnapshotData.forEach((record) => {
+                    const docRef = doc(db, "vehicle", record.originalId);
+                    
+                    // Atomically target and isolate 'vehicleType' for total detachment from database payload
+                    batch.update(docRef, {
+                        vehicleType: deleteField()
+                    });
+                    targetedCount++;
+                });
+
+                // Commit modification transactions asynchronously to Google Server endpoints
+                await batch.commit();
+
+                msgBox.className = "alert alert-warning d-block";
+                msgBox.innerHTML = `<i class="bi bi-trash3 text-dark me-2"></i><strong>Purge Complete!</strong> The field attribute mapping <code>vehicleType</code> was successfully unmapped and deleted from ${targetedCount} vehicle documents.`;
+                
+                // Regenerate structural views automatically
+                await fetchAndBuildTable();
+
+            } catch (error) {
+                console.error("Purge failure pipeline alert: ", error);
+                msgBox.className = "alert alert-danger d-block";
+                msgBox.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-2"></i><strong>Execution Aborted:</strong> Failed to strip fields. ${error.message}`;
+                btn.disabled = false;
+                btn.innerHTML = `<i class="bi bi-trash3-fill me-2"></i>Retry Batch Field Purge`;
+            }
+        });
+
+        // Initialize System hooks
+        document.getElementById('refreshBtn').addEventListener('click', fetchAndBuildTable);
+        window.addEventListener('DOMContentLoaded', fetchAndBuildTable);
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
