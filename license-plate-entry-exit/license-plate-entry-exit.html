@@ -7,15 +7,11 @@
     <title>PLUS — License Plate Entry/Exit</title>
 
     <link rel="stylesheet" href="../lib/master-layout.css">
-
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
 
 <body>
-    <!-- Top Navigation -->
     <header class="navbar navbar-expand-lg navbar-dark bg-light fixed-top">
         <div class="container-fluid">
             <button class="navbar-toggler sidebar-toggler d-lg-none me-2" type="button" style="display: none;">
@@ -46,7 +42,6 @@
         </div>
     </header>
 
-    <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <ul class="nav flex-column">
             <li class="nav-item">
@@ -112,227 +107,322 @@
         </ul>
     </div>
 
-    <!-- Main Content -->
-
-    <!-- ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡
-    . . . . . . LICENSE PLATE ENTRY/EXIT - (Section 1)
-    . . .⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡ -->
-
     <div class="main-content" id="mainContent">
         <h1>License Plate Entry/Exit</h1>
-        <p>Monitor and review real-time entry and exit timestamps for all registered license plates.</p>
+        <p>Monitor and review real-time entry and exit timestamps filtering by Toll Location descriptions.</p>
         <br>
 
-        <div class="form-group row">
-            <label for="inputLocation" class="col-sm-2 col-form-label">Toll Booth</label>
-            <div class="col-sm-10" style="width: 250px;">
-                <select class="form-select" id="inputBoothID" required>
-                    <option selected disabled>Select Booth ID</option>
-                </select>
+        <div class="container-fluid mb-4">
+            <form id="searchForm">
+                <div class="form-group row align-items-center">
+                    <label for="inputLocationDesc" class="col-sm-2 col-form-label">Toll Location</label>
+                    <div class="col-sm-10" style="width: 350px;">
+                        <select class="form-select" id="inputLocationDesc" required disabled>
+                            <option value="" selected disabled>Loading Toll Locations...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <button type="submit" id="searchBtn" class="btn btn-success" disabled>Search Records</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 border-bottom border-light d-flex align-items-center justify-content-between">
+                <h5 class="card-title mb-0 fw-bold text-dark d-flex align-items-center gap-2">
+                    <i class="bi bi-collection text-success"></i> Transaction Records
+                </h5>
+                <span id="recordCount" class="badge bg-light text-dark border fw-medium px-2 py-1.5">1 record(s) found</span>
             </div>
-        </div>
-        <div class="mt-3">
-            <button id="searchBtn" class="btn btn-success">Search</button>
-        </div>
-        <br>
-        <br>
-        <div class="form-group row" style="padding-left: 10px;">
-            <h5 class="mb-3">Records</h5>
-            <div class="container-fluid">
-                <table class="table table-bordered table-striped w-auto">
-                    <thead>
-                        <tr>
-                            <th scope="row" width="150px">Transaction ID</th>
-                            <th scope="row" width="150px">Commuter ID</th>
-                            <th scope="row" width="150px">Vehicle ID</th>
-                            <th scope="row" width="150px">License Plate</th>
-                            <th scope="row" width="150px">Car Make</th>
-                            <th scope="row" width="150px">Car Model</th>
-                            <th scope="row" width="150px">Entry Timestamp</th>
-                            <th scope="row" width="150px">Exit Timestamp</th>
-                            <th scope="row" width="150px">Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody id="recordsTableBody"></tbody>
-                </table>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped align-middle mb-0 text-nowrap">
+                        <thead class="table-light text-secondary uppercase font-weight-bold small">
+                            <tr>
+                                <th scope="col" class="ps-4 py-3" style="min-width: 160px;">Transaction ID</th>
+                                <th scope="col" style="min-width: 140px;">Commuter ID</th>
+                                <th scope="col" style="min-width: 140px;">Vehicle ID</th>
+                                <th scope="col" style="min-width: 150px;">License Plate</th>
+                                <th scope="col" style="min-width: 140px;">Car Make</th>
+                                <th scope="col" style="min-width: 140px;">Car Model</th>
+                                <th scope="col" style="min-width: 200px;">Entry Timestamp</th>
+                                <th scope="col" style="min-width: 200px;">Exit Timestamp</th>
+                                <th scope="col" class="pe-4 text-end" style="min-width: 130px;">Amount (RM)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recordsTableBody">
+                            <tr>
+                                <td class="ps-4 fw-mono text-dark fw-bold">TTID00001</td>
+                                <td class="text-secondary small">CID00005</td>
+                                <td class="text-secondary small">VID00004</td>
+                                <td><span class="badge bg-dark font-monospace px-2.5 py-1.5 fs-6 shadow-sm border border-secondary">W1589J</span></td>
+                                <td class="fw-semibold text-dark">Toyota</td>
+                                <td class="text-secondary">Camry</td>
+                                <td class="text-muted small"><i class="bi bi-box-arrow-in-right text-success me-1"></i> 12/06/2026, 2:24:16 am</td>
+                                <td class="text-muted small"><i class="bi bi-box-arrow-left text-danger me-1"></i> 12/06/2026, 2:25:56 am</td>
+                                <td class="pe-4 text-end fw-bold text-success">RM 19.50</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-
-
-    
-    <!-- ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡
-    . . . . . . JAVASCRIPT - LICENSE PLATE ENTRY/EXIT - (Section 1)
-    . . .⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡ -->
 
     <script type="module">
         import { initializeFirebase } from '/lib/firebase_init.js';
 
         document.addEventListener('DOMContentLoaded', async () => {
             const searchBtn = document.getElementById('searchBtn');
+            const tableBody = document.getElementById('recordsTableBody');
+            const recordCountBadge = document.getElementById('recordCount');
+            const locationSelect = document.getElementById('inputLocationDesc');
 
-            const formInputs = [
-                'inputBoothID',
-            ];
-
-            function setFormEnabled() {
-                formInputs.forEach(id => {
-                    document.getElementById(id).disabled = false;
-                });
-            }
-
-            async function loadBoothIdOptions() {
-                try {
-                    const { db } = await initializeFirebase();
-                    const snapshot = await db.collection("tollBooth").get();
-                    const boothIdSelect = document.getElementById("inputBoothID");
-                    snapshot.forEach(doc => {
-                        const docId = doc.id;
-                        const option = document.createElement("option");
-                        option.value = docId;
-                        option.textContent = docId;
-                        boothIdSelect.appendChild(option);
-                    });
-                } catch (error) {
-                    console.error("Error loading Booth ID options:", error);
-                    alert("Failed to load booth list.");
+            // Helper function to cleanly format Firestore Timestamp instances
+            function formatTimestamp(timestamp) {
+                if (!timestamp) return 'N/A';
+                if (typeof timestamp.toDate === 'function') {
+                    return timestamp.toDate().toLocaleString('en-MY', { timeZone: 'Asia/Kuala_Lumpur' });
                 }
+                return String(timestamp);
             }
 
-            async function searchBoothID() {
-                const tableBody = document.getElementById('recordsTableBody');
-
+            // Populates unique location descriptions inside the dropdown select menu option list
+            async function loadLocationOptions() {
                 try {
                     const { db } = await initializeFirebase();
-                    const boothID = document.getElementById('inputBoothID').value;
+                    const snapshot = await db.collection("tollLocation").get();
 
-                    // clear old rows
-                    tableBody.innerHTML = "";
+                    locationSelect.innerHTML = '<option value="" selected disabled>Select Toll Location</option>';
 
-                    // get ALL transactions (no limit)
-                    const querySnapshot = await db.collection('tollTransaction')
-                        .where('boothID', '==', boothID)
-                        .orderBy('entryTimestamp', 'desc')
-                        .get();
-
-                    if (querySnapshot.empty) {
-                        tableBody.innerHTML = `<tr><td colspan="9">No records found</td></tr>`;
+                    if (snapshot.empty) {
+                        alert("No toll locations found in database.");
                         return;
                     }
 
-                    // loop all records
-                    for (const doc of querySnapshot.docs) {
+                    snapshot.forEach(doc => {
                         const data = doc.data();
+                        if (data.description) {
+                            const option = document.createElement("option");
+                            option.value = data.description;
+                            option.textContent = data.description;
+                            locationSelect.appendChild(option);
+                        }
+                    });
 
-                        const commuterID = data.commuterID;
-                        const vehicleID = data.vehicleID;
+                    // Enable form UI fields once loaded successfully
+                    locationSelect.disabled = false;
+                    searchBtn.disabled = false;
 
+                    // Automatically select first option if available
+                    if (locationSelect.options.length > 1) {
+                        locationSelect.value = locationSelect.options[1].value;
+                    }
+
+                } catch (error) {
+                    console.error("Error loading location descriptions:", error);
+                    alert("Failed to load toll location filter options.");
+                }
+            }
+
+            async function searchByLocationDescription() {
+                try {
+                    const { db } = await initializeFirebase();
+                    const targetDescription = locationSelect.value;
+
+                    if (!targetDescription) {
+                        alert("Please select a valid Toll Location.");
+                        return;
+                    }
+
+                    // Render placeholder loading UI indicator
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="9" class="text-center py-5 text-success">
+                                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                                Tracking relational locations, checking booth boundaries, and generating records...
+                            </td>
+                        </tr>
+                    `;
+
+                    // Step 1: Find matching tollLocation elements mapping to description string
+                    const locationSnapshot = await db.collection('tollLocation')
+                        .where('description', '==', targetDescription)
+                        .get();
+
+                    if (locationSnapshot.empty) {
+                        tableBody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-muted"><i class="bi bi-slash-circle me-1"></i> No locations matching this description found.</td></tr>`;
+                        recordCountBadge.textContent = "0 records found";
+                        return;
+                    }
+
+                    const locationIDs = [];
+                    locationSnapshot.forEach(doc => {
+                        const data = doc.data();
+                        if (data.tollLocationID) locationIDs.push(data.tollLocationID);
+                    });
+
+                    if (locationIDs.length === 0) {
+                        tableBody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-muted"><i class="bi bi-slash-circle me-1"></i> Target fields are structurally missing identifiers.</td></tr>`;
+                        return;
+                    }
+
+                    // Step 2: Fetch corresponding toll booths that link to these location IDs
+                    const boothSnapshot = await db.collection('tollBooth')
+                        .where('tollLocationID', 'in', locationIDs)
+                        .get();
+
+                    if (boothSnapshot.empty) {
+                        tableBody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-muted"><i class="bi bi-slash-circle me-1"></i> No physical booths linked to this location.</td></tr>`;
+                        recordCountBadge.textContent = "0 records found";
+                        return;
+                    }
+
+                    const boothIDs = [];
+                    boothSnapshot.forEach(doc => {
+                        const data = doc.data();
+                        if (data.boothID) boothIDs.push(data.boothID);
+                    });
+
+                    // Step 3: Fetch 'lprRecord' entries tied to these booth IDs (Batch split by 30 max forFirestore 'in' limits)
+                    const entryRecordIDs = [];
+                    const batchSize = 30;
+
+                    for (let i = 0; i < boothIDs.length; i += batchSize) {
+                        const batchBooths = boothIDs.slice(i, i + batchSize);
+                        const lpSnapshot = await db.collection('lprRecord')
+                            .where('tollBoothID', 'in', batchBooths)
+                            .where('tollEventType', '==', 'entry')
+                            .get();
+
+                        lpSnapshot.forEach(doc => {
+                            entryRecordIDs.push(doc.id);
+                        });
+                    }
+
+                    if (entryRecordIDs.length === 0) {
+                        tableBody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-muted"><i class="bi bi-slash-circle me-1"></i> No matching entry records found for this booth cluster.</td></tr>`;
+                        recordCountBadge.textContent = "0 records found";
+                        return;
+                    }
+
+                    // Step 4: Fetch corresponding toll transactions using entryLprRecordID matching our entry IDs
+                    const transactionsList = [];
+                    for (let i = 0; i < entryRecordIDs.length; i += batchSize) {
+                        const batchIDs = entryRecordIDs.slice(i, i + batchSize);
+                        const transSnapshot = await db.collection('tollTransaction')
+                            .where('entryLprRecordID', 'in', batchIDs)
+                            .get();
+
+                        transSnapshot.forEach(doc => {
+                            transactionsList.push({ id: doc.id, ...doc.data() });
+                        });
+                    }
+
+                    // Sort compiled arrays down sequentially by record insertion initialization timestamp
+                    transactionsList.sort((a, b) => {
+                        const timeA = a.createdAt ? (a.createdAt.seconds || 0) : 0;
+                        const timeB = b.createdAt ? (b.createdAt.seconds || 0) : 0;
+                        return timeB - timeA; // Descending order (Latest First)
+                    });
+
+                    if (transactionsList.length === 0) {
+                        tableBody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-muted"><i class="bi bi-slash-circle me-1"></i> No transaction logs exist linked to this location.</td></tr>`;
+                        recordCountBadge.textContent = "0 records found";
+                        return;
+                    }
+
+                    recordCountBadge.textContent = `${transactionsList.length} record(s) found`;
+                    const rows = [];
+
+                    // Fetch details sequentially across linked document layers
+                    for (const transData of transactionsList) {
                         let licensePlate = "N/A";
                         let carMake = "N/A";
                         let carModel = "N/A";
+                        let entryTimeStr = "N/A";
+                        let exitTimeStr = "N/A";
 
-                        // get vehicle info
-                        const vehicleSnap = await db.collection('vehicle')
-                            .where('vehicleID', '==', vehicleID)
-                            .limit(1)
-                            .get();
-
-                        if (!vehicleSnap.empty) {
-                            const v = vehicleSnap.docs[0].data();
-                            licensePlate = v.licensePlate || "N/A";
-                            carMake = v.carMake || "N/A";
-                            carModel = v.carModel || "N/A";
-                        }
-
-                        // create row
-                        const row = `
-                            <tr>
-                                <td>${data.transactionID || 'N/A'}</td>
-                                <td>${commuterID || 'N/A'}</td>
-                                <td>${vehicleID || 'N/A'}</td>
-                                <td>${licensePlate}</td>
-                                <td>${carMake}</td>
-                                <td>${carModel}</td>
-                                <td>${data.entryTimestamp || 'N/A'}</td>
-                                <td>${data.exitTimestamp || 'N/A'}</td>
-                                <td>${data.amountCharged || 'N/A'}</td>
-                            </tr>
-                        `;
-
-                        const rows = [];
-
-                        for (const doc of querySnapshot.docs) {
-                            const data = doc.data();
-
-                            let licensePlate = "N/A";
-                            let carMake = "N/A";
-                            let carModel = "N/A";
-
-                            const vehicleSnap = await db.collection('vehicle')
-                                .where('vehicleID', '==', data.vehicleID)
-                                .limit(1)
-                                .get();
-
-                            if (!vehicleSnap.empty) {
-                                const v = vehicleSnap.docs[0].data();
+                        // Fetch details from vehicle collection matching vehicleID
+                        if (transData.vehicleID) {
+                            const vehicleSnap = await db.collection('vehicle').doc(transData.vehicleID).get();
+                            if (vehicleSnap.exists) {
+                                const v = vehicleSnap.data();
                                 licensePlate = v.licensePlate || "N/A";
                                 carMake = v.carMake || "N/A";
                                 carModel = v.carModel || "N/A";
                             }
-
-                            rows.push(`
-                                <tr>
-                                    <td>${data.transactionID || 'N/A'}</td>
-                                    <td>${data.commuterID || 'N/A'}</td>
-                                    <td>${data.vehicleID || 'N/A'}</td>
-                                    <td>${licensePlate}</td>
-                                    <td>${carMake}</td>
-                                    <td>${carModel}</td>
-                                    <td>${data.entryTimestamp || 'N/A'}</td>
-                                    <td>${data.exitTimestamp || 'N/A'}</td>
-                                    <td>${data.amountCharged || 'N/A'}</td>
-                                </tr>
-                            `);
                         }
 
-                        tableBody.innerHTML = rows.join("");
+                        // Fetch explicit entry LPR capture timestamp 
+                        if (transData.entryLprRecordID) {
+                            const entryLpSnap = await db.collection('lprRecord').doc(transData.entryLprRecordID).get();
+                            if (entryLpSnap.exists) {
+                                entryTimeStr = formatTimestamp(entryLpSnap.data().capturedAt);
+                            }
+                        }
+
+                        // Fetch explicit exit LPR capture timestamp
+                        if (transData.exitLprRecordID) {
+                            const exitLpSnap = await db.collection('lprRecord').doc(transData.exitLprRecordID).get();
+                            if (exitLpSnap.exists) {
+                                exitTimeStr = formatTimestamp(exitLpSnap.data().capturedAt);
+                            }
+                        }
+
+                        // Map tariffRate safely matching your collection structures
+                        const formattedAmount = typeof transData.tariffRate === 'number'
+                            ? transData.tariffRate.toFixed(2)
+                            : '0.00';
+
+                        rows.push(`
+                            <tr>
+                                <td class="text-secondary small">${transData.tollTransactionID || transData.id || 'N/A'}</td>
+                                <td class="text-secondary small">${transData.commuterID || 'N/A'}</td>
+                                <td class="text-secondary small">${transData.vehicleID || 'N/A'}</td>
+                                <td><span class="badge bg-dark font-monospace px-2.5 py-1.5 fs-6 shadow-sm border border-secondary">${licensePlate}</span></td>
+                                <td class="fw-semibold text-dark">${carMake}</td>
+                                <td class="text-secondary">${carModel}</td>
+                                <td class="text-muted small"><i class="bi bi-box-arrow-in-right text-success me-1"></i> ${entryTimeStr}</td>
+                                <td class="text-muted small"><i class="bi bi-box-arrow-left text-danger me-1"></i> ${exitTimeStr}</td>
+                                <td class="pe-4 text-end fw-bold text-success">RM ${formattedAmount}</td>
+                            </tr>
+                        `);
                     }
 
+                    tableBody.innerHTML = rows.join("");
+
                 } catch (error) {
-                    console.error("FULL ERROR:", error);
-                    alert(error.message);
+                    console.error("CRITICAL SEARCH EXCEPTION INTERCEPTED:", error);
+                    alert("An error occurred while filtering query collections: " + error.message);
+                    tableBody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i> Processing failed for chosen parameter scope.</td></tr>`;
                 }
             }
 
-            searchBtn.addEventListener('click', async (e) => {
+            // Bind explicitly to intercept structural form submission actions
+            document.getElementById('searchForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
-                await searchBoothID();
+                await searchByLocationDescription();
             });
 
-            await loadBoothIdOptions();
-            setFormEnabled();
-
-            // Optional: auto-select first location if none selected
-            const selectedBoothID = document.getElementById('inputBoothID');
-            if (!selectedBoothID.value && selectedBoothID.options.length > 0) {
-                selectedBoothID.value = selectedBoothID.options[0].value;
-            }
+            // Run initial database load routines
+            await loadLocationOptions();
         });
     </script>
 
-    <!-- Bootstrap JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
-
     <script>
-        // Toggle sidebar on mobile
-        document.querySelector('.sidebar-toggler').addEventListener('click', function () {
+        // Toggle sidebar on mobile viewports
+        document.querySelector('.navbar-toggler').addEventListener('click', function () {
             document.getElementById('sidebar').classList.toggle('show');
         });
 
-        // Close sidebar when clicking outside on mobile
+        // Close sidebar when clicking outside boundaries on mobile device displays
         document.addEventListener('click', function (event) {
             const sidebar = document.getElementById('sidebar');
-            const toggler = document.querySelector('.sidebar-toggler');
+            const toggler = document.querySelector('.navbar-toggler');
 
             if (window.innerWidth < 992 &&
                 !sidebar.contains(event.target) &&
