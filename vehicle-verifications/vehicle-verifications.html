@@ -8,14 +8,11 @@
 
     <link rel="stylesheet" href="../lib/master-layout.css">
 
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
 
 <body>
-    <!-- Top Navigation -->
     <header class="navbar navbar-expand-lg navbar-dark bg-light fixed-top">
         <div class="container-fluid">
             <button class="navbar-toggler sidebar-toggler d-lg-none me-2" type="button" style="display: none;">
@@ -47,7 +44,6 @@
         </div>
     </header>
 
-    <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <ul class="nav flex-column">
             <li class="nav-item">
@@ -113,400 +109,272 @@
         </ul>
     </div>
 
-    <!-- Main Content -->
     <div class="main-content" id="mainContent">
-
-
-
-        <!-- ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡
-        . . . . . . PENDING APPLICATION REVIEW (Section 1)
-        ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡ -->
 
         <h1>Pending Application Review ⏳</h1>
         <p>Review submitted documentation to approve or reject new vehicle registration requests.</p>
+        <br>
 
-        <div class="form-group row " style="padding-left: 10px;">
-            <div class="container-fluid">
-                <table class="table table-bordered table-striped w-auto">
-                    <thead>
-                        <tr>
-                            <th scope="row" width="150px">Commuter ID</th>
-                            <th scope="row" width="150px">Vehicle ID</th>
-                            <th scope="row" width="150px">Vehicle Type</th>
-                            <th scope="row" width="150px">License Plate</th>
-                            <th scope="row" width="150px">NRIC No.</th>
-                            <th scope="row" width="150px">Commuter Name</th>
-                            <th scope="row" width="150px">Car Make</th>
-                            <th scope="row" width="150px">Car Model</th>
-                            <th scope="row" width="150px">Manufacturing Year</th>
-                            <th scope="row" width="150px">Document</th>
-                            <th scope="row" width="150px">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="pendingTableBody"></tbody>
-                </table>
+        <div class="card border-0 shadow-sm mb-5">
+            <div class="card-header bg-white py-3 border-bottom border-light d-flex align-items-center justify-content-between">
+                <h5 class="card-title mb-0 fw-bold text-dark d-flex align-items-center gap-2">
+                    <i class="bi bi-clock-history text-warning"></i> Pending Requests
+                </h5>
+                <span id="pendingRecordCount" class="badge bg-light text-dark border fw-medium px-2 py-1.5">Loading records...</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped align-middle mb-0 text-nowrap">
+                        <thead class="table-light text-secondary uppercase font-weight-bold small">
+                            <tr>
+                                <th scope="col" style="min-width: 50px;">Commuter ID</th>
+                                <th scope="col" style="min-width: 50px;">Vehicle ID</th>
+                                <th scope="col" style="min-width: 50px;">NRIC No.</th>
+                                <th scope="col" style="min-width: 50px;">Commuter Name</th>
+                                <th scope="col" style="min-width: 50px;">License Plate</th>
+                                <th scope="col" style="min-width: 50px;">Mfg Year</th>
+                                <th scope="col" style="min-width: 50px;">Car Make</th>
+                                <th scope="col" style="min-width: 50px;">Car Model</th>
+                                <th scope="col" style="min-width: 50px;">Vehicle Type</th>
+                                <th scope="col" style="min-width: 50px;">Document</th>
+                                <th scope="col" style="min-width: 50px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pendingTableBody"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <br>
-        <hr>
-
-
-
-        <!-- ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡
-        . . . . . . REJECTED APPLICATIONS ARCHIVE (Section 2)
-        ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡ -->
 
         <h1>Rejected Applications Archive ❌</h1>
-        <p>Manage a list of declined registrations and view specific reasons for rejection, such as incomplete or
-            invalid information.</p>
+        <p>Manage a list of declined registrations and view specific reasons for rejection, such as incomplete or invalid information.</p>
+        <br>
 
-        <div class="form-group row" style="padding-left: 10px;">
-            <div class="container-fluid">
-                <table class="table table-bordered table-striped w-auto">
-                    <thead>
-                        <tr>
-                            <th scope="row" width="150px">Commuter ID</th>
-                            <th scope="row" width="150px">Vehicle ID</th>
-                            <th scope="row" width="150px">Vehicle Type</th>
-                            <th scope="row" width="150px">License Plate</th>
-                            <th scope="row" width="150px">NRIC No.</th>
-                            <th scope="row" width="150px">Commuter Name</th>
-                            <th scope="row" width="150px">Car Make</th>
-                            <th scope="row" width="150px">Car Model</th>
-                            <th scope="row" width="150px">Manufacturing Year</th>
-                            <th scope="row" width="150px">Document</th>
-                        </tr>
-                    </thead>
-                    <tbody id="rejectedTableBody"></tbody>
-                </table>
+        <div class="card border-0 shadow-sm mb-5">
+            <div class="card-header bg-white py-3 border-bottom border-light d-flex align-items-center justify-content-between">
+                <h5 class="card-title mb-0 fw-bold text-dark d-flex align-items-center gap-2">
+                    <i class="bi bi-x-circle text-danger"></i> Declined Records
+                </h5>
+                <span id="rejectedRecordCount" class="badge bg-light text-dark border fw-medium px-2 py-1.5">Loading records...</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped align-middle mb-0 text-nowrap">
+                        <thead class="table-light text-secondary uppercase font-weight-bold small">
+                            <tr>
+                                <th scope="col" style="min-width: 50px;">Commuter ID</th>
+                                <th scope="col" style="min-width: 50px;">Vehicle ID</th>
+                                <th scope="col" style="min-width: 50px;">NRIC No.</th>
+                                <th scope="col" style="min-width: 50px;">Commuter Name</th>
+                                <th scope="col" style="min-width: 50px;">License Plate</th>
+                                <th scope="col" style="min-width: 50px;">Mfg Year</th>
+                                <th scope="col" style="min-width: 50px;">Car Make</th>
+                                <th scope="col" style="min-width: 50px;">Car Model</th>
+                                <th scope="col" style="min-width: 50px;">Vehicle Type</th>
+                                <th scope="col" style="min-width: 50px;">Document</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rejectedTableBody"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <br>
-        <hr>
-
-
-
-        <!-- ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡
-        . . . . . . VERIFIED VEHICLE DIRECTORY (Section 3)
-        ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡ -->
 
         <h1>Verified Vehicle Directory ✅</h1>
         <p>Access the comprehensive database of successfully authenticated vehicles and authorized drivers.</p>
+        <br>
 
-        <div class="form-group row" style="padding-left: 10px;">
-            <div class="container-fluid">
-                <table class="table table-bordered table-striped w-auto">
-                    <thead>
-                        <tr>
-                            <th scope="row" width="150px">Commuter ID</th>
-                            <th scope="row" width="150px">Vehicle ID</th>
-                            <th scope="row" width="150px">Vehicle Type</th>
-                            <th scope="row" width="150px">License Plate</th>
-                            <th scope="row" width="150px">NRIC No.</th>
-                            <th scope="row" width="150px">Commuter Name</th>
-                            <th scope="row" width="150px">Car Make</th>
-                            <th scope="row" width="150px">Car Model</th>
-                            <th scope="row" width="150px">Manufacturing Year</th>
-                            <th scope="row" width="150px">Document</th>
-                        </tr>
-                    </thead>
-                    <tbody id="verifiedTableBody"></tbody>
-                </table>
+        <div class="card border-0 shadow-sm mb-5">
+            <div class="card-header bg-white py-3 border-bottom border-light d-flex align-items-center justify-content-between">
+                <h5 class="card-title mb-0 fw-bold text-dark d-flex align-items-center gap-2">
+                    <i class="bi bi-check-circle text-success"></i> Authenticated Directory
+                </h5>
+                <span id="verifiedRecordCount" class="badge bg-light text-dark border fw-medium px-2 py-1.5">Loading records...</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped align-middle mb-0 text-nowrap">
+                        <thead class="table-light text-secondary uppercase font-weight-bold small">
+                            <tr>
+                                <th scope="col" style="min-width: 50px;">Commuter ID</th>
+                                <th scope="col" style="min-width: 50px;">Vehicle ID</th>
+                                <th scope="col" style="min-width: 50px;">NRIC No.</th>
+                                <th scope="col" style="min-width: 50px;">Commuter Name</th>
+                                <th scope="col" style="min-width: 50px;">License Plate</th>
+                                <th scope="col" style="min-width: 50px;">Mfg Year</th>
+                                <th scope="col" style="min-width: 50px;">Car Make</th>
+                                <th scope="col" style="min-width: 50px;">Car Model</th>
+                                <th scope="col" style="min-width: 50px;">Vehicle Type</th>
+                                <th scope="col" style="min-width: 50px;">Document</th>
+                            </tr>
+                        </thead>
+                        <tbody id="verifiedTableBody"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 
-
-
-    <!-- ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡
-    . . . . . . JAVASCRIPT - PENDING APPLICATION REVIEW (Section 1)
-    ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡ -->
-
     <script type="module">
         import { initializeFirebase } from '/lib/firebase_init.js';
 
         document.addEventListener('DOMContentLoaded', async () => {
+            let db;
+            try {
+                const firebaseApp = await initializeFirebase();
+                db = firebaseApp.db;
+            } catch (err) {
+                console.error("Firebase Initialization Failure:", err);
+                return;
+            }
 
-            const tableBody = document.getElementById('pendingTableBody');
+            // Shared helper to safely lookup and resolve related references across collections
+            async function resolveRelations(vehicleData) {
+                let icNo = 'N/A';
+                let commuterName = 'N/A';
+                let vehicleTypeDesc = 'N/A';
 
-            // ══════〔 LOAD PENDING VEHICLES 〕══════
-            async function loadPendingVehicles() {
+                // 1. Map commuter details using field query .where()
+                if (vehicleData.commuterID) {
+                    try {
+                        const commuterSnapshot = await db.collection('commuter')
+                            .where('commuterID', '==', vehicleData.commuterID)
+                            .get();
+                        
+                        if (!commuterSnapshot.empty) {
+                            const commuterData = commuterSnapshot.docs[0].data();
+                            icNo = commuterData.icNo || 'N/A';
+                            commuterName = commuterData.fullName || 'N/A';
+                        }
+                    } catch (err) {
+                        console.error(`Error resolving Commuter data allocation [${vehicleData.commuterID}]:`, err);
+                    }
+                }
+
+                // 2. Map vehicle type structural definitions by using Document ID
+                if (vehicleData.vehicleTypeID) {
+                    try {
+                        const typeDoc = await db.collection('vehicleType').doc(vehicleData.vehicleTypeID).get();
+                        if (typeDoc.exists) {
+                            vehicleTypeDesc = typeDoc.data().description || 'N/A';
+                        }
+                    } catch (err) {
+                        console.error(`Error resolving Vehicle Type data allocation [${vehicleData.vehicleTypeID}]:`, err);
+                    }
+                }
+
+                return { icNo, commuterName, vehicleTypeDesc };
+            }
+
+            // High-Performance layout compiler to dynamically draw arrays matching status configurations
+            async function loadDynamicVehicleDirectory(status, tableBodyId, recordBadgeId, columnLength) {
+                const targetBody = document.getElementById(tableBodyId);
+                const targetBadge = document.getElementById(recordBadgeId);
 
                 try {
-
-                    const { db } = await initializeFirebase();
-
-                    tableBody.innerHTML = "";
+                    targetBody.innerHTML = `<tr><td colspan="${columnLength}" class="text-center py-4 text-muted">Synchronizing data rows...</td></tr>`;
 
                     const snapshot = await db.collection('vehicle')
-                        .where('verificationStatus', '==', 'Pending')
+                        .where('verificationStatus', '==', status)
                         .get();
 
                     if (snapshot.empty) {
-                        tableBody.innerHTML =
-                            `<tr><td colspan="11">No pending record(s) found</td></tr>`;
+                        targetBody.innerHTML = `<tr><td colspan="${columnLength}" class="text-center py-4 text-muted"><i class="bi bi-slash-circle me-1"></i> No ${status.toLowerCase()} record(s) found.</td></tr>`;
+                        targetBadge.textContent = "0 records found";
                         return;
                     }
 
-                    // run all commuter fetches together
-                    const rowsArray = await Promise.all(
+                    targetBadge.textContent = `${snapshot.size} record(s) found`;
 
+                    const renderedRows = await Promise.all(
                         snapshot.docs.map(async (doc) => {
-
                             const v = doc.data();
                             const docId = doc.id;
 
-                            let icNo = 'N/A';
-                            let commuterName = 'N/A';
+                            // Process background database collection joins asynchronously
+                            const { icNo, commuterName, vehicleTypeDesc } = await resolveRelations(v);
 
-                            try {
-
-                                const commuterDoc = await db.collection('commuter')
-                                    .doc(v.commuterID)
-                                    .get();
-
-                                if (commuterDoc.exists) {
-
-                                    const commuterData = commuterDoc.data();
-
-                                    icNo = commuterData.icNo || 'N/A';
-                                    commuterName = commuterData.fullName || 'N/A';
-                                }
-
-                            } catch (err) {
-                                console.error("Commuter fetch error:", err);
-                            }
+                            // Match operational UI context styles based on historical parameters
+                            const interfaceThemeClass = status === 'Rejected' ? 'btn-danger' : (status === 'Verified' ? 'btn-success' : 'btn-outline-primary');
 
                             return `
-                    <tr>
-                        <td class="text-secondary small">${v.commuterID || 'N/A'}</td>
-                        <td class="text-secondary small">${v.vehicleID || 'N/A'}</td>
-                        <td class="text-secondary small">${v.vehicleType || 'N/A'}</td>
-                        <td><span class="badge bg-dark font-monospace px-2.5 py-1.5 fs-6 shadow-sm border border-secondary">${v.licensePlate}</span></td>
-                        <td class="text-secondary small">${icNo}</td>
-                        <td class="text-secondary small">${commuterName}</td>
-                        <td class="text-secondary small">${v.carMake || 'N/A'}</td>
-                        <td class="text-secondary small">${v.carModel || 'N/A'}</td>
-                        <td class="text-secondary small">${v.manufacturingYear || 'N/A'}</td>
+                                <tr>
+                                    <td class="ps-4 text-secondary small">${v.commuterID || 'N/A'}</td>
+                                    <td class="text-secondary small">${v.vehicleID || 'N/A'}</td>
+                                    <td class="text-secondary small">${icNo}</td>
+                                    <td class="fw-semibold text-dark">${commuterName}</td>
+                                    <td><span class="badge bg-dark font-monospace px-2.5 py-1.5 fs-6 shadow-sm border border-secondary">${v.licensePlate || 'N/A'}</span></td>
+                                    <td class="fw-semibold text-dark">${v.manufacturingYear || 'N/A'}</td>
+                                    <td class="fw-semibold text-dark">${v.carMake || 'N/A'}</td>
+                                    <td class="fw-semibold text-dark">${v.carModel || 'N/A'}</td>
+                                    <td class="text-secondary small">${vehicleTypeDesc}</td>
 
-                        <td>
-                            <a href="/vehicle-verifications/VehicleOwnershipCertificate/${v.licensePlate}.pdf"
-                               target="_blank"
-                               class="btn btn-sm btn-primary">
 
-                               <i class="bi bi-file-earmark-pdf"></i>
-                               View Geran
-                            </a>
-                        </td>
-
-                        <td>
-                            <button class="btn btn-warning btn-sm approveBtn"
-                                    data-id="${docId}">
-                                ✔
-                            </button>
-
-                            <button class="btn btn-warning btn-sm rejectBtn"
-                                    data-id="${docId}">
-                                ✖
-                            </button>
-                        </td>
-                    </tr>
-                `;
+                                    <td>
+                                        <a href="/vehicle-verifications/VehicleOwnershipCertificate/${v.licensePlate}.pdf"
+                                           target="_blank"
+                                           class="btn btn-sm ${interfaceThemeClass} d-inline-flex align-items-center gap-1">
+                                            <i class="bi bi-file-earmark-pdf"></i> Geran
+                                        </a>
+                                    </td>
+                                    ${status === 'Pending' ? `
+                                    <td class="pe-4 text-end">
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-success btn-sm approveBtn d-inline-flex align-items-center gap-1" data-id="${docId}">
+                                                <i class="bi bi-check-lg pointer-events-none"></i> Approve
+                                            </button>
+                                            &nbsp;
+                                            <button class="btn btn-danger btn-sm rejectBtn d-inline-flex align-items-center gap-1" data-id="${docId}">
+                                                <i class="bi bi-x-lg pointer-events-none"></i> Reject
+                                            </button>
+                                        </div>
+                                    </td>` : ''}
+                                </tr>
+                            `;
                         })
                     );
 
-                    // join all rows once
-                    tableBody.innerHTML = rowsArray.join("");
+                    targetBody.innerHTML = renderedRows.join("");
 
                 } catch (error) {
-
-                    console.error("Error loading vehicles:", error);
-
-                    tableBody.innerHTML =
-                        `<tr><td colspan="11">Error loading data</td></tr>`;
+                    console.error(`Error context compilation processing for group [${status}]:`, error);
+                    targetBody.innerHTML = `<tr><td colspan="${columnLength}" class="text-center py-4 text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i> Error loading structural parameters</td></tr>`;
+                    targetBadge.textContent = "Error";
                 }
             }
 
-            // ══════〔 APPROVE / REJECT HANDLER 〕══════
+            // Universal event delegate listener monitoring actions pipeline
             document.addEventListener('click', async (e) => {
-                try {
-                    const { db } = await initializeFirebase();
+                const clickedApprove = e.target.classList.contains('approveBtn');
+                const clickedReject = e.target.classList.contains('rejectBtn');
 
-                    // ══════〔 ✅ APPROVE 〕══════
-                    if (e.target.classList.contains('approveBtn')) {
-                        const id = e.target.dataset.id;
+                if (clickedApprove || clickedReject) {
+                    try {
+                        const targetId = e.target.dataset.id;
+                        const updateStateString = clickedApprove ? 'Verified' : 'Rejected';
 
-                        await db.collection('vehicle').doc(id).update({
-                            verificationStatus: 'Verified',
+                        await db.collection('vehicle').doc(targetId).update({
+                            verificationStatus: updateStateString,
                             verifiedAt: new Date().toISOString()
                         });
 
-                        alert("Vehicle Approved");
-                        loadPendingVehicles();
-
+                        alert(`Vehicle status successfully configured to: ${updateStateString}`);
                         location.reload();
+                    } catch (error) {
+                        console.error("Action error processing update execution criteria:", error);
+                        alert(error.message);
                     }
-
-                    // ══════〔 ❌ REJECT 〕══════
-                    if (e.target.classList.contains('rejectBtn')) {
-                        const id = e.target.dataset.id;
-
-                        await db.collection('vehicle').doc(id).update({
-                            verificationStatus: 'Rejected',
-                            verifiedAt: new Date().toISOString()
-                        });
-
-                        alert("Vehicle Rejected");
-                        loadPendingVehicles();
-
-                        location.reload();
-                    }
-
-                } catch (error) {
-                    console.error("Action error:", error);
-                    alert(error.message);
                 }
             });
 
-            // ══════〔 AUTO LOAD ON PAGE OPEN 〕══════
-            await loadPendingVehicles();
+            // Parallel initiation execution pipeline
+            await loadDynamicVehicleDirectory('Pending', 'pendingTableBody', 'pendingRecordCount', 11);
+            await loadDynamicVehicleDirectory('Rejected', 'rejectedTableBody', 'rejectedRecordCount', 10);
+            await loadDynamicVehicleDirectory('Verified', 'verifiedTableBody', 'verifiedRecordCount', 10);
         });
     </script>
-
-
-
-    <!-- ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡
-    . . . . . . JAVASCRIPT - REJECTED APPLICATION ARCHIVE (Section 2) & VERIFIED VEHICLE DIRECTORY (Section 3)
-    ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡ -->
-
-    <!-- Display records only for Rejected and Verified -->
-    <script type="module">
-        import { initializeFirebase } from '/lib/firebase_init.js';
-
-        document.addEventListener('DOMContentLoaded', async () => {
-
-            const rejectedTable = document.getElementById('rejectedTableBody');
-            const verifiedTable = document.getElementById('verifiedTableBody');
-
-            // ══════〔 LOAD REJECTED RECORDS 〕══════
-            async function loadRejected() {
-                try {
-                    const { db } = await initializeFirebase();
-
-                    rejectedTable.innerHTML = "";
-
-                    const snapshot = await db.collection('vehicle')
-                        .where('verificationStatus', '==', 'Rejected')
-                        .get();
-
-                    if (snapshot.empty) {
-                        rejectedTable.innerHTML = `<tr><td colspan="10">No rejected record(s) found</td></tr>`;
-                        return;
-                    }
-
-                    let rows = "";
-
-                    snapshot.forEach(doc => {
-                        const v = doc.data();
-
-                        rows += `
-                            <tr>
-                                <td class="text-secondary small">${v.commuterID || 'N/A'}</td>
-                                <td class="text-secondary small">${v.vehicleID || 'N/A'}</td>
-                                <td class="text-secondary small">${v.vehicleType || 'N/A'}</td>
-                                <td><span class="badge bg-dark font-monospace px-2.5 py-1.5 fs-6 shadow-sm border border-secondary">${v.licensePlate}</span></td>
-                                <td class="text-secondary small">${v.icNo || 'N/A'}</td>
-                                <td class="text-secondary small">${v.commuterName || 'N/A'}</td>
-                                <td class="text-secondary small">${v.carMake || 'N/A'}</td>
-                                <td class="text-secondary small">${v.carModel || 'N/A'}</td>
-                                <td class="text-secondary small">${v.manufacturingYear || 'N/A'}</td>
-                                <td>
-                                    <a href="/vehicle-verifications/VehicleOwnershipCertificate/${v.licensePlate}.pdf"
-                                       target="_blank"
-                                       class="btn btn-sm btn-danger">
-                                
-                                       <i class="bi bi-file-earmark-pdf"></i>
-                                       View Geran
-                                    </a>
-                                </td>
-                            </tr>
-                        `;
-                    });
-
-                    rejectedTable.innerHTML = rows;
-
-                } catch (error) {
-                    console.error("Rejected load error:", error);
-                    alert(error.message);
-                }
-            }
-
-            // ══════〔 LOAD VERIFIED RECORDS 〕══════
-            async function loadVerified() {
-                try {
-                    const { db } = await initializeFirebase();
-
-                    verifiedTable.innerHTML = "";
-
-                    const snapshot = await db.collection('vehicle')
-                        .where('verificationStatus', '==', 'Verified')
-                        .get();
-
-                    if (snapshot.empty) {
-                        verifiedTable.innerHTML = `<tr><td colspan="10">No verified record(s) found</td></tr>`;
-                        return;
-                    }
-
-                    let rows = "";
-
-                    snapshot.forEach(doc => {
-                        const v = doc.data();
-
-                        rows += `
-                            <tr>
-                                <td class="text-secondary small">${v.commuterID || 'N/A'}</td>
-                                <td class="text-secondary small">${v.vehicleID || 'N/A'}</td>
-                                <td class="text-secondary small">${v.vehicleType || 'N/A'}</td>
-                                <td><span class="badge bg-dark font-monospace px-2.5 py-1.5 fs-6 shadow-sm border border-secondary">${v.licensePlate}</span></td>
-                                <td class="text-secondary small">${v.icNo || 'N/A'}</td>
-                                <td class="text-secondary small">${v.commuterName || 'N/A'}</td>
-                                <td class="text-secondary small">${v.carMake || 'N/A'}</td>
-                                <td class="text-secondary small">${v.carModel || 'N/A'}</td>
-                                <td class="text-secondary small">${v.manufacturingYear || 'N/A'}</td>
-                                <td>
-                                    <a href="/vehicle-verifications/VehicleOwnershipCertificate/${v.licensePlate}.pdf"
-                                       target="_blank"
-                                       class="btn btn-sm btn-success">
-                                
-                                       <i class="bi bi-file-earmark-pdf"></i>
-                                       View Geran
-                                    </a>
-                                </td>
-                            </tr>
-                        `;
-                    });
-
-                    verifiedTable.innerHTML = rows;
-
-                } catch (error) {
-                    console.error("Verified load error:", error);
-                    alert(error.message);
-                }
-            }
-
-            // ══════〔 INITIAL LOAD 〕══════
-            await loadRejected();
-            await loadVerified();
-        });
-    </script>
-
-
-
-    <!-- ⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡
-    . . . . . . Bootstrap JS Bundle with Popper
-    . . .⚡════════════════════════════════════════════════════════════════════════════════════════════════════⚡ -->
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 
