@@ -141,25 +141,25 @@
                     <table class="table table-hover table-striped align-middle mb-0 text-nowrap">
                         <thead class="table-light text-secondary uppercase font-weight-bold small">
                             <tr>
-                                <th scope="col" class="ps-4 py-3" style="min-width: 160px;">Transaction ID</th>
-                                <th scope="col" style="min-width: 140px;">Commuter ID</th>
-                                <th scope="col" style="min-width: 140px;">Vehicle ID</th>
-                                <th scope="col" style="min-width: 150px;">License Plate</th>
-                                <th scope="col" style="min-width: 140px;">Car Make</th>
-                                <th scope="col" style="min-width: 140px;">Car Model</th>
-                                <th scope="col" style="min-width: 200px;">Entry Timestamp</th>
-                                <th scope="col" style="min-width: 200px;">Exit Timestamp</th>
+                                <th scope="col" style="min-width: 120px;">Transaction ID</th>
+                                <th scope="col" style="min-width: 120px;">Commuter ID</th>
+                                <th scope="col" style="min-width: 120px;">Vehicle ID</th>
+                                <th scope="col" style="min-width: 120px;">License Plate</th>
+                                <th scope="col" style="min-width: 120px;">Car Make</th>
+                                <th scope="col" style="min-width: 120px;">Car Model</th>
+                                <th scope="col" style="min-width: 150px;">Entry Timestamp</th>
+                                <th scope="col" style="min-width: 150px;">Exit Timestamp</th>
                                 <th scope="col" class="pe-4 text-end" style="min-width: 130px;">Amount (RM)</th>
                             </tr>
                         </thead>
                         <tbody id="recordsTableBody">
                             <tr>
-                                <td class="ps-4 fw-mono text-dark fw-bold">TTID00001</td>
-                                <td class="text-secondary small">CID00005</td>
-                                <td class="text-secondary small">VID00004</td>
+                                <td class="text-secondary small"></td>
+                                <td class="text-secondary small"></td>
+                                <td class="text-secondary small"></td>
                                 <td><span class="badge bg-dark font-monospace px-2.5 py-1.5 fs-6 shadow-sm border border-secondary">W1589J</span></td>
                                 <td class="fw-semibold text-dark">Toyota</td>
-                                <td class="text-secondary">Camry</td>
+                                <td class="fw-semibold text-dark">Camry</td>
                                 <td class="text-muted small"><i class="bi bi-box-arrow-in-right text-success me-1"></i> 12/06/2026, 2:24:16 am</td>
                                 <td class="text-muted small"><i class="bi bi-box-arrow-left text-danger me-1"></i> 12/06/2026, 2:25:56 am</td>
                                 <td class="pe-4 text-end fw-bold text-success">RM 19.50</td>
@@ -379,7 +379,7 @@
 
                         rows.push(`
                             <tr>
-                                <td class="text-secondary small">${transData.tollTransactionID || transData.id || 'N/A'}</td>
+                                <td class="text-secondary small fw-bold">${transData.tollTransactionID || transData.id || 'N/A'}</td>
                                 <td class="text-secondary small">${transData.commuterID || 'N/A'}</td>
                                 <td class="text-secondary small">${transData.vehicleID || 'N/A'}</td>
                                 <td><span class="badge bg-dark font-monospace px-2.5 py-1.5 fs-6 shadow-sm border border-secondary">${licensePlate}</span></td>
