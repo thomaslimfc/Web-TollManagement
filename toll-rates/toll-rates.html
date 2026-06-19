@@ -10,6 +10,27 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        .sortable-header {
+            cursor: pointer;
+            user-select: none;
+        }
+        .sortable-header:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        .sort-icon {
+            font-size: 0.8rem;
+            margin-left: 4px;
+            color: #bbb;
+        }
+        .sortable-header:hover .sort-icon {
+            color: #666;
+        }
+        .sort-active {
+            color: #000 !important;
+            font-weight: bold;
+        }
+    </style>
 </head>
 
 <body>
@@ -75,25 +96,53 @@
     <div class="main-content" id="mainContent">
         <h1>Toll Tariff Directory</h1>
         <p>Maintain toll tariff rates for different vehicle types and routes.</p>
+        <br>
 
-        <div class="container-fluid">
-            <table class="table table-bordered table-striped w-auto" id="branchTable">
-                <thead>
-                    <tr>
-                        <th width="150px">Tariff ID</th>
-                        <th width="200px">Point A</th>
-                        <th width="200px">Point B</th>
-                        <th width="200px">Vehicle Type</th>
-                        <th width="180px">Tariff Rate</th>
-                        <th width="200px">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="directoryTableBody"></tbody>
-            </table>
-        </div>
-
-        <div class="mt-3">
-            <button id="createBtn" class="btn btn-primary">Create</button>
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white py-3 border-bottom border-light d-flex align-items-center justify-content-between">
+                <h5 class="card-title mb-0 fw-bold text-dark d-flex align-items-center gap-2">
+                    <i class="bi bi-collection text-success"></i> Toll Tariff Records 
+                    <span id="recordCount" class="badge bg-light text-dark border fw-medium px-2 py-1.5">0 record(s) found</span>
+                </h5>
+                <div class="d-flex gap-2 align-items-center" style="min-width: 300px;">
+                    <span class="text-secondary small text-nowrap"><i class="bi bi-funnel"></i> Location:</span>
+                    <select class="form-select form-select-sm" id="filterLocation">
+                        <option value="">All Locations</option>
+                    </select>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped align-middle mb-0 text-nowrap" id="branchTable">
+                        <thead class="table-light text-secondary uppercase font-weight-bold small">
+                            <tr>
+                                <th scope="col" class="sortable-header" style="min-width: 120px;" data-sort-key="tariffID">
+                                    Tariff ID <i class="bi bi-arrow-down-up sort-icon" id="icon-tariffID"></i>
+                                </th>
+                                <th scope="col" class="sortable-header" style="min-width: 120px;" data-sort-key="pointA">
+                                    Point A <i class="bi bi-arrow-down-up sort-icon" id="icon-pointA"></i>
+                                </th>
+                                <th scope="col" class="sortable-header" style="min-width: 120px;" data-sort-key="pointB">
+                                    Point B <i class="bi bi-arrow-down-up sort-icon" id="icon-pointB"></i>
+                                </th>
+                                <th scope="col" class="sortable-header" style="min-width: 120px;" data-sort-key="vehicleType">
+                                    Vehicle Type <i class="bi bi-arrow-down-up sort-icon" id="icon-vehicleType"></i>
+                                </th>
+                                <th scope="col" class="sortable-header text-end" style="min-width: 120px;" data-sort-key="tariffRate">
+                                    Tariff Rate <i class="bi bi-arrow-down-up sort-icon" id="icon-tariffRate"></i>
+                                </th>
+                                <th scope="col" class="pe-4 text-end" style="min-width: 120px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="directoryTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer bg-white border-top border-light py-3">
+                <button id="createBtn" class="btn btn-success d-flex align-items-center gap-2">
+                    <i class="bi bi-plus-circle"></i> Create Tariff
+                </button>
+            </div>
         </div>
     </div>
 
@@ -200,6 +249,8 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const { db } = await initializeFirebase();
             const tableBody = document.getElementById('directoryTableBody');
+            const recordCountText = document.getElementById('recordCount');
+            const filterLocationSelect = document.getElementById('filterLocation');
 
             let selectedEditId = null;
             let selectedDeleteId = null;
@@ -207,83 +258,177 @@
             // Global maps to cache reference labels
             let locationMap = {}; // Maps ID -> Description
             let vehicleTypeMap = {}; // Maps ID -> Description
+            let cachedTariffDocs = []; // Holds current snapshot documents for active filtering
 
-            // Helper to prefetch reference collections
+            // Sorting State Variables
+            let currentSortKey = 'tariffID'; // default key
+            let currentSortOrder = 'asc';    // 'asc' or 'desc'
+
+            // Helper to prefetch reference collections and populate filters
             async function fetchReferences() {
                 const locSnapshot = await db.collection('tollLocation').get();
                 locationMap = {};
+                
+                const previousSelection = filterLocationSelect.value;
+                filterLocationSelect.innerHTML = '<option value="">All Locations</option>';
+
                 locSnapshot.forEach(doc => {
                     const description = doc.data().description || '';
-                    // If description exists, show "Description (ID)", otherwise just show the ID
-                    locationMap[doc.id] = description ? `${description} (${doc.id})` : doc.id;
+                    const mappedValue = description ? `${description} (${doc.id})` : doc.id;
+                    locationMap[doc.id] = mappedValue;
+
+                    const opt = document.createElement('option');
+                    opt.value = doc.id;
+                    opt.textContent = mappedValue;
+                    filterLocationSelect.appendChild(opt);
                 });
+
+                if (previousSelection) {
+                    filterLocationSelect.value = previousSelection;
+                }
 
                 const vehSnapshot = await db.collection('vehicleType').get();
                 vehicleTypeMap = {};
                 vehSnapshot.forEach(doc => {
                     const description = doc.data().description || '';
-                    // Doing the same for vehicle type in case you want to see its ID too (optional)
                     vehicleTypeMap[doc.id] = description ? `${description} (${doc.id})` : doc.id;
                 });
             }
 
-            // ══════〔 LOAD TOLL TARIFF TABLE 〕══════
-            async function loadTollTariffTable() {
-                try {
-                    tableBody.innerHTML = "";
-                    await fetchReferences(); // Fetch up-to-date mappings
-
-                    const snapshot = await db.collection('tollTariff').get();
-
-                    if (snapshot.empty) {
-                        tableBody.innerHTML = `<tr><td colspan="6">No toll tariff record(s) found</td></tr>`;
-                        return;
+            // Update header arrows based on current sort settings
+            function updateSortIcons() {
+                document.querySelectorAll('.sort-icon').forEach(icon => {
+                    icon.className = "bi bi-arrow-down-up sort-icon";
+                });
+                
+                const activeIcon = document.getElementById(`icon-${currentSortKey}`);
+                if (activeIcon) {
+                    if (currentSortOrder === 'asc') {
+                        activeIcon.className = "bi bi-sort-alpha-down sort-icon sort-active";
+                        if(currentSortKey === 'tariffRate') {
+                            activeIcon.className = "bi bi-sort-numeric-down sort-icon sort-active";
+                        }
+                    } else {
+                        activeIcon.className = "bi bi-sort-alpha-down-alt sort-icon sort-active";
+                        if(currentSortKey === 'tariffRate') {
+                            activeIcon.className = "bi bi-sort-numeric-down-alt sort-icon sort-active";
+                        }
                     }
-
-                    let rows = "";
-                    for (const doc of snapshot.docs) {
-                        const data = doc.data();
-
-                        const tariffID = data.tariffID || doc.id || 'N/A';
-
-                        // Map IDs to readable values from our global dictionary stores
-                        const pointA = locationMap[data.entryTollLocationID] || 'N/A';
-                        const pointB = locationMap[data.exitTollLocationID] || 'N/A';
-                        const vehicleType = vehicleTypeMap[data.vehicleTypeID] || 'N/A';
-
-                        const tariffRate = data.tariffRate != null
-                            ? `MYR ${Number(data.tariffRate).toFixed(2)}`
-                            : 'N/A';
-
-                        rows += `
-                            <tr>
-                                <td>${tariffID}</td>
-                                <td>${pointA}</td>
-                                <td>${pointB}</td>
-                                <td>${vehicleType}</td>
-                                <td>${tariffRate}</td>
-                                <td>
-                                    <button class="btn btn-sm btn-primary editBtn" style="width: 68px; margin: 1%;" data-id="${doc.id}">Edit</button>
-                                    <button class="btn btn-sm btn-danger deleteBtn" style="width: 68px; margin: 1%;" data-id="${doc.id}">Delete</button>
-                                </td>
-                            </tr>
-                        `;
-                    }
-                    tableBody.innerHTML = rows;
-                } catch (error) {
-                    console.error("Error loading toll tariff table:", error);
-                    tableBody.innerHTML = `<tr><td colspan="6">Error loading data</td></tr>`;
                 }
             }
+
+            // ══════〔 RENDER TARIFF ROWS WITH FILTER & SORT 〕══════
+            function renderTariffTable() {
+                tableBody.innerHTML = "";
+                const selectedLocFilter = filterLocationSelect.value;
+
+                // 1. Filter phase
+                let filteredDocs = cachedTariffDocs.filter(doc => {
+                    if (!selectedLocFilter) return true;
+                    const data = doc.data();
+                    return data.entryTollLocationID === selectedLocFilter || data.exitTollLocationID === selectedLocFilter;
+                });
+
+                // 2. Map structural values for sorting phase evaluation
+                let parsedItems = filteredDocs.map(doc => {
+                    const data = doc.data();
+                    return {
+                        id: doc.id,
+                        doc: doc,
+                        tariffID: data.tariffID || doc.id || '',
+                        pointA: locationMap[data.entryTollLocationID] || '',
+                        pointB: locationMap[data.exitTollLocationID] || '',
+                        vehicleType: vehicleTypeMap[data.vehicleTypeID] || '',
+                        tariffRate: data.tariffRate != null ? Number(data.tariffRate) : 0
+                    };
+                });
+
+                // 3. Sort phase
+                parsedItems.sort((a, b) => {
+                    let valA = a[currentSortKey];
+                    let valB = b[currentSortKey];
+
+                    if (typeof valA === 'string') {
+                        return currentSortOrder === 'asc' 
+                            ? valA.localeCompare(valB) 
+                            : valB.localeCompare(valA);
+                    } else {
+                        // Numeric comparison
+                        return currentSortOrder === 'asc' 
+                            ? valA - valB 
+                            : valB - valA;
+                    }
+                });
+
+                recordCountText.textContent = `${parsedItems.length} record(s) found`;
+
+                if (parsedItems.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted"><i class="bi bi-slash-circle me-1"></i> No toll tariff record(s) found</td></tr>`;
+                    return;
+                }
+
+                let rows = "";
+                parsedItems.forEach(item => {
+                    const tariffRateString = item.tariffRate.toFixed(2);
+
+                    rows += `
+                        <tr>
+                            <td class="text-secondary small">${item.tariffID}</td>
+                            <td class="text-secondary small">${item.pointA}</td>
+                            <td class="text-secondary small">${item.pointB}</td>
+                            <td class="text-secondary small">${item.vehicleType}</td>
+                            <td class="pe-4 text-end fw-bold text-success">RM ${tariffRateString}</td>
+                            <td class="pe-4 text-end">
+                                <button class="btn btn-sm btn-outline-primary editBtn me-1" style="width: 68px;" data-id="${item.id}">Edit</button>
+                                <button class="btn btn-sm btn-outline-danger deleteBtn" style="width: 68px;" data-id="${item.id}">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                tableBody.innerHTML = rows;
+                updateSortIcons();
+            }
+
+            // ══════〔 LOAD TOLL TARIFF DATA 〕══════
+            async function loadTollTariffTable() {
+                try {
+                    await fetchReferences();
+                    const snapshot = await db.collection('tollTariff').get();
+                    cachedTariffDocs = snapshot.docs;
+                    renderTariffTable();
+                } catch (error) {
+                    console.error("Error loading toll tariff table:", error);
+                    tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i> Error loading data</td></tr>`;
+                }
+            }
+
+            // Filter Dropdown Event Listener
+            filterLocationSelect.addEventListener('change', renderTariffTable);
+
+            // Table Header Click Logic for Sorting
+            document.querySelectorAll('.sortable-header').forEach(header => {
+                header.addEventListener('click', () => {
+                    const selectedKey = header.getAttribute('data-sort-key');
+                    if (currentSortKey === selectedKey) {
+                        // Toggle direction if clicking the same column header
+                        currentSortOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        // Set new sort property column, defaulting to ascending order
+                        currentSortKey = selectedKey;
+                        currentSortOrder = 'asc';
+                    }
+                    renderTariffTable();
+                });
+            });
 
             // ══════〔 GENERATE NEXT TARIFF ID 〕══════
             async function generateNextTariffID() {
                 const snapshot = await db.collection('tollTariff').orderBy('tariffID', 'desc').limit(1).get();
-                let nextID = "TID00001";
+                let nextID = "TLID00001";
                 if (!snapshot.empty) {
                     const latestID = snapshot.docs[0].data().tariffID;
-                    const number = parseInt(latestID.replace('TID', ''));
-                    nextID = 'TID' + String(number + 1).padStart(5, '0');
+                    const number = parseInt(latestID.replace('TLID', ''));
+                    nextID = 'TLID' + String(number + 1).padStart(5, '0');
                 }
                 return nextID;
             }
@@ -363,8 +508,6 @@
                         const data = doc.data();
 
                         document.getElementById('editTariffID').value = data.tariffID || '';
-
-                        // Look up descriptions using current mappings
                         document.getElementById('editPointA').value = locationMap[data.entryTollLocationID] || data.entryTollLocationID || '';
                         document.getElementById('editPointB').value = locationMap[data.exitTollLocationID] || data.exitTollLocationID || '';
                         document.getElementById('editVehicleType').value = vehicleTypeMap[data.vehicleTypeID] || data.vehicleTypeID || '';
