@@ -264,22 +264,40 @@
             let currentSortKey = 'tariffID'; // default key
             let currentSortOrder = 'asc';    // 'asc' or 'desc'
 
-            // Helper to prefetch reference collections and populate filters
+            // Helper to prefetch reference collections and populate filters alphabetically
             async function fetchReferences() {
                 const locSnapshot = await db.collection('tollLocation').get();
                 locationMap = {};
                 
+                // Keep track of the user's active filter setting
                 const previousSelection = filterLocationSelect.value;
                 filterLocationSelect.innerHTML = '<option value="">All Locations</option>';
+
+                // 1. Temporary storage to sort elements cleanly from A to Z
+                let locationsList = [];
 
                 locSnapshot.forEach(doc => {
                     const description = doc.data().description || '';
                     const mappedValue = description ? `${description} (${doc.id})` : doc.id;
+                    
+                    // Populate map directly
                     locationMap[doc.id] = mappedValue;
 
+                    // Push objects to list array for text evaluation sorting
+                    locationsList.push({
+                        id: doc.id,
+                        label: mappedValue
+                    });
+                });
+
+                // 2. Sort the array alphabetically (A-Z) based on the descriptive label string
+                locationsList.sort((a, b) => a.label.localeCompare(b));
+
+                // 3. Append the sorted items to the select drop-down list interface element
+                locationsList.forEach(loc => {
                     const opt = document.createElement('option');
-                    opt.value = doc.id;
-                    opt.textContent = mappedValue;
+                    opt.value = loc.id;
+                    opt.textContent = loc.label;
                     filterLocationSelect.appendChild(opt);
                 });
 
@@ -373,7 +391,7 @@
 
                     rows += `
                         <tr>
-                            <td class="text-secondary small">${item.tariffID}</td>
+                            <td class="text-secondary small fw-bold">${item.tariffID}</td>
                             <td class="text-secondary small">${item.pointA}</td>
                             <td class="text-secondary small">${item.pointB}</td>
                             <td class="text-secondary small">${item.vehicleType}</td>
@@ -445,13 +463,14 @@
                 pointBSelect.innerHTML = '<option value="">-- Select Exit Location --</option>';
                 vehicleSelect.innerHTML = '<option value="">-- Select Vehicle Type --</option>';
 
-                Object.keys(locationMap).forEach(id => {
+                // Match layout rules cleanly using sorted loops here too if desired
+                Object.keys(locationMap).sort((a,b) => locationMap[a].localeCompare(locationMap[b])).forEach(id => {
                     const opt = `<option value="${id}">${locationMap[id]}</option>`;
                     pointASelect.innerHTML += opt;
                     pointBSelect.innerHTML += opt;
                 });
 
-                Object.keys(vehicleTypeMap).forEach(id => {
+                Object.keys(vehicleTypeMap).sort((a,b) => vehicleTypeMap[a].localeCompare(vehicleTypeMap[b])).forEach(id => {
                     vehicleSelect.innerHTML += `<option value="${id}">${vehicleTypeMap[id]}</option>`;
                 });
             }

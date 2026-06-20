@@ -9,6 +9,27 @@
     <link rel="stylesheet" href="../lib/master-layout.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        .sortable-header {
+            cursor: pointer;
+            user-select: none;
+        }
+        .sortable-header:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        .sort-icon {
+            font-size: 0.8rem;
+            margin-left: 4px;
+            color: #bbb;
+        }
+        .sortable-header:hover .sort-icon {
+            color: #666;
+        }
+        .sort-active {
+            color: #000 !important;
+            font-weight: bold;
+        }
+    </style>
 </head>
 
 <body>
@@ -112,57 +133,58 @@
         <p>Monitor and review real-time entry and exit timestamps filtering by Toll Location descriptions.</p>
         <br>
 
-        <div class="container-fluid mb-4">
-            <form id="searchForm">
-                <div class="form-group row align-items-center">
-                    <label for="inputLocationDesc" class="col-sm-2 col-form-label">Toll Location</label>
-                    <div class="col-sm-10" style="width: 350px;">
-                        <select class="form-select" id="inputLocationDesc" required disabled>
-                            <option value="" selected disabled>Loading Toll Locations...</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="mt-3">
-                    <button type="submit" id="searchBtn" class="btn btn-success" disabled>Search Records</button>
-                </div>
-            </form>
-        </div>
-
         <div class="card border-0 shadow-sm">
             <div class="card-header bg-white py-3 border-bottom border-light d-flex align-items-center justify-content-between">
                 <h5 class="card-title mb-0 fw-bold text-dark d-flex align-items-center gap-2">
                     <i class="bi bi-collection text-success"></i> Transaction Records
+                    <span id="recordCount" class="badge bg-light text-dark border fw-medium px-2 py-1.5">0 record(s) found</span>
                 </h5>
-                <span id="recordCount" class="badge bg-light text-dark border fw-medium px-2 py-1.5">1 record(s) found</span>
+                <div class="d-flex gap-2 align-items-center" style="min-width: 350px;">
+                    <span class="text-secondary small text-nowrap"><i class="bi bi-funnel"></i> Location:</span>
+                    <select class="form-select form-select-sm" id="inputLocationDesc" disabled>
+                        <option value="" selected disabled>Loading Toll Locations...</option>
+                    </select>
+                </div>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover table-striped align-middle mb-0 text-nowrap">
                         <thead class="table-light text-secondary uppercase font-weight-bold small">
                             <tr>
-                                <th scope="col" style="min-width: 120px;">Transaction ID</th>
-                                <th scope="col" style="min-width: 120px;">Commuter ID</th>
-                                <th scope="col" style="min-width: 120px;">Vehicle ID</th>
-                                <th scope="col" style="min-width: 120px;">License Plate</th>
-                                <th scope="col" style="min-width: 120px;">Car Make</th>
-                                <th scope="col" style="min-width: 120px;">Car Model</th>
-                                <th scope="col" style="min-width: 150px;">Entry Timestamp</th>
-                                <th scope="col" style="min-width: 150px;">Exit Timestamp</th>
-                                <th scope="col" class="pe-4 text-end" style="min-width: 130px;">Amount (RM)</th>
+                                <th scope="col" class="sortable-header" style="min-width: 150px;" data-sort-key="transactionID">
+                                    Transaction ID <i class="bi bi-arrow-down-up sort-icon" id="icon-transactionID"></i>
+                                </th>
+                                <th scope="col" class="sortable-header" style="min-width: 130px;" data-sort-key="commuterID">
+                                    Commuter ID <i class="bi bi-arrow-down-up sort-icon" id="icon-commuterID"></i>
+                                </th>
+                                <th scope="col" class="sortable-header" style="min-width: 130px;" data-sort-key="vehicleID">
+                                    Vehicle ID <i class="bi bi-arrow-down-up sort-icon" id="icon-vehicleID"></i>
+                                </th>
+                                <th scope="col" class="sortable-header" style="min-width: 140px;" data-sort-key="licensePlate">
+                                    License Plate <i class="bi bi-arrow-down-up sort-icon" id="icon-licensePlate"></i>
+                                </th>
+                                <th scope="col" class="sortable-header" style="min-width: 130px;" data-sort-key="carMake">
+                                    Car Make <i class="bi bi-arrow-down-up sort-icon" id="icon-carMake"></i>
+                                </th>
+                                <th scope="col" class="sortable-header" style="min-width: 130px;" data-sort-key="carModel">
+                                    Car Model <i class="bi bi-arrow-down-up sort-icon" id="icon-carModel"></i>
+                                </th>
+                                <th scope="col" class="sortable-header" style="min-width: 220px;" data-sort-key="entryTimestamp">
+                                    Entry Timestamp <i class="bi bi-arrow-down-up sort-icon" id="icon-entryTimestamp"></i>
+                                </th>
+                                <th scope="col" class="sortable-header" style="min-width: 220px;" data-sort-key="exitTimestamp">
+                                    Exit Timestamp <i class="bi bi-arrow-down-up sort-icon" id="icon-exitTimestamp"></i>
+                                </th>
+                                <th scope="col" class="pe-4 text-end sortable-header" style="min-width: 140px;" data-sort-key="amount">
+                                    Amount <i class="bi bi-arrow-down-up sort-icon" id="icon-amount"></i>
+                                </th>
                             </tr>
                         </thead>
                         <tbody id="recordsTableBody">
                             <tr>
-                                <td class="text-secondary small"></td>
-                                <td class="text-secondary small"></td>
-                                <td class="text-secondary small"></td>
-                                <td><span class="badge bg-dark font-monospace px-2.5 py-1.5 fs-6 shadow-sm border border-secondary">W1589J</span></td>
-                                <td class="fw-semibold text-dark">Toyota</td>
-                                <td class="fw-semibold text-dark">Camry</td>
-                                <td class="text-muted small"><i class="bi bi-box-arrow-in-right text-success me-1"></i> 12/06/2026, 2:24:16 am</td>
-                                <td class="text-muted small"><i class="bi bi-box-arrow-left text-danger me-1"></i> 12/06/2026, 2:25:56 am</td>
-                                <td class="pe-4 text-end fw-bold text-success">RM 19.50</td>
+                                <td colspan="9" class="text-center py-4 text-muted">
+                                    <i class="bi bi-info-circle me-1"></i> Please select a toll location to display records.
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -175,10 +197,14 @@
         import { initializeFirebase } from '/lib/firebase_init.js';
 
         document.addEventListener('DOMContentLoaded', async () => {
-            const searchBtn = document.getElementById('searchBtn');
             const tableBody = document.getElementById('recordsTableBody');
             const recordCountBadge = document.getElementById('recordCount');
             const locationSelect = document.getElementById('inputLocationDesc');
+
+            // Sorting Configuration Trackers
+            let currentSortKey = 'entryTimestamp'; // Default fallback ordering parameter
+            let currentSortOrder = 'desc';         // Latest records on top by default
+            let compiledRecords = [];              // Local global client-cache representing matching data parameters
 
             // Helper function to cleanly format Firestore Timestamp instances
             function formatTimestamp(timestamp) {
@@ -187,6 +213,78 @@
                     return timestamp.toDate().toLocaleString('en-MY', { timeZone: 'Asia/Kuala_Lumpur' });
                 }
                 return String(timestamp);
+            }
+
+            // Updates column heading indicator elements matching active configurations
+            function updateSortIcons() {
+                document.querySelectorAll('.sort-icon').forEach(icon => {
+                    icon.className = "bi bi-arrow-down-up sort-icon";
+                });
+                
+                const activeIcon = document.getElementById(`icon-${currentSortKey}`);
+                if (activeIcon) {
+                    if (currentSortOrder === 'asc') {
+                        activeIcon.className = (currentSortKey === 'amount' || currentSortKey.toLowerCase().includes('timestamp'))
+                            ? "bi bi-sort-numeric-down sort-icon sort-active"
+                            : "bi bi-sort-alpha-down sort-icon sort-active";
+                    } else {
+                        activeIcon.className = (currentSortKey === 'amount' || currentSortKey.toLowerCase().includes('timestamp'))
+                            ? "bi bi-sort-numeric-down-alt sort-icon sort-active"
+                            : "bi bi-sort-alpha-down-alt sort-icon sort-active";
+                    }
+                }
+            }
+
+            // ══════〔 SORT AND RENDER DYNAMIC UI TABLE ROWS 〕══════
+            function renderRecordsTable() {
+                if (compiledRecords.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-muted"><i class="bi bi-slash-circle me-1"></i> No matching transaction logs exist linked to this location.</td></tr>`;
+                    recordCountBadge.textContent = "0 record(s) found";
+                    return;
+                }
+
+                // Sorting processing logic block
+                compiledRecords.sort((a, b) => {
+                    let valA = a[currentSortKey];
+                    let valB = b[currentSortKey];
+
+                    // Safely handle timestamp comparison falls by parsing explicit raw milliseconds tracking fields
+                    if (currentSortKey === 'entryTimestamp') {
+                        valA = a.rawEntryTime;
+                        valB = b.rawEntryTime;
+                    } else if (currentSortKey === 'exitTimestamp') {
+                        valA = a.rawExitTime;
+                        valB = b.rawExitTime;
+                    }
+
+                    if (typeof valA === 'string') {
+                        return currentSortOrder === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                    } else {
+                        return currentSortOrder === 'asc' ? valA - valB : valB - valA;
+                    }
+                });
+
+                recordCountBadge.textContent = `${compiledRecords.length} record(s) found`;
+
+                let rowsHtml = "";
+                compiledRecords.forEach(item => {
+                    rowsHtml += `
+                        <tr>
+                            <td class="text-secondary small fw-bold">${item.transactionID}</td>
+                            <td class="text-secondary small">${item.commuterID}</td>
+                            <td class="text-secondary small">${item.vehicleID}</td>
+                            <td><span class="badge bg-dark font-monospace px-2.5 py-1.5 fs-6 shadow-sm border border-secondary">${item.licensePlate}</span></td>
+                            <td class="fw-semibold text-dark">${item.carMake}</td>
+                            <td class="text-secondary">${item.carModel}</td>
+                            <td class="text-muted small"><i class="bi bi-box-arrow-in-right text-success me-1"></i> ${item.entryTimestamp}</td>
+                            <td class="text-muted small"><i class="bi bi-box-arrow-left text-danger me-1"></i> ${item.exitTimestamp}</td>
+                            <td class="pe-4 text-end fw-bold text-success">RM ${item.amount}</td>
+                        </tr>
+                    `;
+                });
+
+                tableBody.innerHTML = rowsHtml;
+                updateSortIcons();
             }
 
             // Populates unique location descriptions inside the dropdown select menu option list
@@ -212,13 +310,12 @@
                         }
                     });
 
-                    // Enable form UI fields once loaded successfully
                     locationSelect.disabled = false;
-                    searchBtn.disabled = false;
 
-                    // Automatically select first option if available
+                    // Automatically fetch records for the first location option
                     if (locationSelect.options.length > 1) {
                         locationSelect.value = locationSelect.options[1].value;
+                        await fetchAndCacheRecords();
                     }
 
                 } catch (error) {
@@ -227,17 +324,14 @@
                 }
             }
 
-            async function searchByLocationDescription() {
+            // ══════〔 DATA FETCHING AND PARSING PHASE 〕══════
+            async function fetchAndCacheRecords() {
                 try {
                     const { db } = await initializeFirebase();
                     const targetDescription = locationSelect.value;
 
-                    if (!targetDescription) {
-                        alert("Please select a valid Toll Location.");
-                        return;
-                    }
+                    if (!targetDescription) return;
 
-                    // Render placeholder loading UI indicator
                     tableBody.innerHTML = `
                         <tr>
                             <td colspan="9" class="text-center py-5 text-success">
@@ -253,8 +347,8 @@
                         .get();
 
                     if (locationSnapshot.empty) {
-                        tableBody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-muted"><i class="bi bi-slash-circle me-1"></i> No locations matching this description found.</td></tr>`;
-                        recordCountBadge.textContent = "0 records found";
+                        compiledRecords = [];
+                        renderRecordsTable();
                         return;
                     }
 
@@ -264,19 +358,14 @@
                         if (data.tollLocationID) locationIDs.push(data.tollLocationID);
                     });
 
-                    if (locationIDs.length === 0) {
-                        tableBody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-muted"><i class="bi bi-slash-circle me-1"></i> Target fields are structurally missing identifiers.</td></tr>`;
-                        return;
-                    }
-
                     // Step 2: Fetch corresponding toll booths that link to these location IDs
                     const boothSnapshot = await db.collection('tollBooth')
                         .where('tollLocationID', 'in', locationIDs)
                         .get();
 
                     if (boothSnapshot.empty) {
-                        tableBody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-muted"><i class="bi bi-slash-circle me-1"></i> No physical booths linked to this location.</td></tr>`;
-                        recordCountBadge.textContent = "0 records found";
+                        compiledRecords = [];
+                        renderRecordsTable();
                         return;
                     }
 
@@ -286,7 +375,7 @@
                         if (data.boothID) boothIDs.push(data.boothID);
                     });
 
-                    // Step 3: Fetch 'lprRecord' entries tied to these booth IDs (Batch split by 30 max forFirestore 'in' limits)
+                    // Step 3: Fetch 'lprRecord' entries tied to these booth IDs (Batch split by 30 max for Firestore)
                     const entryRecordIDs = [];
                     const batchSize = 30;
 
@@ -303,8 +392,8 @@
                     }
 
                     if (entryRecordIDs.length === 0) {
-                        tableBody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-muted"><i class="bi bi-slash-circle me-1"></i> No matching entry records found for this booth cluster.</td></tr>`;
-                        recordCountBadge.textContent = "0 records found";
+                        compiledRecords = [];
+                        renderRecordsTable();
                         return;
                     }
 
@@ -321,21 +410,7 @@
                         });
                     }
 
-                    // Sort compiled arrays down sequentially by record insertion initialization timestamp
-                    transactionsList.sort((a, b) => {
-                        const timeA = a.createdAt ? (a.createdAt.seconds || 0) : 0;
-                        const timeB = b.createdAt ? (b.createdAt.seconds || 0) : 0;
-                        return timeB - timeA; // Descending order (Latest First)
-                    });
-
-                    if (transactionsList.length === 0) {
-                        tableBody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-muted"><i class="bi bi-slash-circle me-1"></i> No transaction logs exist linked to this location.</td></tr>`;
-                        recordCountBadge.textContent = "0 records found";
-                        return;
-                    }
-
-                    recordCountBadge.textContent = `${transactionsList.length} record(s) found`;
-                    const rows = [];
+                    const tempCompiledList = [];
 
                     // Fetch details sequentially across linked document layers
                     for (const transData of transactionsList) {
@@ -344,8 +419,9 @@
                         let carModel = "N/A";
                         let entryTimeStr = "N/A";
                         let exitTimeStr = "N/A";
+                        let rawEntryTime = 0;
+                        let rawExitTime = 0;
 
-                        // Fetch details from vehicle collection matching vehicleID
                         if (transData.vehicleID) {
                             const vehicleSnap = await db.collection('vehicle').doc(transData.vehicleID).get();
                             if (vehicleSnap.exists) {
@@ -356,55 +432,67 @@
                             }
                         }
 
-                        // Fetch explicit entry LPR capture timestamp 
                         if (transData.entryLprRecordID) {
                             const entryLpSnap = await db.collection('lprRecord').doc(transData.entryLprRecordID).get();
                             if (entryLpSnap.exists) {
-                                entryTimeStr = formatTimestamp(entryLpSnap.data().capturedAt);
+                                const capturedAt = entryLpSnap.data().capturedAt;
+                                entryTimeStr = formatTimestamp(capturedAt);
+                                if (capturedAt && capturedAt.seconds) rawEntryTime = capturedAt.seconds * 1000;
                             }
                         }
 
-                        // Fetch explicit exit LPR capture timestamp
                         if (transData.exitLprRecordID) {
                             const exitLpSnap = await db.collection('lprRecord').doc(transData.exitLprRecordID).get();
                             if (exitLpSnap.exists) {
-                                exitTimeStr = formatTimestamp(exitLpSnap.data().capturedAt);
+                                const capturedAt = exitLpSnap.data().capturedAt;
+                                exitTimeStr = formatTimestamp(capturedAt);
+                                if (capturedAt && capturedAt.seconds) rawExitTime = capturedAt.seconds * 1000;
                             }
                         }
 
-                        // Map tariffRate safely matching your collection structures
                         const formattedAmount = typeof transData.tariffRate === 'number'
                             ? transData.tariffRate.toFixed(2)
                             : '0.00';
 
-                        rows.push(`
-                            <tr>
-                                <td class="text-secondary small fw-bold">${transData.tollTransactionID || transData.id || 'N/A'}</td>
-                                <td class="text-secondary small">${transData.commuterID || 'N/A'}</td>
-                                <td class="text-secondary small">${transData.vehicleID || 'N/A'}</td>
-                                <td><span class="badge bg-dark font-monospace px-2.5 py-1.5 fs-6 shadow-sm border border-secondary">${licensePlate}</span></td>
-                                <td class="fw-semibold text-dark">${carMake}</td>
-                                <td class="text-secondary">${carModel}</td>
-                                <td class="text-muted small"><i class="bi bi-box-arrow-in-right text-success me-1"></i> ${entryTimeStr}</td>
-                                <td class="text-muted small"><i class="bi bi-box-arrow-left text-danger me-1"></i> ${exitTimeStr}</td>
-                                <td class="pe-4 text-end fw-bold text-success">RM ${formattedAmount}</td>
-                            </tr>
-                        `);
+                        tempCompiledList.push({
+                            transactionID: transData.tollTransactionID || transData.id || 'N/A',
+                            commuterID: transData.commuterID || 'N/A',
+                            vehicleID: transData.vehicleID || 'N/A',
+                            licensePlate: licensePlate,
+                            carMake: carMake,
+                            carModel: carModel,
+                            entryTimestamp: entryTimeStr,
+                            exitTimestamp: exitTimeStr,
+                            amount: formattedAmount,
+                            rawEntryTime: rawEntryTime,
+                            rawExitTime: rawExitTime
+                        });
                     }
 
-                    tableBody.innerHTML = rows.join("");
+                    compiledRecords = tempCompiledList;
+                    renderRecordsTable();
 
                 } catch (error) {
-                    console.error("CRITICAL SEARCH EXCEPTION INTERCEPTED:", error);
-                    alert("An error occurred while filtering query collections: " + error.message);
+                    console.error("CRITICAL EXCEPTION RUNNING LOG GENERATOR:", error);
                     tableBody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i> Processing failed for chosen parameter scope.</td></tr>`;
                 }
             }
 
-            // Bind explicitly to intercept structural form submission actions
-            document.getElementById('searchForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                await searchByLocationDescription();
+            // Bind explicitly onto location dropdown alteration updates
+            locationSelect.addEventListener('change', fetchAndCacheRecords);
+
+            // Setup sort heading elements action listeners
+            document.querySelectorAll('.sortable-header').forEach(header => {
+                header.addEventListener('click', () => {
+                    const selectedKey = header.getAttribute('data-sort-key');
+                    if (currentSortKey === selectedKey) {
+                        currentSortOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        currentSortKey = selectedKey;
+                        currentSortOrder = 'asc';
+                    }
+                    renderRecordsTable();
+                });
             });
 
             // Run initial database load routines
@@ -415,14 +503,14 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Toggle sidebar on mobile viewports
-        document.querySelector('.navbar-toggler').addEventListener('click', function () {
+        document.querySelector('.sidebar-toggler').addEventListener('click', function () {
             document.getElementById('sidebar').classList.toggle('show');
         });
 
         // Close sidebar when clicking outside boundaries on mobile device displays
         document.addEventListener('click', function (event) {
             const sidebar = document.getElementById('sidebar');
-            const toggler = document.querySelector('.navbar-toggler');
+            const toggler = document.querySelector('.sidebar-toggler');
 
             if (window.innerWidth < 992 &&
                 !sidebar.contains(event.target) &&
