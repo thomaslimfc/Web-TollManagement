@@ -70,7 +70,7 @@
                 <div class="card-header bg-white py-3 border-bottom border-light">
                     <h5 class="card-title mb-0 fw-bold text-dark d-flex align-items-center gap-2">
                         <i class="bi bi-clock-history text-warning"></i> Active Action Queue
-                        <span id="pendingRecordCount" class="badge bg-light text-dark border fw-medium px-2 py-1.5">0 record(s) found</span>
+                        <span id="pendingRecordCount" class="badge bg-light text-dark border fw-medium px-2 py-2">0 record(s) found</span>
                     </h5>
                 </div>
                 <div class="card-body p-0">
@@ -104,7 +104,7 @@
                 <div class="card-header bg-white py-3 border-bottom border-light">
                     <h5 class="card-title mb-0 fw-bold text-dark d-flex align-items-center gap-2">
                         <i class="bi bi-folder-check text-success"></i> Resolution Repository
-                        <span id="repliedRecordCount" class="badge bg-light text-dark border fw-medium px-2 py-1.5">0 record(s) found</span>
+                        <span id="repliedRecordCount" class="badge bg-light text-dark border fw-medium px-2 py-2">0 record(s) found</span>
                     </h5>
                 </div>
                 <div class="card-body p-0">
@@ -136,7 +136,13 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <input type="hidden" id="selectedInquiryId">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="form-label fw-semibold text-dark mb-0">Feedback ID</label>
+                    </div>
+
+                    <div class="mb-3 p-3 bg-light rounded border border-light-subtle">
+                        <textarea class="form-control bg-white text-muted border-0 p-0 small" id="selectedfeedbackID" rows="1" readonly style="resize: none; font-size: 0.9rem; outline: none; box-shadow: none;"></textarea>
+                    </div>
                     
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <label class="form-label fw-semibold text-dark mb-0">Feedback Description</label>
@@ -167,10 +173,8 @@
     <script type="module">
         import { initializeFirebase } from '/lib/firebase_init.js';
 
-        // Shared variable context accessible across data renderings and event captures
-        let selectedInquiryId = null;
+        let selectedfeedbackID = null;
 
-        // Helper function to format Firestore Timestamp object nicely
         function formatFirestoreTimestamp(timestamp) {
             if (!timestamp) return 'N/A';
             if (typeof timestamp.toDate === 'function') {
@@ -196,12 +200,10 @@
             try {
                 const { db } = await initializeFirebase();
 
-                // 1. Fetch collections defined in data architecture
                 const feedbackSnapshot = await db.collection('feedback').get();
                 const repliesSnapshot = await db.collection('feedbackReply').get();
                 const categoriesSnapshot = await db.collection('feedbackCategory').get();
 
-                // 2. Map structural relational lookups
                 const categoriesMap = {};
                 categoriesSnapshot.forEach(doc => {
                     categoriesMap[doc.id] = doc.data().description || 'N/A';
@@ -220,22 +222,21 @@
                 let pendingCount = 0;
                 let repliedCount = 0;
 
-                // 3. Process records dynamically without hardcoding status strings
                 feedbackSnapshot.forEach(doc => {
                     const feedbackData = doc.data();
-                    const inquiryID = doc.id || 'N/A';
+                    const feedbackID = doc.id || 'N/A';
                     const commuterID = feedbackData.commuterID || 'N/A';
                     const description = feedbackData.description || 'N/A';
                     
                     const timestampStr = formatFirestoreTimestamp(feedbackData.createdAt);
                     const categoryName = categoriesMap[feedbackData.feedbackCategoryID] || 'N/A';
-                    const hasReply = repliesMap.hasOwnProperty(inquiryID);
+                    const hasReply = repliesMap.hasOwnProperty(feedbackID);
 
                     if (!hasReply) {
                         pendingCount++;
                         pendingHTML += `
                             <tr>
-                                <td class="text-secondary small fw-bold">${inquiryID}</td>
+                                <td class="text-secondary small fw-bold">${feedbackID}</td>
                                 <td class="text-secondary small">${commuterID}</td>
                                 <td>
                                     <span class="badge bg-light text-dark border px-2 py-1 inquiry-category-badge">
@@ -245,7 +246,7 @@
                                 <td class="text-secondary small">${timestampStr}</td>
                                 <td class="fw-semibold text-dark text-wrap inquiry-desc-text" style="max-width: 300px;">${description}</td>
                                 <td class="pe-4 text-end">
-                                    <button class="btn btn-outline-primary btn-sm rounded-pill px-3 replyBtn" data-id="${inquiryID}">
+                                    <button class="btn btn-outline-primary btn-sm rounded-pill px-3 replyBtn" data-id="${feedbackID}">
                                         <i class="bi bi-reply-fill me-1"></i> Reply
                                     </button>
                                 </td>
@@ -253,10 +254,10 @@
                         `;
                     } else {
                         repliedCount++;
-                        const systemResponse = repliesMap[inquiryID];
+                        const systemResponse = repliesMap[feedbackID];
                         repliedHTML += `
                             <tr>
-                                <td class="text-secondary small fw-bold">${inquiryID}</td>
+                                <td class="text-secondary small fw-bold">${feedbackID}</td>
                                 <td class="text-secondary small">${commuterID}</td>
                                 <td>
                                     <span class="badge bg-light text-dark border px-2 py-1">
@@ -293,20 +294,17 @@
             }
         }
 
-        // Catch runtime clicks on dynamic table button layouts
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('replyBtn') || e.target.closest('.replyBtn')) {
                 const targetBtn = e.target.classList.contains('replyBtn') ? e.target : e.target.closest('.replyBtn');
                 
-                // Track dynamic context attributes from table row hierarchy
-                selectedInquiryId = targetBtn.dataset.id;
-                document.getElementById('selectedInquiryId').value = selectedInquiryId;
+                selectedfeedbackID = targetBtn.dataset.id;
+                document.getElementById('selectedfeedbackID').value = selectedfeedbackID;
                 
                 const parentRow = targetBtn.closest('tr');
                 const targetDesc = parentRow.querySelector('.inquiry-desc-text').textContent;
                 const targetCategory = parentRow.querySelector('.inquiry-category-badge').textContent.trim();
                 
-                // Populating information fields safely inside presentation layouts
                 document.getElementById('modalInquiryDesc').value = targetDesc;
                 document.getElementById('modalInquiryCategory').innerHTML = `<i class="bi bi-tag text-secondary me-1"></i> ${targetCategory}`;
                 document.getElementById('replyText').value = "";
@@ -316,39 +314,90 @@
             }
         });
 
-        // Commit transaction data securely to Firestore collection architectures
-    document.getElementById('submitReplyBtn').addEventListener('click', async () => {
-    try {
-        console.log('Submit clicked');
+        // Submit and generate custom auto-increment string values for FRID00001 format
+        document.getElementById('submitReplyBtn').addEventListener('click', async () => {
+            try {
+                console.log('Submit clicked');
 
-        const replyText = document.getElementById('replyText').value;
+                const targetID = selectedfeedbackID || document.getElementById('selectedfeedbackID').value;
+                const replyText = document.getElementById('replyText').value;
 
-        if (!replyText.trim() || !selectedInquiryId) {
-            alert("Please write a response before submitting.");
-            return;
-        }
+                if (!replyText.trim() || !targetID) {
+                    alert("Please write a response before submitting.");
+                    return;
+                }
 
-        const { db, firebase } = await initializeFirebase();
+                // Dynamically fetch configurations out of the module reference
+                const firebaseData = await initializeFirebase();
+                const db = firebaseData.db;
+                let firebaseInstance = firebaseData.firebase;
 
-        const newReplyRef = db.collection('feedbackReply').doc();
+                // Step 1: Query the feedbackReply collection to analyze and select the maximum formatted ID value
+                const currentRepliesSnapshot = await db.collection('feedbackReply').get();
+                let highestNumericId = 0;
 
-        await newReplyRef.set({
-            feedbackReplyID: newReplyRef.id,
-            feedbackID: selectedInquiryId,
-            description: replyText,
-            staffID: "PID88888",
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                currentRepliesSnapshot.forEach(doc => {
+                    const docId = doc.id;
+                    if (docId && docId.startsWith('FRID')) {
+                        const numericPart = parseInt(docId.replace('FRID', ''), 10);
+                        if (!isNaN(numericPart) && numericPart > highestNumericId) {
+                            highestNumericId = numericPart;
+                        }
+                    }
+                });
+
+                // Step 2: Auto-increment the baseline maximum value by 1 and build a 5-digit padded tracking string
+                const nextNumericId = highestNumericId + 1;
+                const nextCustomStringId = 'FRID' + String(nextNumericId).padStart(5, '0');
+
+                console.log(`Generated Auto-Increment ID String Reference: ${nextCustomStringId}`);
+
+                // Step 3: Write payload targeting the custom generated document sequence reference ID
+                const newReplyRef = db.collection('feedbackReply').doc(nextCustomStringId);
+
+                // --- SMART TIMESTAMP FALLBACK FIX ---
+                let timestampPayload;
+                if (firebaseInstance && firebaseInstance.firestore) {
+                    // Method A: Standard v8 project syntax format matching
+                    timestampPayload = firebaseInstance.firestore.FieldValue.serverTimestamp();
+                } else if (typeof firebaseData.serverTimestamp === 'function') {
+                    // Method B: Direct v9 helper export match fallback
+                    timestampPayload = firebaseData.serverTimestamp();
+                } else {
+                    // Method C: Runtime object reflection from engine prototypes
+                    try {
+                        const firestorePrototype = Object.getPrototypeOf(db).constructor;
+                        timestampPayload = firestorePrototype.FieldValue.serverTimestamp();
+                    } catch (e) {
+                        // Method D: Safe hard fallback tracking tool matching standard Date objects
+                        timestampPayload = new Date();
+                    }
+                }
+
+                await newReplyRef.set({
+                    feedbackReplyID: nextCustomStringId,
+                    feedbackID: targetID,
+                    description: replyText,
+                    staffID: "PID88888",
+                    createdAt: timestampPayload
+                });
+
+                console.log('Saved successfully');
+
+                const modalElement = document.getElementById('replyModal');
+                const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                if (modalInstance) {
+                    modalInstance.hide();
+                }
+
+                await renderTables();
+
+            } catch (error) {
+                console.error("Submission Error Pipeline Catch:", error);
+                alert("Failed to post response: " + error.message);
+            }
         });
 
-        console.log('Saved successfully');
-
-    } catch (error) {
-        console.error(error);
-        alert(error.message);
-    }
-});
-
-        // Initialization execution run triggers
         document.addEventListener('DOMContentLoaded', renderTables);
     </script>
 
