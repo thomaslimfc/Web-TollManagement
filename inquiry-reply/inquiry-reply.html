@@ -203,10 +203,21 @@
                 const feedbackSnapshot = await db.collection('feedback').get();
                 const repliesSnapshot = await db.collection('feedbackReply').get();
                 const categoriesSnapshot = await db.collection('feedbackCategory').get();
+                const staffSnapshot = await db.collection('staff').get();
 
                 const categoriesMap = {};
                 categoriesSnapshot.forEach(doc => {
                     categoriesMap[doc.id] = doc.data().description || 'N/A';
+                });
+
+                const staffMap = {};
+
+                staffSnapshot.forEach(doc => {
+                    const data = doc.data();
+                
+                    if (data.staffID) {
+                        staffMap[data.staffID] = data.fullName || 'Unknown Staff';
+                    }
                 });
 
                 const repliesMap = {};
@@ -214,6 +225,19 @@
                     const data = doc.data();
                     if (data.feedbackID) {
                         repliesMap[data.feedbackID] = data.description || 'N/A';
+                    }
+                });
+
+                const respondByMap = {};
+
+                repliesSnapshot.forEach(doc => {
+                    const data = doc.data();
+                
+                    if (data.feedbackID) {
+                        const staffID = data.staffID;
+                    
+                        respondByMap[data.feedbackID] =
+                            staffMap[staffID] || 'N/A';
                     }
                 });
 
@@ -255,6 +279,7 @@
                     } else {
                         repliedCount++;
                         const systemResponse = repliesMap[feedbackID];
+                        const respondBy = respondByMap[feedbackID];
                         repliedHTML += `
                             <tr>
                                 <td class="text-secondary small fw-bold">${feedbackID}</td>
@@ -267,6 +292,7 @@
                                 <td class="text-secondary small">${timestampStr}</td>
                                 <td class="text-secondary text-wrap" style="max-width: 250px;">${description}</td>
                                 <td class="fw-semibold text-dark text-wrap" style="max-width: 300px;">
+                                    <p class="text-secondary small fw-bold mb-1">${respondBy}</p>
                                     <i class="bi bi-check2-circle me-1"></i> ${systemResponse}
                                 </td>
                             </tr>
@@ -378,7 +404,7 @@
                     feedbackReplyID: nextCustomStringId,
                     feedbackID: targetID,
                     description: replyText,
-                    staffID: "PID88888",
+                    staffID: "SID00001",
                     createdAt: timestampPayload
                 });
 
