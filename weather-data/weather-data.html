@@ -159,6 +159,46 @@
             </div>
             <br>
 
+            <div class="row mt-4">
+
+                <div class="col-md-4">
+                    <div class="card border-primary">
+                        <div class="card-header bg-primary text-white">
+                            Weather Severity
+                        </div>
+                        <div class="card-body">
+                            <h3 id="outputSeverity">-</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card border-warning">
+                        <div class="card-header bg-warning">
+                            Road Condition Risk
+                        </div>
+                        <div class="card-body">
+                            <h3 id="outputRiskScore">0 / 100</h3>
+                            <p id="outputRiskLevel">-</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card border-danger">
+                        <div class="card-header bg-danger text-white">
+                            Recommended Action
+                        </div>
+                        <div class="card-body">
+                            <p id="outputAction">-</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <br>
+
             <div class="form-group row">
                 <h5 class="mb-3">Speed Limit</h5>
                 <p>Based on the current weather conditions, the speed limit is:</p>
@@ -223,6 +263,34 @@
                             outputRain.textContent = data.rain.toUpperCase() || 'N/A';
                             outputLightIntensityTemperature.textContent = data.lightIntensity.toUpperCase() || 'N/A';
 
+                            const riskScore = calculateRiskScore(
+                                data.temperature,
+                                data.humidity,
+                                data.rain,
+                                data.lightIntensity
+                            );
+
+                            const riskLevel = getRiskLevel(riskScore);
+
+                            const severity = getWeatherSeverity(
+                                data.rain,
+                                data.lightIntensity
+                            );
+
+                            const action = getRecommendedAction(riskScore);
+
+                            document.getElementById('outputSeverity').textContent =
+                                severity;
+
+                            document.getElementById('outputRiskScore').textContent =
+                                riskScore + " / 100";
+
+                            document.getElementById('outputRiskLevel').textContent =
+                                riskLevel;
+
+                            document.getElementById('outputAction').innerHTML =
+                                action;
+
                             const speedLimit = decideSpeedLimit(
                                 data.temperature,
                                 data.humidity,
@@ -233,8 +301,8 @@
                             document.getElementById('outputSpeedLimit').textContent = speedLimit + ' km/h';
                         }
                     } catch (error) {
-                        console.error("Error registering admin:", error);
-                        alert("Failed to load weather data.");
+                        // console.error("Error registering admin:", error);
+                        // alert("Failed to load weather data.");
                     }
                 }
 
@@ -243,34 +311,126 @@
                     await searchWeatherData();
                 });
 
-                function decideSpeedLimit(temp, humidity, rain, light) {
-                    let speed = 130; // base max (highway speed)
+                function calculateRiskScore(temp, humidity, rain, light) {
 
-                    // Temperature effect (too hot or freezing)
-                    if (temp > 35 || temp < 0) {
-                        speed -= 10;
+                    let score = 0;
+
+                    // Rain (Most Important)
+                    switch (rain.toLowerCase()) {
+                        case 'low':
+                            score += 20;
+                            break;
+                        case 'medium':
+                            score += 40;
+                            break;
+                        case 'high':
+                            score += 60;
+                            break;
                     }
 
-                    // Rain impact
-                    if (rain === 'medium') {
-                        speed -= 10;
-                    } else if (rain === 'high') {
-                        speed -= 20;
-                    } else if (rain === 'low') {
-                        speed -= 5;
+                    // Light
+                    switch (light.toLowerCase()) {
+                        case 'medium':
+                            score += 15;
+                            break;
+                        case 'low':
+                            score += 30;
+                            break;
                     }
 
-                    // Light impact (worse if combined with rain)
-                    if (light === 'dim') {
-                        speed -= 5;
-                    } else if (light === 'dark') {
-                        speed -= (rain === 'none') ? 10 : 15;
+                    // Humidity
+                    switch (humidity.toLowerCase()) {
+                        case 'medium':
+                            score += 10;
+                            break;
+                        case 'high':
+                            score += 20;
+                            break;
                     }
 
-                    // Apply lower bound (60 km/h for highways, 30 for urban)
-                    if (speed < 60) speed = 60;
+                    // Temperature
+                    temp = parseInt(temp);
 
-                    return speed;
+                    if (temp > 35)
+                        score += 10;
+
+                    if (temp < 10)
+                        score += 10;
+
+                    return Math.min(score, 100);
+                }
+
+                function getRiskLevel(score) {
+
+                    if (score <= 20)
+                        return "SAFE";
+
+                    if (score <= 40)
+                        return "LOW RISK";
+
+                    if (score <= 60)
+                        return "MODERATE RISK";
+
+                    if (score <= 80)
+                        return "HIGH RISK";
+
+                    return "CRITICAL";
+                }
+
+                function getWeatherSeverity(rain, light) {
+
+                    rain = rain.toLowerCase();
+                    light = light.toLowerCase();
+
+                    if (rain === 'high' && light === 'low')
+                        return 'CRITICAL';
+
+                    if (rain === 'high')
+                        return 'SEVERE';
+
+                    if (rain === 'medium')
+                        return 'MODERATE';
+
+                    return 'NORMAL';
+                }
+
+                function getRecommendedAction(score) {
+
+                    if (score <= 20) {
+                        return `
+        ✓ Continue Monitoring
+        `;
+                    }
+
+                    if (score <= 40) {
+                        return `
+        ✓ Display Drive Safely Message
+        `;
+                    }
+
+                    if (score <= 60) {
+                        return `
+        ✓ Activate Warning Signboard
+        <br>
+        ✓ Increase CCTV Monitoring
+        `;
+                    }
+
+                    if (score <= 80) {
+                        return `
+        ✓ Activate Hazard Warning
+        <br>
+        ✓ Notify Highway Patrol
+        `;
+                    }
+
+                    return `
+    ✓ Emergency Weather Alert
+    <br>
+    ✓ Notify Control Centre
+    <br>
+    ✓ Dispatch Highway Patrol
+    `;
                 }
 
                 document.addEventListener('DOMContentLoaded', () => {
