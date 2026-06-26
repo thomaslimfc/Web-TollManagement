@@ -10,6 +10,25 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        /* Interactive styles for sortable table headers */
+        th.sortable {
+            cursor: pointer;
+            user-select: none;
+        }
+        th.sortable:hover {
+            background-color: #f1f3f5 !important;
+            color: #000 !important;
+        }
+        th.sortable i {
+            font-size: 0.8rem;
+            margin-left: 4px;
+            color: #adb5bd;
+        }
+        th.sortable.active-sort i {
+            color: #0d6efd;
+        }
+    </style>
 </head>
 
 <body>
@@ -75,14 +94,14 @@
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover table-striped align-middle mb-0 text-nowrap">
+                        <table class="table table-hover table-striped align-middle mb-0 text-nowrap" id="pendingTable">
                             <thead class="table-light text-secondary small">
                                 <tr>
-                                    <th scope="col" style="min-width: 120px;">Feedback ID</th>
-                                    <th scope="col" style="min-width: 120px;">Commuter ID</th>
-                                    <th scope="col" style="min-width: 120px;">Category</th>
-                                    <th scope="col" style="min-width: 120px;">Timestamp</th>
-                                    <th scope="col" style="min-width: 140px;">Description</th>
+                                    <th scope="col" class="sortable text-start" data-sort-prop="feedbackID" style="min-width: 120px;">Feedback ID <i class="bi bi-arrow-down-up"></i></th>
+                                    <th scope="col" class="sortable" data-sort-prop="commuterID" style="min-width: 120px;">Commuter ID <i class="bi bi-arrow-down-up"></i></th>
+                                    <th scope="col" class="sortable" data-sort-prop="categoryName" style="min-width: 120px;">Category <i class="bi bi-arrow-down-up"></i></th>
+                                    <th scope="col" class="sortable" data-sort-prop="createdAtRaw" style="min-width: 120px;">Timestamp <i class="bi bi-arrow-down-up"></i></th>
+                                    <th scope="col" class="sortable" data-sort-prop="description" style="min-width: 140px;">Description <i class="bi bi-arrow-down-up"></i></th>
                                     <th scope="col" class="pe-4 text-end" style="min-width: 130px;">Actions</th>
                                 </tr>
                             </thead>
@@ -109,15 +128,15 @@
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover table-striped align-middle mb-0 text-nowrap">
+                        <table class="table table-hover table-striped align-middle mb-0 text-nowrap" id="repliedTable">
                             <thead class="table-light text-secondary small">
                                 <tr>
-                                    <th scope="col" style="min-width: 120px;">Feedback ID</th>
-                                    <th scope="col" style="min-width: 120px;">Commuter ID</th>
-                                    <th scope="col" style="min-width: 120px;">Category</th>
-                                    <th scope="col" style="min-width: 120px;">Timestamp</th>
-                                    <th scope="col" style="min-width: 160px;">Description</th>
-                                    <th scope="col" style="min-width: 160px;">Response</th>
+                                    <th scope="col" class="sortable text-start" data-sort-prop="feedbackID" style="min-width: 120px;">Feedback ID <i class="bi bi-arrow-down-up"></i></th>
+                                    <th scope="col" class="sortable" data-sort-prop="commuterID" style="min-width: 120px;">Commuter ID <i class="bi bi-arrow-down-up"></i></th>
+                                    <th scope="col" class="sortable" data-sort-prop="categoryName" style="min-width: 120px;">Category <i class="bi bi-arrow-down-up"></i></th>
+                                    <th scope="col" class="sortable" data-sort-prop="createdAtRaw" style="min-width: 120px;">Timestamp <i class="bi bi-arrow-down-up"></i></th>
+                                    <th scope="col" class="sortable" data-sort-prop="description" style="min-width: 160px;">Description <i class="bi bi-arrow-down-up"></i></th>
+                                    <th scope="col" class="sortable" data-sort-prop="systemResponse" style="min-width: 160px;">Response <i class="bi bi-arrow-down-up"></i></th>
                                 </tr>
                             </thead>
                             <tbody id="repliedTableBody"></tbody>
@@ -178,6 +197,14 @@
         import { initializeFirebase } from '/lib/firebase_init.js';
 
         let selectedfeedbackID = null;
+        
+        // Global caching references for processing sorting requests locally
+        let localPendingRecords = [];
+        let localRepliedRecords = [];
+        let activeSorts = {
+            pending: { prop: null, order: 'asc' },
+            replied: { prop: null, order: 'asc' }
+        };
 
         function formatFirestoreTimestamp(timestamp) {
             if (!timestamp) return 'N/A';
@@ -195,12 +222,7 @@
             return String(timestamp);
         }
 
-        async function renderTables() {
-            const pendingBody = document.getElementById('pendingTableBody');
-            const repliedBody = document.getElementById('repliedTableBody');
-            const pendingBadge = document.getElementById('pendingRecordCount');
-            const repliedBadge = document.getElementById('repliedRecordCount');
-
+        async function fetchAndProcessData() {
             try {
                 const { db } = await initializeFirebase();
 
@@ -215,10 +237,8 @@
                 });
 
                 const staffMap = {};
-
                 staffSnapshot.forEach(doc => {
                     const data = doc.data();
-                
                     if (data.staffID) {
                         staffMap[data.staffID] = data.fullName || 'Unknown Staff';
                     }
@@ -233,22 +253,17 @@
                 });
 
                 const respondByMap = {};
-
                 repliesSnapshot.forEach(doc => {
                     const data = doc.data();
-                
                     if (data.feedbackID) {
                         const staffID = data.staffID;
-                    
-                        respondByMap[data.feedbackID] =
-                            staffMap[staffID] || 'N/A';
+                        respondByMap[data.feedbackID] = staffMap[staffID] || 'N/A';
                     }
                 });
 
-                let pendingHTML = "";
-                let repliedHTML = "";
-                let pendingCount = 0;
-                let repliedCount = 0;
+                // Clear caches
+                localPendingRecords = [];
+                localRepliedRecords = [];
 
                 feedbackSnapshot.forEach(doc => {
                     const feedbackData = doc.data();
@@ -260,70 +275,162 @@
                     const categoryName = categoriesMap[feedbackData.feedbackCategoryID] || 'N/A';
                     const hasReply = repliesMap.hasOwnProperty(feedbackID);
 
+                    // Normalize timestamp sorting value safely
+                    let createdAtRaw = 0;
+                    if(feedbackData.createdAt) {
+                        if(typeof feedbackData.createdAt.toDate === 'function') {
+                            createdAtRaw = feedbackData.createdAt.toDate().getTime();
+                        } else if (feedbackData.createdAt instanceof Date) {
+                            createdAtRaw = feedbackData.createdAt.getTime();
+                        }
+                    }
+
                     if (!hasReply) {
-                        pendingCount++;
-                        pendingHTML += `
-                            <tr>
-                                <td class="text-secondary small fw-bold">${feedbackID}</td>
-                                <td class="text-secondary small">${commuterID}</td>
-                                <td>
-                                    <span class="badge bg-light text-dark border px-2 py-1 inquiry-category-badge">
-                                        <i class="bi bi-tag text-secondary me-1"></i> ${categoryName}
-                                    </span>
-                                </td>
-                                <td class="text-secondary small">${timestampStr}</td>
-                                <td class="fw-semibold text-dark text-wrap inquiry-desc-text" style="max-width: 300px;">${description}</td>
-                                <td class="pe-4 text-end">
-                                    <button class="btn btn-outline-primary btn-sm rounded-pill px-3 replyBtn" data-id="${feedbackID}">
-                                        <i class="bi bi-reply-fill me-1"></i> Reply
-                                    </button>
-                                </td>
-                            </tr>
-                        `;
+                        localPendingRecords.push({
+                            feedbackID, commuterID, categoryName, timestampStr, createdAtRaw, description
+                        });
                     } else {
-                        repliedCount++;
                         const systemResponse = repliesMap[feedbackID];
                         const respondBy = respondByMap[feedbackID];
-                        repliedHTML += `
-                            <tr>
-                                <td class="text-secondary small fw-bold">${feedbackID}</td>
-                                <td class="text-secondary small">${commuterID}</td>
-                                <td>
-                                    <span class="badge bg-light text-dark border px-2 py-1">
-                                        <i class="bi bi-tag text-secondary me-1"></i> ${categoryName}
-                                    </span>
-                                </td>
-                                <td class="text-secondary small">${timestampStr}</td>
-                                <td class="text-secondary text-wrap" style="max-width: 250px;">${description}</td>
-                                <td class="fw-semibold text-dark text-wrap" style="max-width: 300px;">
-                                    <p class="text-secondary small fw-bold mb-1">${respondBy}</p>
-                                    <i class="bi bi-check2-circle me-1"></i> ${systemResponse}
-                                </td>
-                            </tr>
-                        `;
+                        localRepliedRecords.push({
+                            feedbackID, commuterID, categoryName, timestampStr, createdAtRaw, description, systemResponse, respondBy
+                        });
                     }
                 });
 
-                if (pendingCount === 0) {
-                    pendingHTML = `<tr><td colspan="6" class="text-center py-4 text-muted"><i class="bi bi-slash-circle me-1"></i> No inquiry record(s) found</td></tr>`;
-                }
-                if (repliedCount === 0) {
-                    repliedHTML = `<tr><td colspan="6" class="text-center py-4 text-muted"><i class="bi bi-slash-circle me-1"></i> No inquiry record(s) found</td></tr>`;
-                }
-
-                if (pendingBody) pendingBody.innerHTML = pendingHTML;
-                if (repliedBody) repliedBody.innerHTML = repliedHTML;
-                if (pendingBadge) pendingBadge.textContent = `${pendingCount} record(s) found`;
-                if (repliedBadge) repliedBadge.textContent = `${repliedCount} record(s) found`;
+                renderTableUI('pending');
+                renderTableUI('replied');
 
             } catch (error) {
                 console.error("ERD Relational Mapping Engine Error:", error);
                 const errRow = `<tr><td colspan="6" class="text-center py-4 text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i> Error building relational tables</td></tr>`;
-                if (pendingBody) pendingBody.innerHTML = errRow;
-                if (repliedBody) repliedBody.innerHTML = errRow;
+                document.getElementById('pendingTableBody').innerHTML = errRow;
+                document.getElementById('repliedTableBody').innerHTML = errRow;
             }
         }
 
+        function renderTableUI(tableType) {
+            if (tableType === 'pending') {
+                const pendingBody = document.getElementById('pendingTableBody');
+                const pendingBadge = document.getElementById('pendingRecordCount');
+                let pendingHTML = "";
+
+                localPendingRecords.forEach(rec => {
+                    pendingHTML += `
+                        <tr>
+                            <td class="text-secondary small fw-bold">${rec.feedbackID}</td>
+                            <td class="text-secondary small">${rec.commuterID}</td>
+                            <td>
+                                <span class="badge bg-light text-dark border px-2 py-1 inquiry-category-badge">
+                                    <i class="bi bi-tag text-secondary me-1"></i> ${rec.categoryName}
+                                </span>
+                            </td>
+                            <td class="text-secondary small">${rec.timestampStr}</td>
+                            <td class="fw-semibold text-dark text-wrap inquiry-desc-text" style="max-width: 300px;">${rec.description}</td>
+                            <td class="pe-4 text-end">
+                                <button class="btn btn-outline-primary btn-sm rounded-pill px-3 replyBtn" data-id="${rec.feedbackID}">
+                                    <i class="bi bi-reply-fill me-1"></i> Reply
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                if (localPendingRecords.length === 0) {
+                    pendingHTML = `<tr><td colspan="6" class="text-center py-4 text-muted"><i class="bi bi-slash-circle me-1"></i> No inquiry record(s) found</td></tr>`;
+                }
+                if (pendingBody) pendingBody.innerHTML = pendingHTML;
+                if (pendingBadge) pendingBadge.textContent = `${localPendingRecords.length} record(s) found`;
+
+            } else if (tableType === 'replied') {
+                const repliedBody = document.getElementById('repliedTableBody');
+                const repliedBadge = document.getElementById('repliedRecordCount');
+                let repliedHTML = "";
+
+                localRepliedRecords.forEach(rec => {
+                    repliedHTML += `
+                        <tr>
+                            <td class="text-secondary small fw-bold">${rec.feedbackID}</td>
+                            <td class="text-secondary small">${rec.commuterID}</td>
+                            <td>
+                                <span class="badge bg-light text-dark border px-2 py-1">
+                                    <i class="bi bi-tag text-secondary me-1"></i> ${rec.categoryName}
+                                </span>
+                            </td>
+                            <td class="text-secondary small">${rec.timestampStr}</td>
+                            <td class="text-secondary text-wrap" style="max-width: 250px;">${rec.description}</td>
+                            <td class="fw-semibold text-dark text-wrap" style="max-width: 300px;">
+                                <p class="text-secondary small fw-bold mb-1">${rec.respondBy}</p>
+                                <i class="bi bi-check2-circle me-1"></i> ${rec.systemResponse}
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                if (localRepliedRecords.length === 0) {
+                    repliedHTML = `<tr><td colspan="6" class="text-center py-4 text-muted"><i class="bi bi-slash-circle me-1"></i> No inquiry record(s) found</td></tr>`;
+                }
+                if (repliedBody) repliedBody.innerHTML = repliedHTML;
+                if (repliedBadge) repliedBadge.textContent = `${localRepliedRecords.length} record(s) found`;
+            }
+        }
+
+        // Centralized Sort Engine Functionality (A-Z & Z-A parsing logic)
+        function sortEngine(tableType, property) {
+            let currentSort = activeSorts[tableType];
+            if (currentSort.prop === property) {
+                currentSort.order = currentSort.order === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.prop = property;
+                currentSort.order = 'asc';
+            }
+
+            const targets = tableType === 'pending' ? localPendingRecords : localRepliedRecords;
+
+            targets.sort((x, y) => {
+                let cellX = x[property];
+                let cellY = y[property];
+
+                if (typeof cellX === 'string') cellX = cellX.toLowerCase();
+                if (typeof cellY === 'string') cellY = cellY.toLowerCase();
+
+                if (cellX < cellY) return currentSort.order === 'asc' ? -1 : 1;
+                if (cellX > cellY) return currentSort.order === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            updateHeaderIcons(tableType, property, currentSort.order);
+            renderTableUI(tableType);
+        }
+
+        // Visually toggles bootstrap class properties and configurations matching logic patterns
+        function updateHeaderIcons(tableType, activeProp, activeOrder) {
+            const tableElement = document.getElementById(tableType === 'pending' ? 'pendingTable' : 'repliedTable');
+            const headers = tableElement.querySelectorAll('th.sortable');
+            
+            headers.forEach(header => {
+                header.classList.remove('active-sort');
+                const icon = header.querySelector('i');
+                icon.className = 'bi bi-arrow-down-up'; // resetting template state configurations
+                
+                if (header.dataset.sortProp === activeProp) {
+                    header.classList.add('active-sort');
+                    icon.className = activeOrder === 'asc' ? 'bi bi-sort-alpha-down' : 'bi bi-sort-alpha-down-alt';
+                }
+            });
+        }
+
+        // Listen for Table Sorting header clicks
+        document.querySelectorAll('th.sortable').forEach(th => {
+            th.addEventListener('click', (e) => {
+                const prop = th.dataset.sortProp;
+                const tableId = th.closest('table').id;
+                const type = tableId === 'pendingTable' ? 'pending' : 'replied';
+                sortEngine(type, prop);
+            });
+        });
+
+        // Delegate Click Trigger Configurations
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('replyBtn') || e.target.closest('.replyBtn')) {
                 const targetBtn = e.target.classList.contains('replyBtn') ? e.target : e.target.closest('.replyBtn');
@@ -344,11 +451,9 @@
             }
         });
 
-        // Submit and generate custom auto-increment string values for FRID00001 format
+        // Submit Logic Execution Engine
         document.getElementById('submitReplyBtn').addEventListener('click', async () => {
             try {
-                console.log('Submit clicked');
-
                 const targetID = selectedfeedbackID || document.getElementById('selectedfeedbackID').value;
                 const replyText = document.getElementById('replyText').value;
 
@@ -357,12 +462,10 @@
                     return;
                 }
 
-                // Dynamically fetch configurations out of the module reference
                 const firebaseData = await initializeFirebase();
                 const db = firebaseData.db;
                 let firebaseInstance = firebaseData.firebase;
 
-                // Step 1: Query the feedbackReply collection to analyze and select the maximum formatted ID value
                 const currentRepliesSnapshot = await db.collection('feedbackReply').get();
                 let highestNumericId = 0;
 
@@ -376,30 +479,21 @@
                     }
                 });
 
-                // Step 2: Auto-increment the baseline maximum value by 1 and build a 5-digit padded tracking string
                 const nextNumericId = highestNumericId + 1;
                 const nextCustomStringId = 'FRID' + String(nextNumericId).padStart(5, '0');
 
-                console.log(`Generated Auto-Increment ID String Reference: ${nextCustomStringId}`);
-
-                // Step 3: Write payload targeting the custom generated document sequence reference ID
                 const newReplyRef = db.collection('feedbackReply').doc(nextCustomStringId);
 
-                // --- SMART TIMESTAMP FALLBACK FIX ---
                 let timestampPayload;
                 if (firebaseInstance && firebaseInstance.firestore) {
-                    // Method A: Standard v8 project syntax format matching
                     timestampPayload = firebaseInstance.firestore.FieldValue.serverTimestamp();
                 } else if (typeof firebaseData.serverTimestamp === 'function') {
-                    // Method B: Direct v9 helper export match fallback
                     timestampPayload = firebaseData.serverTimestamp();
                 } else {
-                    // Method C: Runtime object reflection from engine prototypes
                     try {
                         const firestorePrototype = Object.getPrototypeOf(db).constructor;
                         timestampPayload = firestorePrototype.FieldValue.serverTimestamp();
                     } catch (e) {
-                        // Method D: Safe hard fallback tracking tool matching standard Date objects
                         timestampPayload = new Date();
                     }
                 }
@@ -412,15 +506,13 @@
                     createdAt: timestampPayload
                 });
 
-                console.log('Saved successfully');
-
                 const modalElement = document.getElementById('replyModal');
                 const modalInstance = bootstrap.Modal.getInstance(modalElement);
                 if (modalInstance) {
                     modalInstance.hide();
                 }
 
-                await renderTables();
+                await fetchAndProcessData();
 
             } catch (error) {
                 console.error("Submission Error Pipeline Catch:", error);
@@ -428,7 +520,7 @@
             }
         });
 
-        document.addEventListener('DOMContentLoaded', renderTables);
+        document.addEventListener('DOMContentLoaded', fetchAndProcessData);
     </script>
 
     <script>
