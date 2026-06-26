@@ -154,7 +154,11 @@
                             <th scope="row">Light Intensity</th>
                             <td id="outputLightIntensityTemperature"></td>
                         </tr>
-                    </table>
+                        <tr>
+                            <th scope="row">Visibility Rate</th>
+                            <td id="outputVisibility">-</td>
+                        </tr>
+                        </table>
                 </div>
             </div>
             <br>
@@ -200,13 +204,19 @@
             <br>
 
             <div class="form-group row">
-                <h5 class="mb-3">Speed Limit</h5>
-                <p>Based on the current weather conditions, the speed limit is:</p>
+                <h5 class="mb-3">Vehicle Speed Reminder</h5>
+                <p>Based on the real-time weather conditions, the suggested speed limit is:</p>
                 <div class="alert alert-info" role="alert" style="margin-left: 10px; width: 300px;">
-                    <strong>Speed Limit: </strong><span id="outputSpeedLimit"></span>
+                    <strong>Speed Suggestion: </strong><span id="outputSpeedLimit"></span>
                 </div>
             </div>
         </div>
+
+        <hr>
+
+        <footer>
+            <p class="text-center">&copy; 2026 PLUS HIGHWAYS SDN. BHD. All rights reserved.</p>
+        </footer>
 
 
         <script type="module">
@@ -263,6 +273,11 @@
                             outputRain.textContent = data.rain.toUpperCase() || 'N/A';
                             outputLightIntensityTemperature.textContent = data.lightIntensity.toUpperCase() || 'N/A';
 
+                            const visibilityRate = calculateVisibilityRate(
+                                data.rain,
+                                data.lightIntensity
+                            );
+
                             const riskScore = calculateRiskScore(
                                 data.temperature,
                                 data.humidity,
@@ -278,6 +293,8 @@
                             );
 
                             const action = getRecommendedAction(riskScore);
+
+                            document.getElementById('outputVisibility').textContent = visibilityRate + "%";
 
                             document.getElementById('outputSeverity').textContent =
                                 severity;
@@ -360,6 +377,40 @@
                     return Math.min(score, 100);
                 }
 
+                function calculateVisibilityRate(rain, light) {
+                    let visibility = 100;
+
+                    rain = rain.toLowerCase();
+                    light = light.toLowerCase();
+
+                    // Deduct visibility based on rainfall density
+                    if (rain === 'high') visibility -= 40;
+                    else if (rain === 'medium') visibility -= 20;
+                    else if (rain === 'low') visibility -= 5;
+
+                    // Deduct visibility based on ambient light
+                    if (light === 'low') visibility -= 30;           // Night time / Heavy overcast overcast
+                    else if (light === 'medium') visibility -= 10;   // Dusk / Dawn
+
+                    return Math.max(visibility, 10);                 // Clamp minimum threshold at 10%
+                }
+
+                function decideSpeedLimit(temp, humidity, rain, light) {
+                    const visibilityRate = calculateVisibilityRate(rain, light);
+                    let speedLimit = 110; // Standard Malaysian structural speed limit
+
+                    // Adaptive speed adjustments based on road risk matrix
+                    if (visibilityRate <= 30 || rain.toLowerCase() === 'high') {
+                        speedLimit = 50;  // High hazard weather environment
+                    } else if (visibilityRate <= 60 || rain.toLowerCase() === 'medium') {
+                        speedLimit = 70;  // Noticeable standing water / restricted visual range
+                    } else if (visibilityRate <= 80) {
+                        speedLimit = 90;  // Precautionary adjustments for night driving / light rain
+                    }
+
+                    return speedLimit;
+                }
+
                 function getRiskLevel(score) {
 
                     if (score <= 20)
@@ -398,39 +449,39 @@
 
                     if (score <= 20) {
                         return `
-        ✓ Continue Monitoring
-        `;
+                            ✓ Continue Monitoring
+                        `;
                     }
 
                     if (score <= 40) {
                         return `
-        ✓ Display Drive Safely Message
-        `;
+                            ✓ Display Drive Safely Message
+                        `;
                     }
 
                     if (score <= 60) {
                         return `
-        ✓ Activate Warning Signboard
-        <br>
-        ✓ Increase CCTV Monitoring
-        `;
+                            ✓ Activate Warning Signboard
+                            <br>
+                            ✓ Increase CCTV Monitoring
+                        `;
                     }
 
                     if (score <= 80) {
                         return `
-        ✓ Activate Hazard Warning
-        <br>
-        ✓ Notify Highway Patrol
-        `;
+                            ✓ Activate Hazard Warning
+                            <br>
+                            ✓ Notify Highway Patrol
+                        `;
                     }
 
                     return `
-    ✓ Emergency Weather Alert
-    <br>
-    ✓ Notify Control Centre
-    <br>
-    ✓ Dispatch Highway Patrol
-    `;
+                        ✓ Emergency Weather Alert
+                        <br>
+                        ✓ Notify Control Centre
+                        <br>
+                        ✓ Dispatch Highway Patrol
+                    `;
                 }
 
                 document.addEventListener('DOMContentLoaded', () => {
