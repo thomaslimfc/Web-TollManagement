@@ -8,14 +8,21 @@
 
     <link rel="stylesheet" href="../lib/master-layout.css">
 
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        .sortable-header {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .sortable-header:hover {
+            background-color: #e9ecef !important;
+        }
+    </style>
 </head>
 
 <body>
-    <!-- Top Navigation -->
     <header class="navbar navbar-expand-lg navbar-dark bg-light fixed-top">
         <div class="container-fluid">
             <button class="navbar-toggler sidebar-toggler d-lg-none me-2" type="button" style="display: none;">
@@ -46,84 +53,46 @@
         </div>
     </header>
 
-    <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <ul class="nav flex-column">
-            <li class="nav-item">
-                <a class="nav-link" href="../user-management/user-management.html">
-                    <i class="bi bi-people"></i> User Management
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="../toll-rates/toll-rates.html">
-                    <i class="bi bi-cash-coin"></i> Toll Tariff
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="../license-plate-entry-exit/license-plate-entry-exit.html">
-                    <i class="bi bi-car-front"></i> License Plate Entry/Exit
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="../cctv-streaming/cctv-streaming.html">
-                    <i class="bi bi-camera-video"></i> CCTV Streaming
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link active" href="../weather-data/weather-data.html">
-                    <i class="bi bi-cloud-sun"></i> Weather Data
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="../emergency-alerts/emergency-alerts.html">
-                    <i class="bi bi-exclamation-triangle"></i> Emergency Alerts
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="../congestion-alerts/congestion-alerts.html">
-                    <i class="bi bi-cone"></i> Congestion Alerts
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="../sos-emergency/sos-emergency.html">
-                    <i class="bi bi-life-preserver"></i> SOS Emergency
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="../vehicle-verifications/vehicle-verifications.html">
-                    <i class="bi bi-shield-check"></i> Vehicle Verifications
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="../revenue-management/revenue-management.html">
-                    <i class="bi bi-graph-up-arrow"></i> Revenue Management
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="../inquiry-reply/inquiry-reply.html">
-                    <i class="bi bi-chat-left-text"></i> Inquiry Reply
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="../data-manager/data-manager.html">
-                    <i class="bi bi-table"></i> Data Manager
-                </a>
-            </li>
+            <li class="nav-item"><a class="nav-link" href="../user-management/user-management.html"><i
+                        class="bi bi-people"></i> User Management</a></li>
+            <li class="nav-item"><a class="nav-link" href="../toll-rates/toll-rates.html"><i
+                        class="bi bi-cash-coin"></i> Toll Tariff</a></li>
+            <li class="nav-item"><a class="nav-link" href="../license-plate-entry-exit/license-plate-entry-exit.html"><i
+                        class="bi bi-car-front"></i> License Plate Entry/Exit</a></li>
+            <li class="nav-item"><a class="nav-link" href="../cctv-streaming/cctv-streaming.html"><i
+                        class="bi bi-camera-video"></i> CCTV Streaming</a></li>
+            <li class="nav-item"><a class="nav-link active" href="../weather-data/weather-data.html"><i
+                        class="bi bi-cloud-sun"></i> Weather Data</a></li>
+            <li class="nav-item"><a class="nav-link" href="../emergency-alerts/emergency-alerts.html"><i
+                        class="bi bi-exclamation-triangle"></i> Emergency Alerts</a></li>
+            <li class="nav-item"><a class="nav-link" href="../congestion-alerts/congestion-alerts.html"><i
+                        class="bi bi-cone"></i> Congestion Alerts</a></li>
+            <li class="nav-item"><a class="nav-link" href="../sos-emergency/sos-emergency.html"><i
+                        class="bi bi-life-preserver"></i> SOS Emergency</a></li>
+            <li class="nav-item"><a class="nav-link" href="../vehicle-verifications/vehicle-verifications.html"><i
+                        class="bi bi-shield-check"></i> Vehicle Verifications</a></li>
+            <li class="nav-item"><a class="nav-link" href="../revenue-management/revenue-management.html"><i
+                        class="bi bi-graph-up-arrow"></i> Revenue Management</a></li>
+            <li class="nav-item"><a class="nav-link" href="../inquiry-reply/inquiry-reply.html"><i
+                        class="bi bi-chat-left-text"></i> Inquiry Reply</a></li>
+            <li class="nav-item"><a class="nav-link" href="../data-manager/data-manager.html"><i
+                        class="bi bi-table"></i> Data Manager</a></li>
         </ul>
     </div>
 
-    <!-- Main Content -->
     <div class="main-content" id="mainContent">
-        <h1>Weather Data</h1>
+        <h1>Real-time Weather Data Checker</h1>
         <p>Check the latest dynamic speed limit based on real-time weather conditions.</p>
         <br>
 
         <div class="container-fluid">
             <div class="form-group row">
-                <label for="inputLocation" class="col-sm-2 col-form-label">Location</label>
-                <div class="col-sm-10" style="width: 250px;">
+                <label for="inputLocation" class="col-sm-2 col-form-label">Toll Location</label>
+                <div class="col-sm-10" style="width: 350px;">
                     <select class="form-select" id="inputLocation" required>
-                        <option selected disabled>Select Location</option>
+                        <option selected disabled value="">Select Location</option>
                     </select>
                 </div>
             </div>
@@ -131,8 +100,7 @@
             <div class="mt-3">
                 <button id="searchBtn" class="btn btn-success">Search</button>
             </div>
-            <br>
-            <br>
+            <br><br>
 
             <div class="form-group row">
                 <h5 class="mb-3">Weather Data</h5>
@@ -143,11 +111,11 @@
                             <td id="outputTemperature" width="200px"></td>
                         </tr>
                         <tr>
-                            <th scope=" row">Humidity</th>
+                            <th scope="row">Humidity</th>
                             <td id="outputHumidity"></td>
                         </tr>
                         <tr>
-                            <th scope="row">Rain</th>
+                            <th scope="row">Rain Density</th>
                             <td id="outputRain"></td>
                         </tr>
                         <tr>
@@ -158,375 +126,438 @@
                             <th scope="row">Visibility Rate</th>
                             <td id="outputVisibility">-</td>
                         </tr>
-                        </table>
+                    </table>
                 </div>
             </div>
             <br>
 
             <div class="row mt-4">
-
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="card border-primary">
-                        <div class="card-header bg-primary text-white">
-                            Weather Severity
-                        </div>
-                        <div class="card-body">
+                        <div class="card-header bg-primary text-white">Weather Severity</div>
+                        <div class="card-body" style="height: 150px;">
                             <h3 id="outputSeverity">-</h3>
                         </div>
                     </div>
                 </div>
-
-                <div class="col-md-4">
-                    <div class="card border-warning">
-                        <div class="card-header bg-warning">
-                            Road Condition Risk
+                <div class="col-md-3">
+                    <div class="card border-primary">
+                        <div class="card-header bg-success text-white">Vehicle Speed Reminder</div>
+                        <div class="card-body" style="height: 150px;">
+                            <h3 id="outputSpeedLimit">-</h3>
                         </div>
-                        <div class="card-body">
-                            <h3 id="outputRiskScore">0 / 100</h3>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-primary">
+                        <div class="card-header bg-warning">Road Condition Risk</div>
+                        <div class="card-body" style="height: 150px;">
+                            <h3 id="outputRiskScore">?? / 100</h3>
                             <p id="outputRiskLevel">-</p>
                         </div>
                     </div>
                 </div>
-
-                <div class="col-md-4">
-                    <div class="card border-danger">
-                        <div class="card-header bg-danger text-white">
-                            Recommended Action
-                        </div>
-                        <div class="card-body">
+                <div class="col-md-3">
+                    <div class="card border-primary">
+                        <div class="card-header bg-danger text-white">Recommended Action</div>
+                        <div class="card-body" style="height: 150px;">
                             <p id="outputAction">-</p>
                         </div>
                     </div>
                 </div>
-
             </div>
-
             <br>
-
-            <div class="form-group row">
-                <h5 class="mb-3">Vehicle Speed Reminder</h5>
-                <p>Based on the real-time weather conditions, the suggested speed limit is:</p>
-                <div class="alert alert-info" role="alert" style="margin-left: 10px; width: 300px;">
-                    <strong>Speed Suggestion: </strong><span id="outputSpeedLimit"></span>
-                </div>
-            </div>
         </div>
 
         <hr>
 
+        <h1>Historical Weather Data Directory</h1>
+        <p>Access and analyse past weather data.</p>
+        <br>
+
+        <div class="card shadow-sm mb-5">
+            <div
+                class="card-header bg-white py-3 border-bottom border-light d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+                <h5 class="card-title mb-0 fw-bold text-dark d-flex align-items-center gap-2">
+                    <i class="bi bi-collection text-success"></i> Historical Weather Data
+                    <span id="recordCount" class="badge bg-light text-dark border fw-medium px-2 py-1.5">0 record(s)
+                        found</span>
+                </h5>
+
+                <div class="d-flex gap-2 align-items-center" style="min-width: 300px;">
+                    <span class="text-secondary small text-nowrap"><i class="bi bi-funnel"></i> Location:</span>
+                    <select class="form-select form-select-sm" id="filterLocation">
+                        <option value="" selected>All Locations</option>
+                    </select>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover table-striped align-middle border mb-0" id="historicalTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col" class="sortable-header" data-column="id" style="width: 20%;">Weather Data ID
+                                <i class="bi bi-arrow-down-up ms-1 text-muted small"></i>
+                            </th>
+                            <th scope="col" class="sortable-header" data-column="timestamp" style="width: 25%;">
+                                Timestamp <i class="bi bi-arrow-down-up ms-1 text-muted small"></i></th>
+                            <th scope="col" class="sortable-header" data-column="temperature" style="width: 15%;">
+                                Temperature (&deg;C) <i class="bi bi-arrow-down-up ms-1 text-muted small"></i></th>
+                            <th scope="col" class="sortable-header" data-column="rain" style="width: 15%;">Rain Density
+                                <i class="bi bi-arrow-down-up ms-1 text-muted small"></i>
+                            </th>
+                            <th scope="col" class="sortable-header" data-column="lightIntensity" style="width: 15%;">
+                                Light Intensity <i class="bi bi-arrow-down-up ms-1 text-muted small"></i></th>
+                            <th scope="col" class="sortable-header" data-column="humidity" style="width: 10%;">Humidity
+                                <i class="bi bi-arrow-down-up ms-1 text-muted small"></i>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">Initializing and pulling data streams...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <footer>
             <p class="text-center">&copy; 2026 PLUS HIGHWAYS SDN. BHD. All rights reserved.</p>
         </footer>
+    </div>
 
+    <script type="module">
+        import { initializeFirebase } from '/lib/firebase_init.js';
 
-        <script type="module">
-            import { initializeFirebase } from '/lib/firebase_init.js';
+        // Global Memory State Architecture (Prevents duplicate structural database hits when sorting or filtering)
+        let historicalCache = [];
+        let activeSortColumn = null;
+        let isAscending = true;
 
-            document.addEventListener('DOMContentLoaded', async () => {
-                const searchBtn = document.getElementById('searchBtn');
-                const formInputs = [
-                    'inputLocation',
-                ];
+        document.addEventListener('DOMContentLoaded', async () => {
+            const searchBtn = document.getElementById('searchBtn');
+            const inputLocation = document.getElementById('inputLocation');
+            const filterLocation = document.getElementById('filterLocation');
 
-                function setFormEnabled() {
-                    formInputs.forEach(id => {
-                        document.getElementById(id).disabled = false;
+            /**
+             * 1. Dynamic Dropdown Population
+             * Fetches metadata from 'tollLocation' to build selection structures.
+             */
+            async function loadLocationOptions() {
+                try {
+                    const { db } = await initializeFirebase();
+                    const snapshot = await db.collection("tollLocation").get();
+
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        const tollLocationID = data.tollLocationID || doc.id;
+                        const description = data.description || "Unknown Location";
+                        const textDisplay = `${description} (${tollLocationID})`;
+
+                        // Append option row element to the Main Real-Time Search dropdown
+                        const optionMain = document.createElement("option");
+                        optionMain.value = tollLocationID;
+                        optionMain.textContent = textDisplay;
+                        inputLocation.appendChild(optionMain);
+
+                        // Append option row element to the Historical Directory filter dropdown
+                        const optionFilter = document.createElement("option");
+                        optionFilter.value = tollLocationID;
+                        optionFilter.textContent = textDisplay;
+                        filterLocation.appendChild(optionFilter);
                     });
+                } catch (error) {
+                    console.error("CRITICAL: Error mapping location metadata profiles:", error);
                 }
+            }
 
-                async function loadLocationOptions() {
-                    try {
-                        const { db } = await initializeFirebase();
-                        const snapshot = await db.collection("weather").get();
+            /**
+             * 2. Live Dashboard Operations View
+             * Fetches real-time status attributes for a specific booth ID.
+             */
+            async function searchWeatherData() {
+                const outputTemperature = document.getElementById('outputTemperature');
+                const outputHumidity = document.getElementById('outputHumidity');
+                const outputRain = document.getElementById('outputRain');
+                const outputLightIntensityTemperature = document.getElementById('outputLightIntensityTemperature');
 
-                        const locationSelect = document.getElementById("inputLocation");
+                try {
+                    const { db } = await initializeFirebase();
+                    const locationId = inputLocation.value;
 
-                        snapshot.forEach(doc => {
-                            const docId = doc.id; // Use document ID as location
-                            const option = document.createElement("option");
-                            option.value = docId;
-                            option.textContent = docId;
-                            locationSelect.appendChild(option);
-                        });
-                    } catch (error) {
-                        console.error("Error loading location options:", error);
-                        alert("Failed to load location list.");
+                    if (!locationId) return;
+
+                    const doc = await db.collection('weather').doc(locationId).get();
+
+                    if (doc.exists) {
+                        const data = doc.data();
+
+                        // Parse strings safely and match case structures
+                        outputTemperature.textContent = data.temperature !== undefined ? `${parseFloat(data.temperature).toFixed(1)}` : 'N/A';
+                        outputHumidity.textContent = data.humidity ? String(data.humidity).toUpperCase() : 'N/A';
+                        outputRain.textContent = data.rain ? String(data.rain).toUpperCase() : 'N/A';
+                        outputLightIntensityTemperature.textContent = data.lightIntensity ? String(data.lightIntensity).toUpperCase() : 'N/A';
+
+                        // Metrics Evaluations Matrix
+                        const visibilityRate = calculateVisibilityRate(data.rain || 'low', data.lightIntensity || 'high');
+                        const riskScore = calculateRiskScore(data.temperature || 25, data.humidity || 'low', data.rain || 'low', data.lightIntensity || 'high');
+
+                        document.getElementById('outputVisibility').textContent = visibilityRate + "%";
+                        document.getElementById('outputSeverity').textContent = getWeatherSeverity(data.rain || 'low', data.lightIntensity || 'high');
+                        document.getElementById('outputRiskScore').textContent = riskScore + " / 100";
+                        document.getElementById('outputRiskLevel').textContent = getRiskLevel(riskScore);
+                        document.getElementById('outputAction').innerHTML = getRecommendedAction(riskScore);
+                        document.getElementById('outputSpeedLimit').textContent = decideSpeedLimit(data.temperature || 25, data.humidity || 'low', data.rain || 'low', data.lightIntensity || 'high') + ' km/h';
+                    } else {
+                        // Muted/Reset defaults fallback
+                        outputTemperature.textContent = 'N/A';
+                        outputHumidity.textContent = 'N/A';
+                        outputRain.textContent = 'N/A';
+                        outputLightIntensityTemperature.textContent = 'N/A';
+                        document.getElementById('outputVisibility').textContent = "-";
+                        document.getElementById('outputSeverity').textContent = "NO DATA";
+                        document.getElementById('outputRiskScore').textContent = "0 / 100";
+                        document.getElementById('outputRiskLevel').textContent = "-";
+                        document.getElementById('outputAction').innerHTML = "-";
+                        document.getElementById('outputSpeedLimit').textContent = "110 km/h";
                     }
+                } catch (error) {
+                    console.error("Dashboard Engine Exception:", error);
                 }
+            }
 
-                async function searchWeatherData() {
-                    const outputTemperature = document.getElementById('outputTemperature');
-                    const outputHumidity = document.getElementById('outputHumidity');
-                    const outputRain = document.getElementById('outputRain');
-                    const outputLightIntensityTemperature = document.getElementById('outputLightIntensityTemperature');
+            /**
+             * 3. Parallel Async Cloud History Collection Compilation
+             * Aggregates all history subcollections iteratively across standard locations.
+             */
+            async function fetchAllHistoricalData() {
+                const tableBody = document.querySelector("#historicalTable tbody");
 
-                    try {
-                        const { db } = await initializeFirebase();
-                        const location = document.getElementById('inputLocation').value;
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">
+                            <div class="spinner-border spinner-border-sm text-success me-2" role="status"></div>
+                            Compiling multi-station histories across database subcollections...
+                        </td>
+                    </tr>
+                `;
 
-                        const doc = await db.collection('weather').doc(location).get();
+                try {
+                    const { db } = await initializeFirebase();
+                    const tollLocationSnapshot = await db.collection("tollLocation").get();
 
-                        if (doc.exists) {
+                    historicalCache = []; // Flash reset storage array
+
+                    // Maps queries out into an unblocking parallel promise stack sequence execution
+                    const promises = tollLocationSnapshot.docs.map(async (locationDoc) => {
+                        const locId = locationDoc.id;
+                        const historySnapshot = await db.collection("weatherLocation").doc(locId).collection("history").get();
+
+                        historySnapshot.forEach((doc) => {
                             const data = doc.data();
-                            outputTemperature.textContent = data.temperature || 'N/A';
-                            outputHumidity.textContent = data.humidity.toUpperCase() || 'N/A';
-                            outputRain.textContent = data.rain.toUpperCase() || 'N/A';
-                            outputLightIntensityTemperature.textContent = data.lightIntensity.toUpperCase() || 'N/A';
+                            let rawTimestamp = 0;
+                            let displayTime = "N/A";
 
-                            const visibilityRate = calculateVisibilityRate(
-                                data.rain,
-                                data.lightIntensity
-                            );
+                            if (data.timestamp) {
+                                const dateObj = typeof data.timestamp.toDate === "function" ? data.timestamp.toDate() : new Date(data.timestamp);
+                                rawTimestamp = dateObj.getTime();
+                                displayTime = dateObj.toLocaleString('en-MY', { timeZone: 'Asia/Kuala_Lumpur' });
+                            }
 
-                            const riskScore = calculateRiskScore(
-                                data.temperature,
-                                data.humidity,
-                                data.rain,
-                                data.lightIntensity
-                            );
+                            historicalCache.push({
+                                id: doc.id,
+                                locationId: locId,
+                                timestamp: rawTimestamp,
+                                displayTimestamp: displayTime,
+                                temperature: parseFloat(data.temperature || 0),
+                                rain: String(data.rain || 'LOW').toUpperCase().trim(),
+                                lightIntensity: String(data.lightIntensity || 'HIGH').toUpperCase().trim(),
+                                humidity: String(data.humidity || 'LOW').toUpperCase().trim()
+                            });
+                        });
+                    });
 
-                            const riskLevel = getRiskLevel(riskScore);
+                    // Await execution settlement across all subcollection network streams
+                    await Promise.all(promises);
+                    applyFilterAndRender();
 
-                            const severity = getWeatherSeverity(
-                                data.rain,
-                                data.lightIntensity
-                            );
+                } catch (error) {
+                    console.error("Historical Aggregation Exception:", error);
+                    tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-4"><i class="bi bi-exclamation-octagon me-1"></i> Failed to synchronize historical datasets.</td></tr>`;
+                }
+            }
 
-                            const action = getRecommendedAction(riskScore);
+            /**
+             * 4. Cache Filter Layer Application
+             * Processes live selections on the directory panel without requesting firestore reads.
+             */
+            function applyFilterAndRender() {
+                const selectedFilter = filterLocation.value;
+                const recordCountBadge = document.getElementById("recordCount");
 
-                            document.getElementById('outputVisibility').textContent = visibilityRate + "%";
+                const filteredItems = selectedFilter
+                    ? historicalCache.filter(item => item.locationId === selectedFilter)
+                    : historicalCache;
 
-                            document.getElementById('outputSeverity').textContent =
-                                severity;
+                recordCountBadge.textContent = `${filteredItems.length} record(s) found`;
+                renderHistoricalTable(filteredItems);
+            }
 
-                            document.getElementById('outputRiskScore').textContent =
-                                riskScore + " / 100";
-
-                            document.getElementById('outputRiskLevel').textContent =
-                                riskLevel;
-
-                            document.getElementById('outputAction').innerHTML =
-                                action;
-
-                            const speedLimit = decideSpeedLimit(
-                                data.temperature,
-                                data.humidity,
-                                data.rain,
-                                data.lightIntensity
-                            );
-
-                            document.getElementById('outputSpeedLimit').textContent = speedLimit + ' km/h';
-                        }
-                    } catch (error) {
-                        // console.error("Error registering admin:", error);
-                        // alert("Failed to load weather data.");
-                    }
+            /**
+             * 5. Document Node Fragment Generation Rendering
+             * Formats Malaysian thresholds and targets row construction dynamics.
+             */
+            function renderHistoricalTable(items) {
+                const tableBody = document.querySelector("#historicalTable tbody");
+                if (items.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">No matching records found for this location profile selection.</td></tr>`;
+                    return;
                 }
 
-                searchBtn.addEventListener('click', async (e) => {
-                    e.preventDefault();
-                    await searchWeatherData();
+                let htmlRows = "";
+                items.forEach((item) => {
+                    // Apply Malaysian weather specific thermal metrics classes
+                    let tempClass = "bg-secondary text-white";
+                    if (item.temperature > 35.0) tempClass = "bg-danger text-white";
+                    else if (item.temperature >= 30.0) tempClass = "bg-warning text-dark";
+
+                    const getBadgeClass = (val) => {
+                        if (val === "HIGH") return "bg-danger text-white";
+                        if (val === "MEDIUM" || val === "MED") return "bg-warning text-dark";
+                        return "bg-secondary text-white";
+                    };
+
+                    htmlRows += `
+                <tr>
+                    <td class="text-secondary small fw-bold">${item.id} <span class="badge bg-light text-secondary border ms-1">${item.locationId}</span></td>
+                    <td class="text-secondary small fw-bold">${item.displayTimestamp}</td>
+                    <td><span class="badge ${tempClass}">${item.temperature.toFixed(1)}&deg;C</span></td>
+                    <td><span class="badge ${getBadgeClass(item.rain)}">${item.rain}</span></td>
+                    <td><span class="badge ${getBadgeClass(item.lightIntensity)}">${item.lightIntensity}</span></td>
+                    <td><span class="badge ${getBadgeClass(item.humidity)}">${item.humidity}</span></td>
+                </tr>`;
                 });
+                tableBody.innerHTML = htmlRows;
+            }
 
-                function calculateRiskScore(temp, humidity, rain, light) {
+            /**
+             * 6. Client-side Memory Sort Strategy Handler
+             */
+            document.querySelectorAll('.sortable-header').forEach(header => {
+                header.addEventListener('click', () => {
+                    const columnKey = header.getAttribute('data-column');
+                    isAscending = (activeSortColumn === columnKey) ? !isAscending : true;
+                    activeSortColumn = columnKey;
 
-                    let score = 0;
+                    // Normalize and cycle typography icons styles context
+                    document.querySelectorAll('.sortable-header i').forEach(icon => icon.className = "bi bi-arrow-down-up ms-1 text-muted small");
+                    header.querySelector('i').className = isAscending ? "bi bi-sort-up ms-1 text-dark" : "bi bi-sort-down ms-1 text-dark";
 
-                    // Rain (Most Important)
-                    switch (rain.toLowerCase()) {
-                        case 'low':
-                            score += 20;
-                            break;
-                        case 'medium':
-                            score += 40;
-                            break;
-                        case 'high':
-                            score += 60;
-                            break;
-                    }
+                    historicalCache.sort((a, b) => {
+                        let valA = a[columnKey];
+                        let valB = b[columnKey];
+                        return typeof valA === 'string'
+                            ? (isAscending ? valA.localeCompare(valB) : valB.localeCompare(valA))
+                            : (isAscending ? valA - valB : valB - valA);
+                    });
 
-                    // Light
-                    switch (light.toLowerCase()) {
-                        case 'medium':
-                            score += 15;
-                            break;
-                        case 'low':
-                            score += 30;
-                            break;
-                    }
-
-                    // Humidity
-                    switch (humidity.toLowerCase()) {
-                        case 'medium':
-                            score += 10;
-                            break;
-                        case 'high':
-                            score += 20;
-                            break;
-                    }
-
-                    // Temperature
-                    temp = parseInt(temp);
-
-                    if (temp > 35)
-                        score += 10;
-
-                    if (temp < 10)
-                        score += 10;
-
-                    return Math.min(score, 100);
-                }
-
-                function calculateVisibilityRate(rain, light) {
-                    let visibility = 100;
-
-                    rain = rain.toLowerCase();
-                    light = light.toLowerCase();
-
-                    // Deduct visibility based on rainfall density
-                    if (rain === 'high') visibility -= 40;
-                    else if (rain === 'medium') visibility -= 20;
-                    else if (rain === 'low') visibility -= 5;
-
-                    // Deduct visibility based on ambient light
-                    if (light === 'low') visibility -= 30;           // Night time / Heavy overcast overcast
-                    else if (light === 'medium') visibility -= 10;   // Dusk / Dawn
-
-                    return Math.max(visibility, 10);                 // Clamp minimum threshold at 10%
-                }
-
-                function decideSpeedLimit(temp, humidity, rain, light) {
-                    const visibilityRate = calculateVisibilityRate(rain, light);
-                    let speedLimit = 110; // Standard Malaysian structural speed limit
-
-                    // Adaptive speed adjustments based on road risk matrix
-                    if (visibilityRate <= 30 || rain.toLowerCase() === 'high') {
-                        speedLimit = 50;  // High hazard weather environment
-                    } else if (visibilityRate <= 60 || rain.toLowerCase() === 'medium') {
-                        speedLimit = 70;  // Noticeable standing water / restricted visual range
-                    } else if (visibilityRate <= 80) {
-                        speedLimit = 90;  // Precautionary adjustments for night driving / light rain
-                    }
-
-                    return speedLimit;
-                }
-
-                function getRiskLevel(score) {
-
-                    if (score <= 20)
-                        return "SAFE";
-
-                    if (score <= 40)
-                        return "LOW RISK";
-
-                    if (score <= 60)
-                        return "MODERATE RISK";
-
-                    if (score <= 80)
-                        return "HIGH RISK";
-
-                    return "CRITICAL";
-                }
-
-                function getWeatherSeverity(rain, light) {
-
-                    rain = rain.toLowerCase();
-                    light = light.toLowerCase();
-
-                    if (rain === 'high' && light === 'low')
-                        return 'CRITICAL';
-
-                    if (rain === 'high')
-                        return 'SEVERE';
-
-                    if (rain === 'medium')
-                        return 'MODERATE';
-
-                    return 'NORMAL';
-                }
-
-                function getRecommendedAction(score) {
-
-                    if (score <= 20) {
-                        return `
-                            ✓ Continue Monitoring
-                        `;
-                    }
-
-                    if (score <= 40) {
-                        return `
-                            ✓ Display Drive Safely Message
-                        `;
-                    }
-
-                    if (score <= 60) {
-                        return `
-                            ✓ Activate Warning Signboard
-                            <br>
-                            ✓ Increase CCTV Monitoring
-                        `;
-                    }
-
-                    if (score <= 80) {
-                        return `
-                            ✓ Activate Hazard Warning
-                            <br>
-                            ✓ Notify Highway Patrol
-                        `;
-                    }
-
-                    return `
-                        ✓ Emergency Weather Alert
-                        <br>
-                        ✓ Notify Control Centre
-                        <br>
-                        ✓ Dispatch Highway Patrol
-                    `;
-                }
-
-                document.addEventListener('DOMContentLoaded', () => {
-                    initialize();
+                    applyFilterAndRender();
                 });
+            });
 
-                await loadLocationOptions();
-                setFormEnabled();
+            // Sub-Table Selection Change Event Wire-Up
+            filterLocation.addEventListener('change', applyFilterAndRender);
 
-                // Optional: auto-select first location if none selected
-                const inputLocation = document.getElementById('inputLocation');
-                if (!inputLocation.value && inputLocation.options.length > 0) {
-                    inputLocation.value = inputLocation.options[0].value;
+            // Primary Interactive Form Submit Controls
+            searchBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                await searchWeatherData(); // Only updates the live top panel view
+            });
+
+            // Bootstrap Initialization Lifecycle Execution
+            await loadLocationOptions();
+            await fetchAllHistoricalData();
+
+            /**
+             * 7. Real-Time Monitor Loop
+             * Silently updates the top dashboard every 5 seconds without resetting the history view state.
+             */
+            setInterval(() => {
+                if (inputLocation.value) {
+                    searchWeatherData();
                 }
+            }, 5000);
 
-                // Auto-refresh every 3 seconds
-                setInterval(() => {
-                    if (inputLocation.value) {
-                        searchWeatherData();
-                    }
-                }, 3000);
-            });
-        </script>
-
-        <!-- Bootstrap JS Bundle with Popper -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
-
-        <script>
-            // Toggle sidebar on mobile
-            document.querySelector('.sidebar-toggler').addEventListener('click', function () {
-                document.getElementById('sidebar').classList.toggle('show');
-            });
-
-            // Close sidebar when clicking outside on mobile
-            document.addEventListener('click', function (event) {
-                const sidebar = document.getElementById('sidebar');
-                const toggler = document.querySelector('.sidebar-toggler');
-
-                if (window.innerWidth < 992 &&
-                    !sidebar.contains(event.target) &&
-                    !toggler.contains(event.target)) {
-                    sidebar.classList.remove('show');
+            // Operational Mathematical Engineering Equations Logic
+            function calculateRiskScore(temp, humidity, rain, light) {
+                let score = 0;
+                switch (String(rain).toLowerCase()) {
+                    case 'low': score += 20; break;
+                    case 'medium': score += 40; break;
+                    case 'high': score += 60; break;
                 }
-            });
-        </script>
+                switch (String(light).toLowerCase()) {
+                    case 'medium': score += 15; break;
+                    case 'low': score += 30; break;
+                }
+                switch (String(humidity).toLowerCase()) {
+                    case 'medium': score += 10; break;
+                    case 'high': score += 20; break;
+                }
+                if (parseInt(temp) > 35 || parseInt(temp) < 10) score += 10;
+                return Math.min(score, 100);
+            }
+
+            function calculateVisibilityRate(rain, light) {
+                let visibility = 100;
+                rain = String(rain).toLowerCase(); light = String(light).toLowerCase();
+                if (rain === 'high') visibility -= 40; else if (rain === 'medium') visibility -= 20;
+                if (light === 'low') visibility -= 30; else if (light === 'medium') visibility -= 10;
+                return Math.max(visibility, 10);
+            }
+
+            function decideSpeedLimit(temp, humidity, rain, light) {
+                const vis = calculateVisibilityRate(rain, light);
+                if (vis <= 30 || String(rain).toLowerCase() === 'high') return 50;
+                if (vis <= 60 || String(rain).toLowerCase() === 'medium') return 70;
+                if (vis <= 80) return 90;
+                return 110;
+            }
+
+            function getRiskLevel(score) {
+                if (score <= 20) return "SAFE"; if (score <= 40) return "LOW RISK";
+                if (score <= 60) return "MODERATE RISK"; if (score <= 80) return "HIGH RISK";
+                return "CRITICAL";
+            }
+
+            if (activeSortColumn === null) { getRiskLevel(0); } // Dead execution fallback branch protection
+
+            function getWeatherSeverity(rain, light) {
+                rain = String(rain).toLowerCase(); light = String(light).toLowerCase();
+                if (rain === 'high' && light === 'low') return 'CRITICAL';
+                if (rain === 'high') return 'SEVERE';
+                if (rain === 'medium') return 'MODERATE';
+                return 'NORMAL';
+            }
+
+            function getRecommendedAction(score) {
+                if (score <= 20) return `✓ Continue Monitoring`;
+                if (score <= 40) return `✓ Display Drive Safely Message`;
+                if (score <= 60) return `✓ Activate Warning Signboard <br> ✓ Increase CCTV Monitoring`;
+                if (score <= 80) return `✓ Activate Hazard Warning <br> ✓ Notify Highway Patrol`;
+                return `✓ Emergency Weather Alert <br> ✓ Notify Control Centre <br> ✓ Dispatch Highway Patrol`;
+            }
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.querySelector('.sidebar-toggler').addEventListener('click', function () {
+            document.getElementById('sidebar').classList.toggle('show');
+        });
+    </script>
 </body>
 
 </html>
