@@ -171,12 +171,26 @@
                                     License Plate <i class="bi bi-arrow-down-up sort-icon" id="icon-licensePlate"></i>
                                 </th>
                                 <th scope="col" class="sortable-header" style="min-width: 130px;"
+                                    data-sort-key="vehicleType">
+                                    Vehicle Type <i class="bi bi-arrow-down-up sort-icon" id="icon-vehicleType"></i>
+                                </th>
+                                <th scope="col" class="sortable-header" style="min-width: 130px;"
                                     data-sort-key="carMake">
                                     Car Make <i class="bi bi-arrow-down-up sort-icon" id="icon-carMake"></i>
                                 </th>
                                 <th scope="col" class="sortable-header" style="min-width: 130px;"
                                     data-sort-key="carModel">
                                     Car Model <i class="bi bi-arrow-down-up sort-icon" id="icon-carModel"></i>
+                                </th>
+                                <th scope="col" class="sortable-header" style="min-width: 160px;"
+                                    data-sort-key="entryLocationName">
+                                    Entry Location <i class="bi bi-arrow-down-up sort-icon"
+                                        id="icon-entryLocationName"></i>
+                                </th>
+                                <th scope="col" class="sortable-header" style="min-width: 160px;"
+                                    data-sort-key="exitLocationName">
+                                    Exit Location <i class="bi bi-arrow-down-up sort-icon"
+                                        id="icon-exitLocationName"></i>
                                 </th>
                                 <th scope="col" class="sortable-header" style="min-width: 220px;"
                                     data-sort-key="entryTimestamp">
@@ -186,6 +200,10 @@
                                 <th scope="col" class="sortable-header" style="min-width: 220px;"
                                     data-sort-key="exitTimestamp">
                                     Exit Timestamp <i class="bi bi-arrow-down-up sort-icon" id="icon-exitTimestamp"></i>
+                                </th>
+                                <th scope="col" class="sortable-header" style="min-width: 120px;"
+                                    data-sort-key="status">
+                                    Status <i class="bi bi-arrow-down-up sort-icon" id="icon-status"></i>
                                 </th>
                                 <th scope="col" class="pe-4 text-end sortable-header" style="min-width: 140px;"
                                     data-sort-key="amount">
@@ -262,24 +280,20 @@
                 }
             }
 
-            function renderRecordsTable() {
+function renderRecordsTable() {
                 if (compiledRecords.length === 0) {
-                    tableBody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-muted"><i class="bi bi-slash-circle me-1"></i> No matching transaction logs exist linked to this location.</td></tr>`;
+                    tableBody.innerHTML = `<tr><td colspan="12" class="text-center py-4 text-muted"><i class="bi bi-slash-circle me-1"></i> No matching transaction logs exist.</td></tr>`;
                     recordCountBadge.textContent = "0 record(s) found";
                     return;
                 }
 
+                // Sort handling logic block
                 compiledRecords.sort((a, b) => {
                     let valA = a[currentSortKey];
                     let valB = b[currentSortKey];
 
-                    if (currentSortKey === 'entryTimestamp') {
-                        valA = a.rawEntryTime;
-                        valB = b.rawEntryTime;
-                    } else if (currentSortKey === 'exitTimestamp') {
-                        valA = a.rawExitTime;
-                        valB = b.rawExitTime;
-                    }
+                    if (currentSortKey === 'entryTimestamp') { valA = a.rawEntryTime; valB = b.rawEntryTime; }
+                    else if (currentSortKey === 'exitTimestamp') { valA = a.rawExitTime; valB = b.rawExitTime; }
 
                     if (typeof valA === 'string') {
                         return currentSortOrder === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
@@ -292,15 +306,27 @@
 
                 let rowsHtml = "";
                 compiledRecords.forEach(item => {
+                    // Contextual badge generator evaluated per row iteration loop safely
+                    let statusBadgeClass = "text-danger-emphasis border-danger fw-bolder";
+                    if (item.status === "Completed") {
+                        statusBadgeClass = "bg-success text-light border-success-subtle fw-bolder";
+                    } else if (item.status === "Failed" || item.status === "Penalised") {
+                        statusBadgeClass = "bg-warning-subtle text-danger border-danger fw-bolder";
+                    }
+
                     rowsHtml += `
                     <tr>
                         <td class="text-secondary small fw-bold">${item.transactionID}</td>
                         <td class="text-secondary small">${item.commuterID}</td>
                         <td><span class="badge bg-dark font-monospace px-2.5 py-1.5 fs-6 shadow-sm border border-secondary">${item.licensePlate}</span></td>
+                        <td class="text-dark small"><span class="badge bg-secondary-subtle text-secondary-emphasis">${item.vehicleType}</span></td>
                         <td class="fw-semibold text-dark">${item.carMake}</td>
                         <td class="text-secondary">${item.carModel}</td>
-                        <td class="text-muted small"><i class="bi bi-box-arrow-in-right text-success me-1"></i> ${item.entryTimestamp}</td>
-                        <td class="text-muted small"><i class="bi bi-box-arrow-left text-danger me-1"></i> ${item.exitTimestamp}</td>
+                        <td class="text-dark fw-medium small"><i class="bi bi-box-arrow-in-right text-success me-1"></i>${item.entryLocationName}</td>
+                        <td class="text-dark fw-medium small"><i class="bi bi-box-arrow-left text-danger me-1"></i>${item.exitLocationName}</td>
+                        <td class="text-muted small">${item.entryTimestamp}</td>
+                        <td class="text-muted small">${item.exitTimestamp}</td>
+                        <td><span class="badge ${statusBadgeClass} border px-2 py-1">${item.status}</span></td>
                         <td class="pe-4 text-end fw-bold text-success">RM ${item.amount}</td>
                     </tr>`;
                 });
@@ -343,7 +369,7 @@
                 }
             }
 
-            async function fetchAndCacheRecords() {
+async function fetchAndCacheRecords() {
                 try {
                     const { db } = await initializeFirebase();
                     const targetDescription = locationSelect.value;
@@ -351,98 +377,99 @@
 
                     tableBody.innerHTML = `
                     <tr>
-                        <td colspan="9" class="text-center py-5 text-success">
+                        <td colspan="12" class="text-center py-5 text-success">
                             <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-                            Querying data structures and compiling target relational maps...
+                            Downloading database snapshots and compiling relations mapping...
                         </td>
                     </tr>`;
 
-                    let transactionsList = [];
+                    // 1. Fetch reference collections to build map tables locally
+                    const [locationsWin, vehiclesWin, vehicleTypesWin] = await Promise.all([
+                        db.collection('tollLocation').get(),
+                        db.collection('vehicle').get(),
+                        db.collection('vehicleType').get()
+                    ]);
 
-                    if (targetDescription === "ALL") {
-                        // All Locations Mode: Direct structural grab over the top-level collection snapshot
-                        const transSnapshot = await db.collection('tollTransaction').get();
-                        transSnapshot.forEach(doc => transactionsList.push({ id: doc.id, ...doc.data() }));
-                    } else {
-                        // Location-Filtered Mode: Relational dependency traverse pipeline execution
-                        const locationSnapshot = await db.collection('tollLocation').where('description', '==', targetDescription).get();
-                        if (locationSnapshot.empty) { compiledRecords = []; renderRecordsTable(); return; }
+                    // Map configurations to instantly retrieve master data objects by key
+                    const locationMap = {};
+                    locationsWin.forEach(d => { 
+                        const data = d.data();
+                        if (data.tollLocationID) locationMap[data.tollLocationID] = data.description;
+                    });
 
-                        const locationIDs = [];
-                        locationSnapshot.forEach(doc => { if (doc.data().tollLocationID) locationIDs.push(doc.data().tollLocationID); });
+                    const vehicleMap = {};
+                    vehiclesWin.forEach(d => { vehicleMap[d.id] = d.data(); });
 
-                        const boothSnapshot = await db.collection('tollBooth').where('tollLocationID', 'in', locationIDs).get();
-                        if (boothSnapshot.empty) { compiledRecords = []; renderRecordsTable(); return; }
+                    const typeMap = {};
+                    vehicleTypesWin.forEach(d => { 
+                        const data = d.data();
+                        if (data.vehicleTypeID) typeMap[data.vehicleTypeID] = data.description || data.name;
+                    });
 
-                        const boothIDs = [];
-                        boothSnapshot.forEach(doc => { if (doc.data().boothID) boothIDs.push(doc.data().boothID); });
+                    // 2. Fetch all LPR Records to map capture details safely 
+                    const lprWin = await db.collection('lprRecord').get();
+                    const lprMap = {};
+                    lprWin.forEach(d => { lprMap[d.id] = d.data(); });
 
-                        const entryRecordIDs = [];
-                        const boothBatches = chunkArray(boothIDs, 30);
-                        for (const batch of boothBatches) {
-                            const lpSnapshot = await db.collection('lprRecord').where('tollBoothID', 'in', batch).where('tollEventType', '==', 'entry').get();
-                            lpSnapshot.forEach(doc => entryRecordIDs.push(doc.id));
-                        }
+                    // 3. Fetch Transaction base records
+                    const transSnapshot = await db.collection('tollTransaction').get();
+                    let rawTransactionsList = [];
+                    transSnapshot.forEach(doc => rawTransactionsList.push({ id: doc.id, ...doc.data() }));
 
-                        if (entryRecordIDs.length === 0) { compiledRecords = []; renderRecordsTable(); return; }
+                    // 4. Transform raw records locally using the map configurations
+                    const transformedRecords = rawTransactionsList.map(transData => {
+                        const vData = vehicleMap[transData.vehicleID] || {};
+                        const entryLpr = lprMap[transData.entryLprRecordID] || {};
+                        const exitLpr = lprMap[transData.exitLprRecordID] || {};
 
-                        const entryBatches = chunkArray(entryRecordIDs, 30);
-                        for (const batch of entryBatches) {
-                            const transSnapshot = await db.collection('tollTransaction').where('entryLprRecordID', 'in', batch).get();
-                            transSnapshot.forEach(doc => transactionsList.push({ id: doc.id, ...doc.data() }));
-                        }
-                    }
+                        // Identify textual display tags mapped to corresponding records
+                        const licensePlate = vData.licensePlate || transData.licensePlate || "N/A";
+                        const carMake = vData.carMake || "N/A";
+                        const carModel = vData.carModel || "N/A";
+                        const vehicleType = typeMap[vData.vehicleTypeID] || "Class 1";
 
-                    // Map fields asynchronously across documents cleanly
-                    compiledRecords = await Promise.all(transactionsList.map(async (transData) => {
-                        let licensePlate = "N/A", carMake = "N/A", carModel = "N/A", entryTimeStr = "N/A", exitTimeStr = "N/A";
-                        let rawEntryTime = 0, rawExitTime = 0;
-                        const tasks = [];
+                        const entryLocationName = locationMap[entryLpr.tollLocationID] || "Unknown Entry";
+                        const exitLocationName = locationMap[exitLpr.tollLocationID] || "Unknown Exit";
 
-                        if (transData.vehicleID) {
-                            tasks.push(db.collection('vehicle').doc(transData.vehicleID).get().then(snap => {
-                                if (snap.exists) {
-                                    licensePlate = snap.data().licensePlate || "N/A";
-                                    carMake = snap.data().carMake || "N/A";
-                                    carModel = snap.data().carModel || "N/A";
-                                }
-                            }));
-                        }
-                        if (transData.entryLprRecordID) {
-                            tasks.push(db.collection('lprRecord').doc(transData.entryLprRecordID).get().then(snap => {
-                                if (snap.exists) {
-                                    const capturedAt = snap.data().capturedAt;
-                                    entryTimeStr = formatTimestamp(capturedAt);
-                                    if (capturedAt?.seconds) rawEntryTime = capturedAt.seconds * 1000;
-                                }
-                            }));
-                        }
-                        if (transData.exitLprRecordID) {
-                            tasks.push(db.collection('lprRecord').doc(transData.exitLprRecordID).get().then(snap => {
-                                if (snap.exists) {
-                                    const capturedAt = snap.data().capturedAt;
-                                    exitTimeStr = formatTimestamp(capturedAt);
-                                    if (capturedAt?.seconds) rawExitTime = capturedAt.seconds * 1000;
-                                }
-                            }));
-                        }
+                        const entryTimeStr = formatTimestamp(entryLpr.capturedAt);
+                        const exitTimeStr = formatTimestamp(exitLpr.capturedAt);
 
-                        await Promise.all(tasks);
+                        const rawEntryTime = (entryLpr.capturedAt?.seconds) ? entryLpr.capturedAt.seconds * 1000 : 0;
+                        const rawExitTime = (exitLpr.capturedAt?.seconds) ? exitLpr.capturedAt.seconds * 1000 : 0;
+
                         return {
                             transactionID: transData.tollTransactionID || transData.id || 'N/A',
                             commuterID: transData.commuterID || 'N/A',
-                            licensePlate, carMake, carModel,
+                            status: transData.status || 'Completed',
+                            licensePlate, vehicleType, carMake, carModel, entryLocationName, exitLocationName,
                             entryTimestamp: entryTimeStr,
                             exitTimestamp: exitTimeStr,
                             amount: typeof transData.tariffRate === 'number' ? transData.tariffRate.toFixed(2) : '0.00',
                             rawEntryTime, rawExitTime
                         };
-                    }));
+                    });
+
+                    // 5. Apply dropdown filter selection criteria
+                    if (targetDescription === "ALL") {
+                        compiledRecords = transformedRecords;
+                    } else {
+                        // Filter rows where either the Entry Location or Exit Location matches the selection
+                        compiledRecords = transformedRecords.filter(r => 
+                            r.entryLocationName === targetDescription || 
+                            r.exitLocationName === targetDescription
+                        );
+                    }
 
                     renderRecordsTable();
                 } catch (error) {
-                    console.error("CRITICAL EXCEPTION RUNNING LOG GENERATOR:", error);
-                    tableBody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i> Processing failed.</td></tr>`;
+                    console.error("CRITICAL RUNTIME EXCEPTION:", error);
+                    tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="12" class="text-center py-4 text-danger">
+                            <i class="bi bi-exclamation-triangle-fill me-1"></i> 
+                            Processing failed. Error details: ${error.message}
+                        </td>
+                    </tr>`;
                 }
             }
 
@@ -504,10 +531,14 @@
                             transactionID: r.transactionID,
                             commuterID: r.commuterID,
                             licensePlate: r.licensePlate,
+                            vehicleType: r.vehicleType,
                             carMake: r.carMake,
                             carModel: r.carModel,
+                            entryLocationName: r.entryLocationName,
+                            exitLocationName: r.exitLocationName,
                             entryTimestamp: r.entryTimestamp,
                             exitTimestamp: r.exitTimestamp,
+                            status: r.status,
                             amount: r.amount
                         }))
                     };
