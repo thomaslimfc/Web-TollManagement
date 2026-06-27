@@ -195,26 +195,30 @@
                 <table class="table table-hover table-striped align-middle border mb-0" id="historicalTable">
                     <thead class="table-light">
                         <tr>
-                            <th scope="col" class="sortable-header" data-column="id" style="width: 20%;">Weather Data ID
+                            <th scope="col" class="sortable-header" data-column="id" style="width: 15%;">Weather Data ID
                                 <i class="bi bi-arrow-down-up ms-1 text-muted small"></i>
                             </th>
-                            <th scope="col" class="sortable-header" data-column="timestamp" style="width: 25%;">
+                            <th scope="col" class="sortable-header" data-column="timestamp" style="width: 20%;">
                                 Timestamp <i class="bi bi-arrow-down-up ms-1 text-muted small"></i></th>
-                            <th scope="col" class="sortable-header" data-column="temperature" style="width: 15%;">
+                            <th scope="col" class="sortable-header" data-column="temperature" style="width: 12%;">
                                 Temperature (&deg;C) <i class="bi bi-arrow-down-up ms-1 text-muted small"></i></th>
-                            <th scope="col" class="sortable-header" data-column="rain" style="width: 15%;">Rain Density
+                            <th scope="col" class="sortable-header" data-column="rain" style="width: 13%;">Rain Density
                                 <i class="bi bi-arrow-down-up ms-1 text-muted small"></i>
                             </th>
-                            <th scope="col" class="sortable-header" data-column="lightIntensity" style="width: 15%;">
+                            <th scope="col" class="sortable-header" data-column="lightIntensity" style="width: 13%;">
                                 Light Intensity <i class="bi bi-arrow-down-up ms-1 text-muted small"></i></th>
-                            <th scope="col" class="sortable-header" data-column="humidity" style="width: 10%;">Humidity
+                            <th scope="col" class="sortable-header" data-column="humidity" style="width: 12%;">Humidity
+                                <i class="bi bi-arrow-down-up ms-1 text-muted small"></i>
+                            </th>
+                            <th scope="col" class="sortable-header" data-column="visibilityRate" style="width: 15%;">
+                                Visibility Rate
                                 <i class="bi bi-arrow-down-up ms-1 text-muted small"></i>
                             </th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td colspan="6" class="text-center text-muted py-4">Initializing and pulling data streams...
+                            <td colspan="7" class="text-center text-muted py-4">Initializing and pulling data streams...
                             </td>
                         </tr>
                     </tbody>
@@ -227,208 +231,243 @@
         </footer>
     </div>
 
-    <script type="module">
+<script type="module">
         import { initializeFirebase } from '/lib/firebase_init.js';
 
-        // Global Memory State Architecture (Prevents duplicate structural database hits when sorting or filtering)
+        // Global Memory State Architecture
         let historicalCache = [];
         let activeSortColumn = null;
         let isAscending = true;
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            const searchBtn = document.getElementById('searchBtn');
+        // Global Database Instance Ref
+        let dbInstance = null;
+
+        /**
+         * Core Initialization Engine
+         */
+        async function initApplication() {
+            try {
+                // 1. Establish database synchronization link
+                const { db } = await initializeFirebase();
+                dbInstance = db;
+                console.log("Database Connection Established Successfully.");
+
+                // 2. Load dropdown architecture UI components
+                await loadLocationOptions();
+
+                // 3. Compile history pipelines
+                await fetchAllHistoricalData();
+
+                // 4. Wire up reactive event listeners
+                setupEventListeners();
+
+                // 5. Start live monitoring loops
+                startRealTimeMonitor();
+
+            } catch (error) {
+                console.error("CRITICAL BOOT ERROR: Application framework failed to initialize:", error);
+            }
+        }
+
+        /**
+         * 1. Dynamic Dropdown Population
+         */
+        async function loadLocationOptions() {
             const inputLocation = document.getElementById('inputLocation');
             const filterLocation = document.getElementById('filterLocation');
 
-            /**
-             * 1. Dynamic Dropdown Population
-             * Fetches metadata from 'tollLocation' to build selection structures.
-             */
-            async function loadLocationOptions() {
-                try {
-                    const { db } = await initializeFirebase();
-                    const snapshot = await db.collection("tollLocation").get();
+            try {
+                const snapshot = await dbInstance.collection("tollLocation").get();
 
-                    snapshot.forEach(doc => {
-                        const data = doc.data();
-                        const tollLocationID = data.tollLocationID || doc.id;
-                        const description = data.description || "Unknown Location";
-                        const textDisplay = `${description} (${tollLocationID})`;
+                // Structural resets
+                inputLocation.innerHTML = '<option selected disabled value="">Select Location</option>';
+                filterLocation.innerHTML = '<option value="" selected>All Locations</option>';
 
-                        // Append option row element to the Main Real-Time Search dropdown
-                        const optionMain = document.createElement("option");
-                        optionMain.value = tollLocationID;
-                        optionMain.textContent = textDisplay;
-                        inputLocation.appendChild(optionMain);
-
-                        // Append option row element to the Historical Directory filter dropdown
-                        const optionFilter = document.createElement("option");
-                        optionFilter.value = tollLocationID;
-                        optionFilter.textContent = textDisplay;
-                        filterLocation.appendChild(optionFilter);
-                    });
-                } catch (error) {
-                    console.error("CRITICAL: Error mapping location metadata profiles:", error);
-                }
-            }
-
-            /**
-             * 2. Live Dashboard Operations View
-             * Fetches real-time status attributes for a specific booth ID.
-             */
-            async function searchWeatherData() {
-                const outputTemperature = document.getElementById('outputTemperature');
-                const outputHumidity = document.getElementById('outputHumidity');
-                const outputRain = document.getElementById('outputRain');
-                const outputLightIntensityTemperature = document.getElementById('outputLightIntensityTemperature');
-
-                try {
-                    const { db } = await initializeFirebase();
-                    const locationId = inputLocation.value;
-
-                    if (!locationId) return;
-
-                    const doc = await db.collection('weather').doc(locationId).get();
-
-                    if (doc.exists) {
-                        const data = doc.data();
-
-                        // Parse strings safely and match case structures
-                        outputTemperature.textContent = data.temperature !== undefined ? `${parseFloat(data.temperature).toFixed(1)}` : 'N/A';
-                        outputHumidity.textContent = data.humidity ? String(data.humidity).toUpperCase() : 'N/A';
-                        outputRain.textContent = data.rain ? String(data.rain).toUpperCase() : 'N/A';
-                        outputLightIntensityTemperature.textContent = data.lightIntensity ? String(data.lightIntensity).toUpperCase() : 'N/A';
-
-                        // Metrics Evaluations Matrix
-                        const visibilityRate = calculateVisibilityRate(data.rain || 'low', data.lightIntensity || 'high');
-                        const riskScore = calculateRiskScore(data.temperature || 25, data.humidity || 'low', data.rain || 'low', data.lightIntensity || 'high');
-
-                        document.getElementById('outputVisibility').textContent = visibilityRate + "%";
-                        document.getElementById('outputSeverity').textContent = getWeatherSeverity(data.rain || 'low', data.lightIntensity || 'high');
-                        document.getElementById('outputRiskScore').textContent = riskScore + " / 100";
-                        document.getElementById('outputRiskLevel').textContent = getRiskLevel(riskScore);
-                        document.getElementById('outputAction').innerHTML = getRecommendedAction(riskScore);
-                        document.getElementById('outputSpeedLimit').textContent = decideSpeedLimit(data.temperature || 25, data.humidity || 'low', data.rain || 'low', data.lightIntensity || 'high') + ' km/h';
-                    } else {
-                        // Muted/Reset defaults fallback
-                        outputTemperature.textContent = 'N/A';
-                        outputHumidity.textContent = 'N/A';
-                        outputRain.textContent = 'N/A';
-                        outputLightIntensityTemperature.textContent = 'N/A';
-                        document.getElementById('outputVisibility').textContent = "-";
-                        document.getElementById('outputSeverity').textContent = "NO DATA";
-                        document.getElementById('outputRiskScore').textContent = "0 / 100";
-                        document.getElementById('outputRiskLevel').textContent = "-";
-                        document.getElementById('outputAction').innerHTML = "-";
-                        document.getElementById('outputSpeedLimit').textContent = "110 km/h";
-                    }
-                } catch (error) {
-                    console.error("Dashboard Engine Exception:", error);
-                }
-            }
-
-            /**
-             * 3. Parallel Async Cloud History Collection Compilation
-             * Aggregates all history subcollections iteratively across standard locations.
-             */
-            async function fetchAllHistoricalData() {
-                const tableBody = document.querySelector("#historicalTable tbody");
-
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="6" class="text-center text-muted py-4">
-                            <div class="spinner-border spinner-border-sm text-success me-2" role="status"></div>
-                            Compiling multi-station histories across database subcollections...
-                        </td>
-                    </tr>
-                `;
-
-                try {
-                    const { db } = await initializeFirebase();
-                    const tollLocationSnapshot = await db.collection("tollLocation").get();
-
-                    historicalCache = []; // Flash reset storage array
-
-                    // Maps queries out into an unblocking parallel promise stack sequence execution
-                    const promises = tollLocationSnapshot.docs.map(async (locationDoc) => {
-                        const locId = locationDoc.id;
-                        const historySnapshot = await db.collection("weatherLocation").doc(locId).collection("history").get();
-
-                        historySnapshot.forEach((doc) => {
-                            const data = doc.data();
-                            let rawTimestamp = 0;
-                            let displayTime = "N/A";
-
-                            if (data.timestamp) {
-                                const dateObj = typeof data.timestamp.toDate === "function" ? data.timestamp.toDate() : new Date(data.timestamp);
-                                rawTimestamp = dateObj.getTime();
-                                displayTime = dateObj.toLocaleString('en-MY', { timeZone: 'Asia/Kuala_Lumpur' });
-                            }
-
-                            historicalCache.push({
-                                id: doc.id,
-                                locationId: locId,
-                                timestamp: rawTimestamp,
-                                displayTimestamp: displayTime,
-                                temperature: parseFloat(data.temperature || 0),
-                                rain: String(data.rain || 'LOW').toUpperCase().trim(),
-                                lightIntensity: String(data.lightIntensity || 'HIGH').toUpperCase().trim(),
-                                humidity: String(data.humidity || 'LOW').toUpperCase().trim()
-                            });
-                        });
-                    });
-
-                    // Await execution settlement across all subcollection network streams
-                    await Promise.all(promises);
-                    applyFilterAndRender();
-
-                } catch (error) {
-                    console.error("Historical Aggregation Exception:", error);
-                    tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-4"><i class="bi bi-exclamation-octagon me-1"></i> Failed to synchronize historical datasets.</td></tr>`;
-                }
-            }
-
-            /**
-             * 4. Cache Filter Layer Application
-             * Processes live selections on the directory panel without requesting firestore reads.
-             */
-            function applyFilterAndRender() {
-                const selectedFilter = filterLocation.value;
-                const recordCountBadge = document.getElementById("recordCount");
-
-                const filteredItems = selectedFilter
-                    ? historicalCache.filter(item => item.locationId === selectedFilter)
-                    : historicalCache;
-
-                recordCountBadge.textContent = `${filteredItems.length} record(s) found`;
-                renderHistoricalTable(filteredItems);
-            }
-
-            /**
-             * 5. Document Node Fragment Generation Rendering
-             * Formats Malaysian thresholds and targets row construction dynamics.
-             */
-            function renderHistoricalTable(items) {
-                const tableBody = document.querySelector("#historicalTable tbody");
-                if (items.length === 0) {
-                    tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">No matching records found for this location profile selection.</td></tr>`;
+                if (snapshot.empty) {
+                    console.warn("Target collection 'tollLocation' returned 0 records. Check Firestore collection name matching.");
                     return;
                 }
 
-                let htmlRows = "";
-                items.forEach((item) => {
-                    // Apply Malaysian weather specific thermal metrics classes
-                    let tempClass = "bg-secondary text-white";
-                    if (item.temperature > 35.0) tempClass = "bg-danger text-white";
-                    else if (item.temperature >= 30.0) tempClass = "bg-warning text-dark";
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    
+                    // Direct field fallback matching engine
+                    const tollLocationID = data.tollLocationID || doc.id;
+                    const description = data.description || "Unknown Location";
+                    const textDisplay = `${description} (${tollLocationID})`;
 
-                    const getBadgeClass = (val) => {
-                        if (val === "HIGH") return "bg-danger text-white";
-                        if (val === "MEDIUM" || val === "MED") return "bg-warning text-dark";
-                        return "bg-secondary text-white";
-                    };
+                    const optionMain = document.createElement("option");
+                    optionMain.value = tollLocationID;
+                    optionMain.textContent = textDisplay;
+                    inputLocation.appendChild(optionMain);
 
-                    htmlRows += `
+                    const optionFilter = document.createElement("option");
+                    optionFilter.value = tollLocationID;
+                    optionFilter.textContent = textDisplay;
+                    filterLocation.appendChild(optionFilter);
+                });
+
+                console.log(`Dropdown Population Complete: Registered ${snapshot.size} toll networks.`);
+            } catch (error) {
+                console.error("Error executing 'tollLocation' collection snapshot fetch:", error);
+            }
+        }
+
+        /**
+         * 2. Live Dashboard Operations View
+         */
+        async function searchWeatherData() {
+            const inputLocation = document.getElementById('inputLocation');
+            const outputTemperature = document.getElementById('outputTemperature');
+            const outputHumidity = document.getElementById('outputHumidity');
+            const outputRain = document.getElementById('outputRain');
+            const outputLightIntensityTemperature = document.getElementById('outputLightIntensityTemperature');
+
+            try {
+                const locationId = inputLocation.value;
+                if (!locationId) return;
+
+                const doc = await dbInstance.collection('weatherLocation').doc(locationId).get();
+
+                if (doc.exists) {
+                    const rootData = doc.data();
+                    const data = rootData.current || {};
+
+                    outputTemperature.textContent = data.temperature !== undefined ? `${parseFloat(data.temperature).toFixed(1)}` : 'N/A';
+                    outputHumidity.textContent = data.humidity ? String(data.humidity).toUpperCase() : 'N/A';
+                    outputRain.textContent = data.rain ? String(data.rain).toUpperCase() : 'N/A';
+                    outputLightIntensityTemperature.textContent = data.lightIntensity ? String(data.lightIntensity).toUpperCase() : 'N/A';
+
+                    const visibilityRate = calculateVisibilityRate(data.rain || 'low', data.lightIntensity || 'high');
+                    const riskScore = calculateRiskScore(data.temperature || 25, data.humidity || 'low', data.rain || 'low', data.lightIntensity || 'high');
+
+                    document.getElementById('outputVisibility').textContent = visibilityRate + "%";
+                    document.getElementById('outputSeverity').textContent = getWeatherSeverity(data.rain || 'low', data.lightIntensity || 'high');
+                    document.getElementById('outputRiskScore').textContent = riskScore + " / 100";
+                    document.getElementById('outputRiskLevel').textContent = getRiskLevel(riskScore);
+                    document.getElementById('outputAction').innerHTML = getRecommendedAction(riskScore);
+                    document.getElementById('outputSpeedLimit').textContent = decideSpeedLimit(data.temperature || 25, data.humidity || 'low', data.rain || 'low', data.lightIntensity || 'high') + ' km/h';
+                } else {
+                    resetDashboardToDefaults();
+                }
+            } catch (error) {
+                console.error("Dashboard Engine Exception:", error);
+            }
+        }
+
+        function resetDashboardToDefaults() {
+            document.getElementById('outputTemperature').textContent = 'N/A';
+            document.getElementById('outputHumidity').textContent = 'N/A';
+            document.getElementById('outputRain').textContent = 'N/A';
+            document.getElementById('outputLightIntensityTemperature').textContent = 'N/A';
+            document.getElementById('outputVisibility').textContent = "-";
+            document.getElementById('outputSeverity').textContent = "NO DATA";
+            document.getElementById('outputRiskScore').textContent = "0 / 100";
+            document.getElementById('outputRiskLevel').textContent = "-";
+            document.getElementById('outputAction').innerHTML = "-";
+            document.getElementById('outputSpeedLimit').textContent = "110 km/h";
+        }
+
+        /**
+         * 3. Parallel Async Cloud History Collection Compilation
+         */
+        async function fetchAllHistoricalData() {
+            const tableBody = document.querySelector("#historicalTable tbody");
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-4">
+                        <div class="spinner-border spinner-border-sm text-success me-2" role="status"></div>
+                        Compiling multi-station histories across database subcollections...
+                    </td>
+                </tr>`;
+
+            try {
+                const tollLocationSnapshot = await dbInstance.collection("tollLocation").get();
+                historicalCache = [];
+
+                const promises = tollLocationSnapshot.docs.map(async (locationDoc) => {
+                    const locId = locationDoc.id;
+                    const historySnapshot = await dbInstance.collection("weatherLocation").doc(locId).collection("history").get();
+
+                    historySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        let rawTimestamp = 0;
+                        let displayTime = "N/A";
+
+                        if (data.timestamp) {
+                            const dateObj = typeof data.timestamp.toDate === "function" ? data.timestamp.toDate() : new Date(data.timestamp);
+                            rawTimestamp = dateObj.getTime();
+                            displayTime = dateObj.toLocaleString('en-MY', { timeZone: 'Asia/Kuala_Lumpur' });
+                        }
+
+                        const cleanRain = String(data.rain || 'LOW').toUpperCase().trim();
+                        const cleanLight = String(data.lightIntensity || 'HIGH').toUpperCase().trim();
+
+                        historicalCache.push({
+                            id: doc.id,
+                            locationId: locId,
+                            timestamp: rawTimestamp,
+                            displayTimestamp: displayTime,
+                            temperature: parseFloat(data.temperature || 0),
+                            rain: cleanRain,
+                            lightIntensity: cleanLight,
+                            humidity: String(data.humidity || 'LOW').toUpperCase().trim(),
+                            visibilityRate: calculateVisibilityRate(cleanRain, cleanLight)
+                        });
+                    });
+                });
+
+                await Promise.all(promises);
+                applyFilterAndRender();
+            } catch (error) {
+                console.error("Historical Aggregation Exception:", error);
+                tableBody.innerHTML = `<tr><td colspan="7" class="text-center text-danger py-4"><i class="bi bi-exclamation-octagon me-1"></i> Failed to synchronize historical datasets.</td></tr>`;
+            }
+        }
+
+        /**
+         * 4. Cache Filter Layer Application
+         */
+        function applyFilterAndRender() {
+            const filterLocation = document.getElementById('filterLocation');
+            const selectedFilter = filterLocation.value;
+            const recordCountBadge = document.getElementById("recordCount");
+
+            const filteredItems = selectedFilter
+                ? historicalCache.filter(item => item.locationId === selectedFilter)
+                : historicalCache;
+
+            recordCountBadge.textContent = `${filteredItems.length} record(s) found`;
+            renderHistoricalTable(filteredItems);
+        }
+
+        /**
+         * 5. Document Node Fragment Generation Rendering
+         */
+        function renderHistoricalTable(items) {
+            const tableBody = document.querySelector("#historicalTable tbody");
+            if (items.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">No matching records found for this location profile selection.</td></tr>`;
+                return;
+            }
+
+            let htmlRows = "";
+            items.forEach((item) => {
+                let tempClass = "bg-secondary text-white";
+                if (item.temperature > 35.0) tempClass = "bg-danger text-white";
+                else if (item.temperature >= 30.0) tempClass = "bg-warning text-dark";
+
+                const getBadgeClass = (val) => {
+                    if (val === "HIGH") return "bg-danger text-white";
+                    if (val === "MEDIUM" || val === "MED") return "bg-warning text-dark";
+                    return "bg-secondary text-white";
+                };
+
+                let visClass = "bg-success text-white";
+                if (item.visibilityRate <= 30) visClass = "bg-danger text-white";
+                else if (item.visibilityRate <= 70) visClass = "bg-warning text-dark";
+
+                htmlRows += `
                 <tr>
                     <td class="text-secondary small fw-bold">${item.id} <span class="badge bg-light text-secondary border ms-1">${item.locationId}</span></td>
                     <td class="text-secondary small fw-bold">${item.displayTimestamp}</td>
@@ -436,21 +475,32 @@
                     <td><span class="badge ${getBadgeClass(item.rain)}">${item.rain}</span></td>
                     <td><span class="badge ${getBadgeClass(item.lightIntensity)}">${item.lightIntensity}</span></td>
                     <td><span class="badge ${getBadgeClass(item.humidity)}">${item.humidity}</span></td>
+                    <td><span class="badge ${visClass}">${item.visibilityRate}%</span></td>
                 </tr>`;
-                });
-                tableBody.innerHTML = htmlRows;
-            }
+            });
+            tableBody.innerHTML = htmlRows;
+        }
 
-            /**
-             * 6. Client-side Memory Sort Strategy Handler
-             */
+        /**
+         * Event Listeners Setup
+         */
+        function setupEventListeners() {
+            const searchBtn = document.getElementById('searchBtn');
+            const filterLocation = document.getElementById('filterLocation');
+
+            searchBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                await searchWeatherData();
+            });
+
+            filterLocation.addEventListener('change', applyFilterAndRender);
+
             document.querySelectorAll('.sortable-header').forEach(header => {
                 header.addEventListener('click', () => {
                     const columnKey = header.getAttribute('data-column');
                     isAscending = (activeSortColumn === columnKey) ? !isAscending : true;
                     activeSortColumn = columnKey;
 
-                    // Normalize and cycle typography icons styles context
                     document.querySelectorAll('.sortable-header i').forEach(icon => icon.className = "bi bi-arrow-down-up ms-1 text-muted small");
                     header.querySelector('i').className = isAscending ? "bi bi-sort-up ms-1 text-dark" : "bi bi-sort-down ms-1 text-dark";
 
@@ -465,90 +515,80 @@
                     applyFilterAndRender();
                 });
             });
+        }
 
-            // Sub-Table Selection Change Event Wire-Up
-            filterLocation.addEventListener('change', applyFilterAndRender);
-
-            // Primary Interactive Form Submit Controls
-            searchBtn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                await searchWeatherData(); // Only updates the live top panel view
-            });
-
-            // Bootstrap Initialization Lifecycle Execution
-            await loadLocationOptions();
-            await fetchAllHistoricalData();
-
-            /**
-             * 7. Real-Time Monitor Loop
-             * Silently updates the top dashboard every 5 seconds without resetting the history view state.
-             */
+        /**
+         * Real-time Data Sync Loop
+         */
+        function startRealTimeMonitor() {
             setInterval(() => {
-                if (inputLocation.value) {
+                const inputLocation = document.getElementById('inputLocation');
+                if (inputLocation && inputLocation.value) {
                     searchWeatherData();
                 }
             }, 5000);
+        }
 
-            // Operational Mathematical Engineering Equations Logic
-            function calculateRiskScore(temp, humidity, rain, light) {
-                let score = 0;
-                switch (String(rain).toLowerCase()) {
-                    case 'low': score += 20; break;
-                    case 'medium': score += 40; break;
-                    case 'high': score += 60; break;
-                }
-                switch (String(light).toLowerCase()) {
-                    case 'medium': score += 15; break;
-                    case 'low': score += 30; break;
-                }
-                switch (String(humidity).toLowerCase()) {
-                    case 'medium': score += 10; break;
-                    case 'high': score += 20; break;
-                }
-                if (parseInt(temp) > 35 || parseInt(temp) < 10) score += 10;
-                return Math.min(score, 100);
+        // Calculation Helpers
+        function calculateRiskScore(temp, humidity, rain, light) {
+            let score = 0;
+            switch (String(rain).toLowerCase()) {
+                case 'low': score += 20; break;
+                case 'medium': score += 40; break;
+                case 'high': score += 60; break;
             }
-
-            function calculateVisibilityRate(rain, light) {
-                let visibility = 100;
-                rain = String(rain).toLowerCase(); light = String(light).toLowerCase();
-                if (rain === 'high') visibility -= 40; else if (rain === 'medium') visibility -= 20;
-                if (light === 'low') visibility -= 30; else if (light === 'medium') visibility -= 10;
-                return Math.max(visibility, 10);
+            switch (String(light).toLowerCase()) {
+                case 'medium': score += 15; break;
+                case 'low': score += 30; break;
             }
-
-            function decideSpeedLimit(temp, humidity, rain, light) {
-                const vis = calculateVisibilityRate(rain, light);
-                if (vis <= 30 || String(rain).toLowerCase() === 'high') return 50;
-                if (vis <= 60 || String(rain).toLowerCase() === 'medium') return 70;
-                if (vis <= 80) return 90;
-                return 110;
+            switch (String(humidity).toLowerCase()) {
+                case 'medium': score += 10; break;
+                case 'high': score += 20; break;
             }
+            if (parseInt(temp) > 35 || parseInt(temp) < 10) score += 10;
+            return Math.min(score, 100);
+        }
 
-            function getRiskLevel(score) {
-                if (score <= 20) return "SAFE"; if (score <= 40) return "LOW RISK";
-                if (score <= 60) return "MODERATE RISK"; if (score <= 80) return "HIGH RISK";
-                return "CRITICAL";
-            }
+        function calculateVisibilityRate(rain, light) {
+            let visibility = 100;
+            rain = String(rain).toLowerCase(); light = String(light).toLowerCase();
+            if (rain === 'high') visibility -= 40; else if (rain === 'medium') visibility -= 20;
+            if (light === 'low') visibility -= 30; else if (light === 'medium') visibility -= 10;
+            return Math.max(visibility, 10);
+        }
 
-            if (activeSortColumn === null) { getRiskLevel(0); } // Dead execution fallback branch protection
+        function decideSpeedLimit(temp, humidity, rain, light) {
+            const vis = calculateVisibilityRate(rain, light);
+            if (vis <= 30 || String(rain).toLowerCase() === 'high') return 50;
+            if (vis <= 60 || String(rain).toLowerCase() === 'medium') return 70;
+            if (vis <= 80) return 90;
+            return 110;
+        }
 
-            function getWeatherSeverity(rain, light) {
-                rain = String(rain).toLowerCase(); light = String(light).toLowerCase();
-                if (rain === 'high' && light === 'low') return 'CRITICAL';
-                if (rain === 'high') return 'SEVERE';
-                if (rain === 'medium') return 'MODERATE';
-                return 'NORMAL';
-            }
+        function getRiskLevel(score) {
+            if (score <= 20) return "SAFE"; if (score <= 40) return "LOW RISK";
+            if (score <= 60) return "MODERATE RISK"; if (score <= 80) return "HIGH RISK";
+            return "CRITICAL";
+        }
 
-            function getRecommendedAction(score) {
-                if (score <= 20) return `✓ Continue Monitoring`;
-                if (score <= 40) return `✓ Display Drive Safely Message`;
-                if (score <= 60) return `✓ Activate Warning Signboard <br> ✓ Increase CCTV Monitoring`;
-                if (score <= 80) return `✓ Activate Hazard Warning <br> ✓ Notify Highway Patrol`;
-                return `✓ Emergency Weather Alert <br> ✓ Notify Control Centre <br> ✓ Dispatch Highway Patrol`;
-            }
-        });
+        function getWeatherSeverity(rain, light) {
+            rain = String(rain).toLowerCase(); light = String(light).toLowerCase();
+            if (rain === 'high' && light === 'low') return 'CRITICAL';
+            if (rain === 'high') return 'SEVERE';
+            if (rain === 'medium') return 'MODERATE';
+            return 'NORMAL';
+        }
+
+        function getRecommendedAction(score) {
+            if (score <= 20) return `✓ Continue Monitoring`;
+            if (score <= 40) return `✓ Display Drive Safely Message`;
+            if (score <= 60) return `✓ Activate Warning Signboard <br> ✓ Increase CCTV Monitoring`;
+            if (score <= 80) return `✓ Activate Hazard Warning <br> ✓ Notify Highway Patrol`;
+            return `✓ Emergency Weather Alert <br> ✓ Notify Control Centre <br> ✓ Dispatch Highway Patrol`;
+        }
+
+        // Trigger Life Cycle on Document Ready
+        document.addEventListener('DOMContentLoaded', initApplication);
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
