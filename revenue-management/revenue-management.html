@@ -405,11 +405,20 @@
             const btnMonthly = document.getElementById('btnMonthly');
 
             // =========================
-            // LOCK FUTURE DATE SELECTION
+            // LOCK FUTURE DATE SELECTION & PRESET CURRENT MONTH BOUNDS
             // =========================
-            const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kuala_Lumpur' });
+            const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kuala_Lumpur' }); // Format: YYYY-MM-DD
             if (startDateFilter) startDateFilter.setAttribute('max', today);
             if (endDateFilter) endDateFilter.setAttribute('max', today);
+
+            // Auto-select first day of current month and today's date
+            if (startDateFilter && endDateFilter) {
+                const [year, month] = today.split('-');
+                const firstDayOfMonth = `${year}-${month}-01`;
+
+                startDateFilter.value = firstDayOfMonth;
+                endDateFilter.value = today;
+            }
 
             // =========================
             // STATE
@@ -456,7 +465,7 @@
             });
 
             // =========================
-            // CHART UPDATE (FULLY RECOVERED)
+            // CHART UPDATE
             // =========================
             function updateChartVisualization() {
                 const groups = {};
