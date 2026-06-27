@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Incident Management Center</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+body {
+    background: #f4f6f9;
+}
+
+.kpi-card {
+    border: none;
+    border-radius: 12px;
+    color: white;
+}
+
+.map-placeholder {
+    height: 400px;
+    background: #e9ecef;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #6c757d;
+}
+
+.section-title {
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+</style>
+
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-dark bg-dark px-3">
+    <span class="navbar-brand">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        Incident Management Center
+    </span>
+    <div>
+        <button class="btn btn-outline-light btn-sm">Live</button>
+    </div>
+</nav>
+
+<div class="container-fluid mt-4">
+
+<!-- KPI CARDS -->
+<div class="row g-3">
+
+    <div class="col-md-2">
+        <div class="card kpi-card bg-danger p-3">
+            <div>Active SOS</div>
+            <h3>5</h3>
+        </div>
+    </div>
+
+    <div class="col-md-2">
+        <div class="card kpi-card bg-warning p-3 text-dark">
+            <div>Congestion</div>
+            <h3>12</h3>
+        </div>
+    </div>
+
+    <div class="col-md-2">
+        <div class="card kpi-card bg-primary p-3">
+            <div>Accidents</div>
+            <h3>3</h3>
+        </div>
+    </div>
+
+    <div class="col-md-2">
+        <div class="card kpi-card bg-info p-3">
+            <div>Weather Alerts</div>
+            <h3>4</h3>
+        </div>
+    </div>
+
+    <div class="col-md-2">
+        <div class="card kpi-card bg-secondary p-3">
+            <div>Roadblocks</div>
+            <h3>2</h3>
+        </div>
+    </div>
+
+    <div class="col-md-2">
+        <div class="card kpi-card bg-success p-3">
+            <div>Resolved</div>
+            <h3>18</h3>
+        </div>
+    </div>
+
+</div>
+
+<!-- MAP + FILTER -->
+<div class="row mt-4 g-3">
+
+    <div class="col-md-8">
+        <div class="section-title">Live Incident Map</div>
+        <div class="map-placeholder">
+            MAP VIEW (Google Maps / Leaflet Integration)
+        </div>
+    </div>
+
+    <div class="col-md-4">
+
+        <div class="section-title">Filters</div>
+
+        <div class="card p-3 mb-3">
+            <label class="form-label">Priority</label>
+            <select class="form-select">
+                <option>All</option>
+                <option>Critical</option>
+                <option>High</option>
+                <option>Medium</option>
+                <option>Low</option>
+            </select>
+        </div>
+
+        <div class="card p-3">
+            <label class="form-label">Type</label>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" checked>
+                <label class="form-check-label">Emergency (SOS)</label>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" checked>
+                <label class="form-check-label">Traffic Congestion</label>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox">
+                <label class="form-check-label">Weather Alerts</label>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox">
+                <label class="form-check-label">System Alerts</label>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- INCIDENT TABLES -->
+<div class="row mt-4 g-3">
+
+    <!-- EMERGENCY -->
+    <div class="col-md-6">
+        <div class="section-title">Emergency (SOS & Accidents)</div>
+
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-danger">
+                        <tr>
+                            <th>ID</th>
+                            <th>Type</th>
+                            <th>Location</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>SOS001</td>
+                            <td>Breakdown</td>
+                            <td>Penang Bridge</td>
+                            <td><span class="badge bg-warning">Dispatching</span></td>
+                        </tr>
+                        <tr>
+                            <td>ACC002</td>
+                            <td>Accident</td>
+                            <td>Juru Toll</td>
+                            <td><span class="badge bg-danger">Critical</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- TRAFFIC -->
+    <div class="col-md-6">
+        <div class="section-title">Traffic & Congestion</div>
+
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-warning">
+                        <tr>
+                            <th>ID</th>
+                            <th>Type</th>
+                            <th>Location</th>
+                            <th>Level</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>TRF001</td>
+                            <td>Congestion</td>
+                            <td>Penang Bridge</td>
+                            <td><span class="badge bg-warning text-dark">High</span></td>
+                        </tr>
+                        <tr>
+                            <td>TRF002</td>
+                            <td>Roadblock</td>
+                            <td>Sungai Dua</td>
+                            <td><span class="badge bg-secondary">Medium</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ACTIVITY LOG -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="section-title">Incident Timeline</div>
+
+        <div class="card p-3">
+
+            <ul class="list-group list-group-flush">
+
+                <li class="list-group-item">
+                    <i class="bi bi-exclamation-circle text-danger"></i>
+                    10:01 Accident reported at Juru Toll
+                </li>
+
+                <li class="list-group-item">
+                    <i class="bi bi-person-check text-primary"></i>
+                    10:03 SOS request received
+                </li>
+
+                <li class="list-group-item">
+                    <i class="bi bi-truck text-warning"></i>
+                    10:12 Tow truck dispatched
+                </li>
+
+                <li class="list-group-item">
+                    <i class="bi bi-check-circle text-success"></i>
+                    10:25 Incident resolved
+                </li>
+
+            </ul>
+
+        </div>
+
+    </div>
+</div>
+
+</div>
+
+</body>
+</html>
