@@ -105,7 +105,7 @@
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-header bg-white py-3 border-bottom border-light">
                 <h5 class="card-title mb-0 fw-bold text-dark d-flex align-items-center gap-2">
-                    <i class="bi bi-file-earmark-pdf text-danger"></i> Export Transaction Report
+                    <i class="bi bi-file-earmark-pdf text-danger"></i> LPR Transaction Report
                 </h5>
             </div>
             <div class="card-body bg-light-subtle">
@@ -129,9 +129,9 @@
                     </div>
                     <div class="col-md-2">
                         <button type="button"
-                            class="btn btn-danger w-100 fw-bold d-flex align-items-center justify-content-center gap-2"
+                            class="btn btn-primary w-100 fw-bold d-flex align-items-center justify-content-center gap-2"
                             id="btnExportPDF">
-                            <i class="bi bi-download"></i> Export PDF
+                            <i class="bi bi-file-earmark-pdf-fill"></i> Export PDF
                         </button>
                     </div>
                 </div>
@@ -143,7 +143,8 @@
                 class="card-header bg-white py-3 border-bottom border-light d-flex align-items-center justify-content-between">
                 <h5 class="card-title mb-0 fw-bold text-dark d-flex align-items-center gap-2">
                     <i class="bi bi-collection text-success"></i> Transaction Records
-                    <span id="recordCount" class="badge bg-light text-dark border fw-medium px-2 py-1.5">0 record(s) found</span>
+                    <span id="recordCount" class="badge bg-light text-dark border fw-medium px-2 py-1.5">0 record(s)
+                        found</span>
                 </h5>
                 <div class="d-flex gap-2 align-items-center" style="min-width: 350px;">
                     <span class="text-secondary small text-nowrap"><i class="bi bi-funnel"></i> Location:</span>
@@ -157,28 +158,37 @@
                     <table class="table table-hover table-striped align-middle mb-0 text-nowrap">
                         <thead class="table-light text-secondary uppercase font-weight-bold small">
                             <tr>
-                                <th scope="col" class="sortable-header" style="min-width: 150px;" data-sort-key="transactionID">
+                                <th scope="col" class="sortable-header" style="min-width: 150px;"
+                                    data-sort-key="transactionID">
                                     Transaction ID <i class="bi bi-arrow-down-up sort-icon" id="icon-transactionID"></i>
                                 </th>
-                                <th scope="col" class="sortable-header" style="min-width: 130px;" data-sort-key="commuterID">
+                                <th scope="col" class="sortable-header" style="min-width: 130px;"
+                                    data-sort-key="commuterID">
                                     Commuter ID <i class="bi bi-arrow-down-up sort-icon" id="icon-commuterID"></i>
                                 </th>
-                                <th scope="col" class="sortable-header" style="min-width: 140px;" data-sort-key="licensePlate">
+                                <th scope="col" class="sortable-header" style="min-width: 140px;"
+                                    data-sort-key="licensePlate">
                                     License Plate <i class="bi bi-arrow-down-up sort-icon" id="icon-licensePlate"></i>
                                 </th>
-                                <th scope="col" class="sortable-header" style="min-width: 130px;" data-sort-key="carMake">
+                                <th scope="col" class="sortable-header" style="min-width: 130px;"
+                                    data-sort-key="carMake">
                                     Car Make <i class="bi bi-arrow-down-up sort-icon" id="icon-carMake"></i>
                                 </th>
-                                <th scope="col" class="sortable-header" style="min-width: 130px;" data-sort-key="carModel">
+                                <th scope="col" class="sortable-header" style="min-width: 130px;"
+                                    data-sort-key="carModel">
                                     Car Model <i class="bi bi-arrow-down-up sort-icon" id="icon-carModel"></i>
                                 </th>
-                                <th scope="col" class="sortable-header" style="min-width: 220px;" data-sort-key="entryTimestamp">
-                                    Entry Timestamp <i class="bi bi-arrow-down-up sort-icon" id="icon-entryTimestamp"></i>
+                                <th scope="col" class="sortable-header" style="min-width: 220px;"
+                                    data-sort-key="entryTimestamp">
+                                    Entry Timestamp <i class="bi bi-arrow-down-up sort-icon"
+                                        id="icon-entryTimestamp"></i>
                                 </th>
-                                <th scope="col" class="sortable-header" style="min-width: 220px;" data-sort-key="exitTimestamp">
+                                <th scope="col" class="sortable-header" style="min-width: 220px;"
+                                    data-sort-key="exitTimestamp">
                                     Exit Timestamp <i class="bi bi-arrow-down-up sort-icon" id="icon-exitTimestamp"></i>
                                 </th>
-                                <th scope="col" class="pe-4 text-end sortable-header" style="min-width: 140px;" data-sort-key="amount">
+                                <th scope="col" class="pe-4 text-end sortable-header" style="min-width: 140px;"
+                                    data-sort-key="amount">
                                     Amount <i class="bi bi-arrow-down-up sort-icon" id="icon-amount"></i>
                                 </th>
                             </tr>
@@ -186,7 +196,8 @@
                         <tbody id="recordsTableBody">
                             <tr>
                                 <td colspan="9" class="text-center py-4 text-muted">
-                                    <i class="bi bi-info-circle me-1"></i> Please select a toll location to display records.
+                                    <i class="bi bi-info-circle me-1"></i> Please select a toll location to display
+                                    records.
                                 </td>
                             </tr>
                         </tbody>
@@ -200,8 +211,7 @@
         </footer>
     </div>
 
-    <script type="module">
-        import { initializeFirebase } from '/lib/firebase_init.js';
+    <script type="module">import { initializeFirebase } from '/lib/firebase_init.js';
 
         document.addEventListener('DOMContentLoaded', async () => {
             const tableBody = document.getElementById('recordsTableBody');
@@ -267,7 +277,7 @@
                         valA = a.rawEntryTime;
                         valB = b.rawEntryTime;
                     } else if (currentSortKey === 'exitTimestamp') {
-                        valA = a.rawExitTime; // Fixed sorting issue fallback
+                        valA = a.rawExitTime;
                         valB = b.rawExitTime;
                     }
 
@@ -304,29 +314,30 @@
                     const { db } = await initializeFirebase();
                     const snapshot = await db.collection("tollLocation").get();
 
-                    locationSelect.innerHTML = '<option value="" selected disabled>Select Toll Location</option>';
-                    exportLocationSelect.innerHTML = '<option value="ALL" selected>ALL TOLL LOCATIONS</option>';
+                    // Insert custom "All Location" selectors into structural view elements
+                    locationSelect.innerHTML = `
+                        <option value="ALL" selected>All Locations</option>
+                    `;
+                    exportLocationSelect.innerHTML = '<option value="ALL" selected>All Locations</option>';
 
-                    if (snapshot.empty) return;
-
-                    snapshot.forEach(doc => {
-                        const data = doc.data();
-                        if (data.description) {
-                            const option = document.createElement("option");
-                            option.value = data.description;
-                            option.textContent = data.description;
-                            locationSelect.appendChild(option);
-                            exportLocationSelect.appendChild(option.cloneNode(true));
-                        }
-                    });
+                    if (!snapshot.empty) {
+                        snapshot.forEach(doc => {
+                            const data = doc.data();
+                            if (data.description) {
+                                const option = document.createElement("option");
+                                option.value = data.description;
+                                option.textContent = data.description;
+                                locationSelect.appendChild(option);
+                                exportLocationSelect.appendChild(option.cloneNode(true));
+                            }
+                        });
+                    }
 
                     locationSelect.disabled = false;
                     exportLocationSelect.disabled = false;
 
-                    if (locationSelect.options.length > 1) {
-                        locationSelect.value = locationSelect.options[1].value;
-                        await fetchAndCacheRecords();
-                    }
+                    // Trigger primary collection stream on startup fallback execution
+                    await fetchAndCacheRecords();
                 } catch (error) {
                     console.error("Error loading location descriptions:", error);
                 }
@@ -342,38 +353,47 @@
                     <tr>
                         <td colspan="9" class="text-center py-5 text-success">
                             <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-                            Tracking relational locations, checking booth boundaries, and generating records...
+                            Querying data structures and compiling target relational maps...
                         </td>
                     </tr>`;
 
-                    const locationSnapshot = await db.collection('tollLocation').where('description', '==', targetDescription).get();
-                    if (locationSnapshot.empty) { compiledRecords = []; renderRecordsTable(); return; }
+                    let transactionsList = [];
 
-                    const locationIDs = [];
-                    locationSnapshot.forEach(doc => { if (doc.data().tollLocationID) locationIDs.push(doc.data().tollLocationID); });
-
-                    const boothSnapshot = await db.collection('tollBooth').where('tollLocationID', 'in', locationIDs).get();
-                    if (boothSnapshot.empty) { compiledRecords = []; renderRecordsTable(); return; }
-
-                    const boothIDs = [];
-                    boothSnapshot.forEach(doc => { if (doc.data().boothID) boothIDs.push(doc.data().boothID); });
-
-                    const entryRecordIDs = [];
-                    const boothBatches = chunkArray(boothIDs, 30);
-                    for (const batch of boothBatches) {
-                        const lpSnapshot = await db.collection('lprRecord').where('tollBoothID', 'in', batch).where('tollEventType', '==', 'entry').get();
-                        lpSnapshot.forEach(doc => entryRecordIDs.push(doc.id));
-                    }
-
-                    if (entryRecordIDs.length === 0) { compiledRecords = []; renderRecordsTable(); return; }
-
-                    const transactionsList = [];
-                    const entryBatches = chunkArray(entryRecordIDs, 30);
-                    for (const batch of entryBatches) {
-                        const transSnapshot = await db.collection('tollTransaction').where('entryLprRecordID', 'in', batch).get();
+                    if (targetDescription === "ALL") {
+                        // All Locations Mode: Direct structural grab over the top-level collection snapshot
+                        const transSnapshot = await db.collection('tollTransaction').get();
                         transSnapshot.forEach(doc => transactionsList.push({ id: doc.id, ...doc.data() }));
+                    } else {
+                        // Location-Filtered Mode: Relational dependency traverse pipeline execution
+                        const locationSnapshot = await db.collection('tollLocation').where('description', '==', targetDescription).get();
+                        if (locationSnapshot.empty) { compiledRecords = []; renderRecordsTable(); return; }
+
+                        const locationIDs = [];
+                        locationSnapshot.forEach(doc => { if (doc.data().tollLocationID) locationIDs.push(doc.data().tollLocationID); });
+
+                        const boothSnapshot = await db.collection('tollBooth').where('tollLocationID', 'in', locationIDs).get();
+                        if (boothSnapshot.empty) { compiledRecords = []; renderRecordsTable(); return; }
+
+                        const boothIDs = [];
+                        boothSnapshot.forEach(doc => { if (doc.data().boothID) boothIDs.push(doc.data().boothID); });
+
+                        const entryRecordIDs = [];
+                        const boothBatches = chunkArray(boothIDs, 30);
+                        for (const batch of boothBatches) {
+                            const lpSnapshot = await db.collection('lprRecord').where('tollBoothID', 'in', batch).where('tollEventType', '==', 'entry').get();
+                            lpSnapshot.forEach(doc => entryRecordIDs.push(doc.id));
+                        }
+
+                        if (entryRecordIDs.length === 0) { compiledRecords = []; renderRecordsTable(); return; }
+
+                        const entryBatches = chunkArray(entryRecordIDs, 30);
+                        for (const batch of entryBatches) {
+                            const transSnapshot = await db.collection('tollTransaction').where('entryLprRecordID', 'in', batch).get();
+                            transSnapshot.forEach(doc => transactionsList.push({ id: doc.id, ...doc.data() }));
+                        }
                     }
 
+                    // Map fields asynchronously across documents cleanly
                     compiledRecords = await Promise.all(transactionsList.map(async (transData) => {
                         let licensePlate = "N/A", carMake = "N/A", carModel = "N/A", entryTimeStr = "N/A", exitTimeStr = "N/A";
                         let rawEntryTime = 0, rawExitTime = 0;
@@ -441,7 +461,6 @@
                 });
             });
 
-            // Standard Architecture Export Worker Trigger Task
             btnExportPDF.addEventListener('click', async () => {
                 try {
                     if (!compiledRecords.length) {
@@ -458,12 +477,30 @@
                         return;
                     }
 
+                    // Normalize input boundary dates to absolute millisecond timestamps
+                    // Set start date boundary to 00:00:00 (Start of day)
+                    const filterStartMs = new Date(`${startDateVal}T00:00:00`).getTime();
+                    // Set end date boundary to 23:59:59 (End of day) to catch late-night records
+                    const filterEndMs = new Date(`${endDateVal}T23:59:59`).getTime();
+
+                    // Apply date filter logic to compiled records
+                    const filteredRecords = compiledRecords.filter(r => {
+                        // Fallback check: if raw entry time is missing, let it pass or use fallback check
+                        if (!r.rawEntryTime) return true;
+                        return r.rawEntryTime >= filterStartMs && r.rawEntryTime <= filterEndMs;
+                    });
+
+                    if (filteredRecords.length === 0) {
+                        alert("No transaction records found matching the selected date scope criteria.");
+                        return;
+                    }
+
                     const payload = {
                         module: "LPR_TRANSACTION_REPORT",
                         location: targetLoc,
                         startDate: startDateVal,
                         endDate: endDateVal,
-                        records: compiledRecords.map(r => ({
+                        records: filteredRecords.map(r => ({
                             transactionID: r.transactionID,
                             commuterID: r.commuterID,
                             licensePlate: r.licensePlate,

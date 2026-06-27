@@ -158,7 +158,7 @@
                     doc.setFont("Helvetica", "normal");
                     doc.setFontSize(8.5);
                     doc.setTextColor(108, 117, 125);
-                    doc.text("License Plate Recognition", 196, 24, { align: 'right' });
+                    doc.text("License Plate Recognition (LPR)", 196, 24, { align: 'right' });
 
                     // Structural Dividers
                     doc.setDrawColor(222, 226, 230);
@@ -171,7 +171,7 @@
                     doc.setFont("Helvetica", "bold");
                     doc.setFontSize(13);
                     doc.setTextColor(27, 38, 59);
-                    doc.text("LICENSE PLATE ENTRY/EXIT TRANSACTION REPORT", 14, 48);
+                    doc.text("LPR TRANSACTION REPORT", 14, 48);
 
                     // Row 1: Time Period Scope
                     doc.setFont("Helvetica", "normal");
@@ -232,8 +232,8 @@
                             2: { cellWidth: 24 },
                             3: { cellWidth: 22 },
                             4: { cellWidth: 30 },
-                            5: { cellWidth: 20 }, // Fixed width to accommodate extended time strings safely
-                            6: { cellWidth: 20 }, // Fixed width to accommodate extended time strings safely
+                            5: { cellWidth: 20 },
+                            6: { cellWidth: 20 }, 
                             7: { halign: 'right', fontStyle: 'bold' }
                         },
                         styles: {
