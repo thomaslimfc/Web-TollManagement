@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>PLUS Export Layout Engine</title>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
+
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f6f8;
+            color: #333333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .card {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            max-width: 440px;
+            width: 100%;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(25, 135, 84, 0.1);
+            border-left-color: #198754;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 24px auto;
+        }
+
+        h2 {
+            color: #212529;
+            font-size: 22px;
+            margin: 0 0 12px 0;
+            font-weight: 600;
+        }
+
+        p {
+            color: #6c757d;
+            font-size: 15px;
+            margin: 0 0 6px 0;
+            line-height: 1.5;
+        }
+
+        .error-card {
+            border-top: 4px solid #dc3545;
+        }
+
+        .error-icon {
+            color: #dc3545;
+            font-size: 40px;
+            margin-bottom: 16px;
+            font-weight: bold;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="loaderStatus" class="card">
+        <div class="spinner"></div>
+        <h2>Compiling Document...</h2>
+        <p>Generating your customized <strong>Top Up History Summary Report</strong>.</p>
+        <p style="font-size: 12px; color: #adb5bd; margin-top: 12px;">This window closes automatically upon download.
+        </p>
+    </div>
+
+    <script>
+        window.onload = function () {
+            try {
+                const payloadStr = sessionStorage.getItem('pdf_export_payload');
+
+                if (!payloadStr) {
+                    document.getElementById('loaderStatus').className = "card error-card";
+                    document.getElementById('loaderStatus').innerHTML = `
+                <div class="error-icon">⚠️</div>
+                <h2 style="color:#dc3545;">Data Transit Blocked</h2>
+                <p>No active data packet was located in this session window context.</p>
+                <p style="font-size:13px; color:#6c757d; margin-top:12px;">Please return to your primary dashboard window and click the <strong>Export PDF</strong> button to generate this report safely.</p>
+            `;
+                    return;
+                }
+
+                const payload = JSON.parse(payloadStr);
+                const dataRecords = payload.records || [];
+
+                // Helper Date Formatter (YYYY-MM-DD -> DD/MM/YYYY)
+                const formatCustomDate = (dateString) => {
+                    if (!dateString) return "All Time";
+                    const [y, m, d] = dateString.split('-');
+                    return `${d}/${m}/${y}`;
+                };
+
+                const startDateText = formatCustomDate(payload.startDate);
+                const endDateText = formatCustomDate(payload.endDate);
+
+                // Calculate Grand Total Summary Value
+                const grandTotalSum = dataRecords.reduce((total, r) => total + (r.amountAdded || 0), 0);
+
+                // Pre-render Logo Image context safely
+                const logoImg = new Image();
+                logoImg.src = '/images/plus-logo.png';
+
+                logoImg.onload = function () {
+                    executeGeneration(logoImg);
+                };
+                logoImg.onerror = function () {
+                    console.warn("Logo baseline missing from route assets. Using clean text headers instead.");
+                    executeGeneration(null);
+                };
+
+                function executeGeneration(loadedLogo) {
+                    window.jsPDF = window.jspdf.jsPDF;
+                    // Initialize document standard layout framework profile
+                    const doc = new window.jsPDF('p', 'mm', 'a4');
+
+                    // ----------------------------------------------------
+                    // 1. BRANDING & HEADER ENTRIES
+                    // ----------------------------------------------------
+                    if (loadedLogo) {
+                        doc.addImage(loadedLogo, 'PNG', 14, 14, 38, 18);
+                    } else {
+                        doc.setFont("Helvetica", "bold");
+                        doc.setFontSize(16);
+                        doc.setTextColor(25, 135, 84);
+                        doc.text("PLUS HIGHWAYS", 14, 22);
+                    }
+
+                    // Right-aligned Corporate Meta Information
+                    doc.setFont("Helvetica", "bold");
+                    doc.setFontSize(11);
+                    doc.setTextColor(33, 37, 41);
+                    doc.text("PLUS HIGHWAYS SDN. BHD.", 196, 19, { align: 'right' });
+
+                    doc.setFont("Helvetica", "normal");
+                    doc.setFontSize(8.5);
+                    doc.setTextColor(108, 117, 125);
+                    doc.text("Revenue Management", 196, 24, { align: 'right' });
+
+                    // Structural Dividers
+                    doc.setDrawColor(222, 226, 230);
+                    doc.setLineWidth(0.4);
+                    doc.line(14, 38, 196, 38);
+
+                    // ----------------------------------------------------
+                    // 2. DOCUMENT TITLE & SCOPE META METRICS
+                    // ----------------------------------------------------
+                    doc.setFont("Helvetica", "bold");
+                    doc.setFontSize(14);
+                    doc.setTextColor(27, 38, 59);
+                    doc.text("TOP UP HISTORY SUMMARY REPORT", 14, 48);
+
+                    doc.setFont("Helvetica", "normal");
+                    doc.setFontSize(9);
+                    doc.setTextColor(100);
+                    doc.text(`Time Period Scope:`, 14, 55);
+                    doc.setFont("Helvetica", "bold");
+                    doc.setTextColor(33, 37, 41);
+                    doc.text(`${startDateText} to ${endDateText}`, 47, 55);
+
+                    doc.setFont("Helvetica", "normal");
+                    doc.setTextColor(100);
+                    doc.text(`Generated Timestamp:`, 14, 60);
+                    doc.setFont("Helvetica", "bold");
+                    doc.setTextColor(33, 37, 41);
+                    doc.text(`${new Date().toLocaleString('en-MY', { hour12: true })}`, 51, 60);
+
+                    // ----------------------------------------------------
+                    // 3. TRANSACTION DATA TRANSFORMATION GRID
+                    // ----------------------------------------------------
+                    const tableRows = dataRecords.map((r, index) => [
+                        (index + 1).toString(),
+                        r.topUpID,
+                        r.commuterID,
+                        r.fullName,
+                        r.paymentMethod,
+                        r.formattedTime,
+                        `RM ${(r.amountAdded || 0).toFixed(2)}`
+                    ]);
+
+                    doc.autoTable({
+                        startY: 68,
+                        head: [["No.", "TopUp ID", "Commuter ID", "Full Name", "Payment Method", "Timestamp", "Amount Added"]],
+                        body: tableRows,
+                        theme: 'striped',
+                        headStyles: {
+                            fillColor: [33, 37, 41], // Premium corporate off-black branding
+                            fontStyle: 'bold',
+                            fontSize: 9,
+                            cellPadding: { top: 4, bottom: 4, left: 2, right: 2 }
+                        },
+                        alternateRowStyles: {
+                            fillColor: [248, 249, 250]
+                        },
+                        columnStyles: {
+                            0: { cellWidth: 10, halign: 'center' },
+                            1: { cellWidth: 22 },
+                            2: { cellWidth: 24 },
+                            4: { cellWidth: 38 },
+                            6: { halign: 'right', fontStyle: 'bold' }
+                        },
+                        styles: {
+                            fontSize: 8.5,
+                            lineColor: [233, 236, 239],
+                            lineWidth: 0.1,
+                            cellPadding: 3
+                        },
+                        margin: { left: 14, right: 14, bottom: 25 }
+                    });
+
+                    // ----------------------------------------------------
+                    // 4. FINANCIAL SUMMARY CONTEXT BLOCK
+                    // ----------------------------------------------------
+                    let finalY = doc.lastAutoTable.finalY + 8;
+
+                    // Check cross page boundary thresholds safely
+                    if (finalY > 245) {
+                        doc.addPage();
+                        finalY = 25;
+                    }
+
+                    // Draw clean total callout layout frame
+                    doc.setFillColor(241, 243, 245);
+                    doc.rect(130, finalY, 66, 12, 'F');
+
+                    doc.setDrawColor(25, 135, 84);
+                    doc.setLineWidth(0.5);
+                    doc.line(130, finalY, 196, finalY); // Highlight accent border line
+                    doc.line(130, finalY + 12, 196, finalY + 12);
+
+                    doc.setFont("Helvetica", "bold");
+                    doc.setFontSize(9.5);
+                    doc.setTextColor(73, 80, 87);
+                    doc.text("GRAND TOTAL:", 134, finalY + 7.5);
+
+                    doc.setFont("Helvetica", "bold");
+                    doc.setFontSize(11);
+                    doc.setTextColor(25, 135, 84); // Theme color match matching system revenue
+                    doc.text(`RM ${grandTotalSum.toFixed(2)}`, 192, finalY + 7.5, { align: 'right' });
+
+                    // ----------------------------------------------------
+                    // 5. RUNNING HEADERS & FOOTERS INJECTOR LOOP
+                    // ----------------------------------------------------
+                    const totalPageCount = doc.internal.getNumberOfPages();
+                    for (let i = 1; i <= totalPageCount; i++) {
+                        doc.setPage(i);
+
+                        // Hairline Footer Border line
+                        doc.setDrawColor(233, 236, 239);
+                        doc.setLineWidth(0.2);
+                        doc.line(14, 280, 196, 280);
+
+                        doc.setFont("Helvetica", "normal");
+                        doc.setFontSize(8);
+                        doc.setTextColor(140, 145, 155);
+
+                        // Left Footnote
+                        doc.text("CONFIDENTIAL (FOR INTERNAL USE ONLY)", 14, 286);
+                        // Right page trace mapping metrics
+                        doc.text(`Page ${i} of ${totalPageCount}`, 196, 286, { align: 'right' });
+                    }
+
+                    // Save Document and auto close active tab session securely
+                    doc.save(`TopUp_History_Summary_Report_${Date.now()}.pdf`);
+                    sessionStorage.removeItem('pdf_export_payload');
+                    setTimeout(() => window.close(), 1000);
+                }
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('loaderStatus').className = "card error-card";
+                document.getElementById('loaderStatus').innerHTML = `
+            <div class="error-icon">❌</div>
+            <h2 style="color:#dc3545;">Export Aborted</h2>
+            <p>An runtime compilation error blocked the engine from mapping records:</p>
+            <p style="font-family:monospace; font-size:12px; color:#6c757d; background:#f8f9fa; padding:10px; border-radius:4px; margin-top:12px; text-align:left;">${err.message}</p>
+        `;
+            }
+        };
+    </script>
+</body>
+
+</html>

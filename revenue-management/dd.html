@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Firestore + PDF Test</title>
+
+    <!-- jsPDF -->
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
+</head>
+
+<body>
+
+<h2>Firestore Test + Export PDF</h2>
+
+<button onclick="loadData()">Load Data</button>
+<button onclick="exportPDF()">Export PDF</button>
+
+<br><br>
+
+<table border="1" cellpadding="6">
+    <thead>
+        <tr>
+            <th>TopUp ID</th>
+            <th>Commuter ID</th>
+            <th>Name</th>
+            <th>Amount</th>
+            <th>Time</th>
+        </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+</table>
+
+<script>
+let records = [];
+
+// ================= FIREBASE INIT =================
+const firebaseConfig = {
+    apiKey: "AIzaSyARgm74vfdsdgj2fFKETh_rjmMZEgTk5br10",
+    authDomain: "plus-370sc3.firebaseapp.com",
+    projectId: "plus-370c3"
+};
+
+const scripts = [
+    "https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js",
+    "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"
+];
+
+let loaded = 0;
+
+scripts.forEach(src => {
+    const s = document.createElement("script");
+    s.src = src;
+
+    s.onload = () => {
+        loaded++;
+        if (loaded === scripts.length) {
+            firebase.initializeApp(firebaseConfig);
+            window.db = firebase.firestore();
+            console.log("Firebase ready");
+        }
+    };
+
+    document.head.appendChild(s);
+});
+
+// ================= LOAD DATA =================
+async function loadData() {
+
+    const snapshot = await db.collection("topUp").get();
+
+    records = [];
+
+    snapshot.forEach(doc => {
+        const d = doc.data();
+
+        records.push({
+            topUpID: d.topUpID || doc.id,
+            commuterID: d.commuterID || "-",
+            fullName: d.fullName || "Unknown",
+            amount: Number(d.amountAdded || 0),
+            time: d.timestamp ? "OK" : "No Time"
+        });
+    });
+
+    renderTable();
+
+    alert("Loaded: " + records.length);
+}
+
+// ================= TABLE =================
+function renderTable() {
+
+    const body = document.getElementById("tableBody");
+    body.innerHTML = "";
+
+    records.forEach(r => {
+        body.innerHTML += `
+            <tr>
+                <td>${r.topUpID}</td>
+                <td>${r.commuterID}</td>
+                <td>${r.fullName}</td>
+                <td>RM ${r.amount.toFixed(2)}</td>
+                <td>${r.time}</td>
+            </tr>
+        `;
+    });
+}
+
+// ================= PDF EXPORT =================
+function exportPDF() {
+
+    if (records.length === 0) {
+        alert("No data to export");
+        return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'a4');
+
+    doc.text("TopUp Report", 14, 15);
+
+    const rows = records.map(r => [
+        r.topUpID,
+        r.commuterID,
+        r.fullName,
+        `RM ${r.amount.toFixed(2)}`,
+        r.time
+    ]);
+
+    doc.autoTable({
+        head: headers,
+        body: rows,
+        startY: 36,
+        // head: [["TopUp ID", "Commuter ID", "Name", "Amount", "Time"]],
+        // body: rows,
+        // startY: 20
+    });
+
+    doc.save("topup_report.pdf");
+}
+</script>
+
+</body>
+</html>
