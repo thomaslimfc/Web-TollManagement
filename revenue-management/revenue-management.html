@@ -386,7 +386,7 @@
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
 
-    <script type="module">
+<script type="module">
         import { initializeFirebase } from '/lib/firebase_init.js';
 
         document.addEventListener('DOMContentLoaded', async () => {
@@ -415,7 +415,7 @@
             if (startDateFilter && endDateFilter) {
                 const [year, month] = today.split('-');
                 const firstDayOfMonth = `${year}-${month}-01`;
-
+                
                 startDateFilter.value = firstDayOfMonth;
                 endDateFilter.value = today;
             }
@@ -465,7 +465,7 @@
             });
 
             // =========================
-            // CHART UPDATE
+            // CHART UPDATE (FULLY RECOVERED)
             // =========================
             function updateChartVisualization() {
                 const groups = {};

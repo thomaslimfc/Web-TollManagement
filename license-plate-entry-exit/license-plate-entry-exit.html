@@ -14,17 +14,21 @@
             cursor: pointer;
             user-select: none;
         }
+
         .sortable-header:hover {
             background-color: rgba(0, 0, 0, 0.05);
         }
+
         .sort-icon {
             font-size: 0.8rem;
             margin-left: 4px;
             color: #bbb;
         }
+
         .sortable-header:hover .sort-icon {
             color: #666;
         }
+
         .sort-active {
             color: #000 !important;
             font-weight: bold;
@@ -65,76 +69,78 @@
 
     <div class="sidebar" id="sidebar">
         <ul class="nav flex-column">
-            <li class="nav-item">
-                <a class="nav-link" href="../user-management/user-management.html">
-                    <i class="bi bi-people"></i> User Management
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="../toll-rates/toll-rates.html">
-                    <i class="bi bi-cash-coin"></i> Toll Tariff
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link active" href="../license-plate-entry-exit/license-plate-entry-exit.html">
-                    <i class="bi bi-car-front"></i> License Plate Entry/Exit
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="../cctv-streaming/cctv-streaming.html">
-                    <i class="bi bi-camera-video"></i> CCTV Streaming
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="../weather-data/weather-data.html">
-                    <i class="bi bi-cloud-sun"></i> Weather Data
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="../emergency-alerts/emergency-alerts.html">
-                    <i class="bi bi-exclamation-triangle"></i> Emergency Alerts
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="../congestion-alerts/congestion-alerts.html">
-                    <i class="bi bi-cone"></i> Congestion Alerts
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="../sos-emergency/sos-emergency.html">
-                    <i class="bi bi-life-preserver"></i> SOS Emergency
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="../vehicle-verifications/vehicle-verifications.html">
-                    <i class="bi bi-shield-check"></i> Vehicle Verifications
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="../revenue-management/revenue-management.html">
-                    <i class="bi bi-graph-up-arrow"></i> Revenue Management
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="../inquiry-reply/inquiry-reply.html">
-                    <i class="bi bi-chat-left-text"></i> Inquiry Reply
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="../data-manager/data-manager.html">
-                    <i class="bi bi-table"></i> Data Manager
-                </a>
-            </li>
+            <li class="nav-item"><a class="nav-link" href="../user-management/user-management.html"><i
+                        class="bi bi-people"></i> User Management</a></li>
+            <li class="nav-item"><a class="nav-link" href="../toll-rates/toll-rates.html"><i
+                        class="bi bi-cash-coin"></i> Toll Tariff</a></li>
+            <li class="nav-item"><a class="nav-link active"
+                    href="../license-plate-entry-exit/license-plate-entry-exit.html"><i class="bi bi-car-front"></i>
+                    License Plate Entry/Exit</a></li>
+            <li class="nav-item"><a class="nav-link" href="../cctv-streaming/cctv-streaming.html"><i
+                        class="bi bi-camera-video"></i> CCTV Streaming</a></li>
+            <li class="nav-item"><a class="nav-link" href="../weather-data/weather-data.html"><i
+                        class="bi bi-cloud-sun"></i> Weather Data</a></li>
+            <li class="nav-item"><a class="nav-link" href="../emergency-alerts/emergency-alerts.html"><i
+                        class="bi bi-exclamation-triangle"></i> Emergency Alerts</a></li>
+            <li class="nav-item"><a class="nav-link" href="../congestion-alerts/congestion-alerts.html"><i
+                        class="bi bi-cone"></i> Congestion Alerts</a></li>
+            <li class="nav-item"><a class="nav-link" href="../sos-emergency/sos-emergency.html"><i
+                        class="bi bi-life-preserver"></i> SOS Emergency</a></li>
+            <li class="nav-item"><a class="nav-link" href="../vehicle-verifications/vehicle-verifications.html"><i
+                        class="bi bi-shield-check"></i> Vehicle Verifications</a></li>
+            <li class="nav-item"><a class="nav-link" href="../revenue-management/revenue-management.html"><i
+                        class="bi bi-graph-up-arrow"></i> Revenue Management</a></li>
+            <li class="nav-item"><a class="nav-link" href="../inquiry-reply/inquiry-reply.html"><i
+                        class="bi bi-chat-left-text"></i> Inquiry Reply</a></li>
+            <li class="nav-item"><a class="nav-link" href="../data-manager/data-manager.html"><i
+                        class="bi bi-table"></i> Data Manager</a></li>
         </ul>
     </div>
 
     <div class="main-content" id="mainContent">
         <h1>License Plate Entry/Exit</h1>
-        <p>Monitor and review real-time entry and exit timestamps filtering by Toll Location descriptions.</p>
+        <p>Monitor and review real-time entry and exit timestamps filtering by toll location.</p>
         <br>
 
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white py-3 border-bottom border-light">
+                <h5 class="card-title mb-0 fw-bold text-dark d-flex align-items-center gap-2">
+                    <i class="bi bi-file-earmark-pdf text-danger"></i> Export Transaction Report
+                </h5>
+            </div>
+            <div class="card-body bg-light-subtle">
+                <div id="exportReportForm" class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label for="exportLocation" class="form-label small fw-bold text-secondary"><i
+                                class="bi bi-geo-alt"></i> Toll Location Scope</label>
+                        <select class="form-select" id="exportLocation" disabled>
+                            <option value="" selected disabled>Loading Toll Locations...</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="exportStartDate" class="form-label small fw-bold text-secondary"><i
+                                class="bi bi-calendar-date"></i> Start Date</label>
+                        <input type="date" class="form-select" id="exportStartDate" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="exportEndDate" class="form-label small fw-bold text-secondary"><i
+                                class="bi bi-calendar-date"></i> End Date</label>
+                        <input type="date" class="form-select" id="exportEndDate" required>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button"
+                            class="btn btn-danger w-100 fw-bold d-flex align-items-center justify-content-center gap-2"
+                            id="btnExportPDF">
+                            <i class="bi bi-download"></i> Export PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white py-3 border-bottom border-light d-flex align-items-center justify-content-between">
+            <div
+                class="card-header bg-white py-3 border-bottom border-light d-flex align-items-center justify-content-between">
                 <h5 class="card-title mb-0 fw-bold text-dark d-flex align-items-center gap-2">
                     <i class="bi bi-collection text-success"></i> Transaction Records
                     <span id="recordCount" class="badge bg-light text-dark border fw-medium px-2 py-1.5">0 record(s) found</span>
@@ -156,9 +162,6 @@
                                 </th>
                                 <th scope="col" class="sortable-header" style="min-width: 130px;" data-sort-key="commuterID">
                                     Commuter ID <i class="bi bi-arrow-down-up sort-icon" id="icon-commuterID"></i>
-                                </th>
-                                <th scope="col" class="sortable-header" style="min-width: 130px;" data-sort-key="vehicleID">
-                                    Vehicle ID <i class="bi bi-arrow-down-up sort-icon" id="icon-vehicleID"></i>
                                 </th>
                                 <th scope="col" class="sortable-header" style="min-width: 140px;" data-sort-key="licensePlate">
                                     License Plate <i class="bi bi-arrow-down-up sort-icon" id="icon-licensePlate"></i>
@@ -204,13 +207,27 @@
             const tableBody = document.getElementById('recordsTableBody');
             const recordCountBadge = document.getElementById('recordCount');
             const locationSelect = document.getElementById('inputLocationDesc');
+            const exportLocationSelect = document.getElementById('exportLocation');
+            const btnExportPDF = document.getElementById('btnExportPDF');
 
-            // Sorting Configuration Trackers
-            let currentSortKey = 'entryTimestamp'; // Default fallback ordering parameter
-            let currentSortOrder = 'desc';         // Latest records on top by default
-            let compiledRecords = [];              // Local global client-cache representing matching data parameters
+            // Form Defaults Configuration
+            const today = new Date();
+            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
+            document.getElementById('exportStartDate').value = firstDay;
+            document.getElementById('exportEndDate').value = today.toISOString().split('T')[0];
 
-            // Helper function to cleanly format Firestore Timestamp instances
+            let currentSortKey = 'entryTimestamp';
+            let currentSortOrder = 'desc';
+            let compiledRecords = [];
+
+            const chunkArray = (array, size) => {
+                const result = [];
+                for (let i = 0; i < array.length; i += size) {
+                    result.push(array.slice(i, i + size));
+                }
+                return result;
+            };
+
             function formatTimestamp(timestamp) {
                 if (!timestamp) return 'N/A';
                 if (typeof timestamp.toDate === 'function') {
@@ -219,27 +236,22 @@
                 return String(timestamp);
             }
 
-            // Updates column heading indicator elements matching active configurations
             function updateSortIcons() {
                 document.querySelectorAll('.sort-icon').forEach(icon => {
                     icon.className = "bi bi-arrow-down-up sort-icon";
                 });
-                
+
                 const activeIcon = document.getElementById(`icon-${currentSortKey}`);
                 if (activeIcon) {
+                    const isNumericOrTime = (currentSortKey === 'amount' || currentSortKey.toLowerCase().includes('timestamp'));
                     if (currentSortOrder === 'asc') {
-                        activeIcon.className = (currentSortKey === 'amount' || currentSortKey.toLowerCase().includes('timestamp'))
-                            ? "bi bi-sort-numeric-down sort-icon sort-active"
-                            : "bi bi-sort-alpha-down sort-icon sort-active";
+                        activeIcon.className = isNumericOrTime ? "bi bi-sort-numeric-down sort-icon sort-active" : "bi bi-sort-alpha-down sort-icon sort-active";
                     } else {
-                        activeIcon.className = (currentSortKey === 'amount' || currentSortKey.toLowerCase().includes('timestamp'))
-                            ? "bi bi-sort-numeric-down-alt sort-icon sort-active"
-                            : "bi bi-sort-alpha-down-alt sort-icon sort-active";
+                        activeIcon.className = isNumericOrTime ? "bi bi-sort-numeric-down-alt sort-icon sort-active" : "bi bi-sort-alpha-down-alt sort-icon sort-active";
                     }
                 }
             }
 
-            // ══════〔 SORT AND RENDER DYNAMIC UI TABLE ROWS 〕══════
             function renderRecordsTable() {
                 if (compiledRecords.length === 0) {
                     tableBody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-muted"><i class="bi bi-slash-circle me-1"></i> No matching transaction logs exist linked to this location.</td></tr>`;
@@ -247,17 +259,15 @@
                     return;
                 }
 
-                // Sorting processing logic block
                 compiledRecords.sort((a, b) => {
                     let valA = a[currentSortKey];
                     let valB = b[currentSortKey];
 
-                    // Safely handle timestamp comparison falls by parsing explicit raw milliseconds tracking fields
                     if (currentSortKey === 'entryTimestamp') {
                         valA = a.rawEntryTime;
                         valB = b.rawEntryTime;
                     } else if (currentSortKey === 'exitTimestamp') {
-                        valA = a.rawExitTime;
+                        valA = a.rawExitTime; // Fixed sorting issue fallback
                         valB = b.rawExitTime;
                     }
 
@@ -273,36 +283,31 @@
                 let rowsHtml = "";
                 compiledRecords.forEach(item => {
                     rowsHtml += `
-                        <tr>
-                            <td class="text-secondary small fw-bold">${item.transactionID}</td>
-                            <td class="text-secondary small">${item.commuterID}</td>
-                            <td class="text-secondary small">${item.vehicleID}</td>
-                            <td><span class="badge bg-dark font-monospace px-2.5 py-1.5 fs-6 shadow-sm border border-secondary">${item.licensePlate}</span></td>
-                            <td class="fw-semibold text-dark">${item.carMake}</td>
-                            <td class="text-secondary">${item.carModel}</td>
-                            <td class="text-muted small"><i class="bi bi-box-arrow-in-right text-success me-1"></i> ${item.entryTimestamp}</td>
-                            <td class="text-muted small"><i class="bi bi-box-arrow-left text-danger me-1"></i> ${item.exitTimestamp}</td>
-                            <td class="pe-4 text-end fw-bold text-success">RM ${item.amount}</td>
-                        </tr>
-                    `;
+                    <tr>
+                        <td class="text-secondary small fw-bold">${item.transactionID}</td>
+                        <td class="text-secondary small">${item.commuterID}</td>
+                        <td><span class="badge bg-dark font-monospace px-2.5 py-1.5 fs-6 shadow-sm border border-secondary">${item.licensePlate}</span></td>
+                        <td class="fw-semibold text-dark">${item.carMake}</td>
+                        <td class="text-secondary">${item.carModel}</td>
+                        <td class="text-muted small"><i class="bi bi-box-arrow-in-right text-success me-1"></i> ${item.entryTimestamp}</td>
+                        <td class="text-muted small"><i class="bi bi-box-arrow-left text-danger me-1"></i> ${item.exitTimestamp}</td>
+                        <td class="pe-4 text-end fw-bold text-success">RM ${item.amount}</td>
+                    </tr>`;
                 });
 
                 tableBody.innerHTML = rowsHtml;
                 updateSortIcons();
             }
 
-            // Populates unique location descriptions inside the dropdown select menu option list
             async function loadLocationOptions() {
                 try {
                     const { db } = await initializeFirebase();
                     const snapshot = await db.collection("tollLocation").get();
 
                     locationSelect.innerHTML = '<option value="" selected disabled>Select Toll Location</option>';
+                    exportLocationSelect.innerHTML = '<option value="ALL" selected>ALL TOLL LOCATIONS</option>';
 
-                    if (snapshot.empty) {
-                        alert("No toll locations found in database.");
-                        return;
-                    }
+                    if (snapshot.empty) return;
 
                     snapshot.forEach(doc => {
                         const data = doc.data();
@@ -311,181 +316,118 @@
                             option.value = data.description;
                             option.textContent = data.description;
                             locationSelect.appendChild(option);
+                            exportLocationSelect.appendChild(option.cloneNode(true));
                         }
                     });
 
                     locationSelect.disabled = false;
+                    exportLocationSelect.disabled = false;
 
-                    // Automatically fetch records for the first location option
                     if (locationSelect.options.length > 1) {
                         locationSelect.value = locationSelect.options[1].value;
                         await fetchAndCacheRecords();
                     }
-
                 } catch (error) {
                     console.error("Error loading location descriptions:", error);
-                    alert("Failed to load toll location filter options.");
                 }
             }
 
-            // ══════〔 DATA FETCHING AND PARSING PHASE 〕══════
             async function fetchAndCacheRecords() {
                 try {
                     const { db } = await initializeFirebase();
                     const targetDescription = locationSelect.value;
-
                     if (!targetDescription) return;
 
                     tableBody.innerHTML = `
-                        <tr>
-                            <td colspan="9" class="text-center py-5 text-success">
-                                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-                                Tracking relational locations, checking booth boundaries, and generating records...
-                            </td>
-                        </tr>
-                    `;
+                    <tr>
+                        <td colspan="9" class="text-center py-5 text-success">
+                            <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                            Tracking relational locations, checking booth boundaries, and generating records...
+                        </td>
+                    </tr>`;
 
-                    // Step 1: Find matching tollLocation elements mapping to description string
-                    const locationSnapshot = await db.collection('tollLocation')
-                        .where('description', '==', targetDescription)
-                        .get();
-
-                    if (locationSnapshot.empty) {
-                        compiledRecords = [];
-                        renderRecordsTable();
-                        return;
-                    }
+                    const locationSnapshot = await db.collection('tollLocation').where('description', '==', targetDescription).get();
+                    if (locationSnapshot.empty) { compiledRecords = []; renderRecordsTable(); return; }
 
                     const locationIDs = [];
-                    locationSnapshot.forEach(doc => {
-                        const data = doc.data();
-                        if (data.tollLocationID) locationIDs.push(data.tollLocationID);
-                    });
+                    locationSnapshot.forEach(doc => { if (doc.data().tollLocationID) locationIDs.push(doc.data().tollLocationID); });
 
-                    // Step 2: Fetch corresponding toll booths that link to these location IDs
-                    const boothSnapshot = await db.collection('tollBooth')
-                        .where('tollLocationID', 'in', locationIDs)
-                        .get();
-
-                    if (boothSnapshot.empty) {
-                        compiledRecords = [];
-                        renderRecordsTable();
-                        return;
-                    }
+                    const boothSnapshot = await db.collection('tollBooth').where('tollLocationID', 'in', locationIDs).get();
+                    if (boothSnapshot.empty) { compiledRecords = []; renderRecordsTable(); return; }
 
                     const boothIDs = [];
-                    boothSnapshot.forEach(doc => {
-                        const data = doc.data();
-                        if (data.boothID) boothIDs.push(data.boothID);
-                    });
+                    boothSnapshot.forEach(doc => { if (doc.data().boothID) boothIDs.push(doc.data().boothID); });
 
-                    // Step 3: Fetch 'lprRecord' entries tied to these booth IDs (Batch split by 30 max for Firestore)
                     const entryRecordIDs = [];
-                    const batchSize = 30;
-
-                    for (let i = 0; i < boothIDs.length; i += batchSize) {
-                        const batchBooths = boothIDs.slice(i, i + batchSize);
-                        const lpSnapshot = await db.collection('lprRecord')
-                            .where('tollBoothID', 'in', batchBooths)
-                            .where('tollEventType', '==', 'entry')
-                            .get();
-
-                        lpSnapshot.forEach(doc => {
-                            entryRecordIDs.push(doc.id);
-                        });
+                    const boothBatches = chunkArray(boothIDs, 30);
+                    for (const batch of boothBatches) {
+                        const lpSnapshot = await db.collection('lprRecord').where('tollBoothID', 'in', batch).where('tollEventType', '==', 'entry').get();
+                        lpSnapshot.forEach(doc => entryRecordIDs.push(doc.id));
                     }
 
-                    if (entryRecordIDs.length === 0) {
-                        compiledRecords = [];
-                        renderRecordsTable();
-                        return;
-                    }
+                    if (entryRecordIDs.length === 0) { compiledRecords = []; renderRecordsTable(); return; }
 
-                    // Step 4: Fetch corresponding toll transactions using entryLprRecordID matching our entry IDs
                     const transactionsList = [];
-                    for (let i = 0; i < entryRecordIDs.length; i += batchSize) {
-                        const batchIDs = entryRecordIDs.slice(i, i + batchSize);
-                        const transSnapshot = await db.collection('tollTransaction')
-                            .where('entryLprRecordID', 'in', batchIDs)
-                            .get();
-
-                        transSnapshot.forEach(doc => {
-                            transactionsList.push({ id: doc.id, ...doc.data() });
-                        });
+                    const entryBatches = chunkArray(entryRecordIDs, 30);
+                    for (const batch of entryBatches) {
+                        const transSnapshot = await db.collection('tollTransaction').where('entryLprRecordID', 'in', batch).get();
+                        transSnapshot.forEach(doc => transactionsList.push({ id: doc.id, ...doc.data() }));
                     }
 
-                    const tempCompiledList = [];
-
-                    // Fetch details sequentially across linked document layers
-                    for (const transData of transactionsList) {
-                        let licensePlate = "N/A";
-                        let carMake = "N/A";
-                        let carModel = "N/A";
-                        let entryTimeStr = "N/A";
-                        let exitTimeStr = "N/A";
-                        let rawEntryTime = 0;
-                        let rawExitTime = 0;
+                    compiledRecords = await Promise.all(transactionsList.map(async (transData) => {
+                        let licensePlate = "N/A", carMake = "N/A", carModel = "N/A", entryTimeStr = "N/A", exitTimeStr = "N/A";
+                        let rawEntryTime = 0, rawExitTime = 0;
+                        const tasks = [];
 
                         if (transData.vehicleID) {
-                            const vehicleSnap = await db.collection('vehicle').doc(transData.vehicleID).get();
-                            if (vehicleSnap.exists) {
-                                const v = vehicleSnap.data();
-                                licensePlate = v.licensePlate || "N/A";
-                                carMake = v.carMake || "N/A";
-                                carModel = v.carModel || "N/A";
-                            }
+                            tasks.push(db.collection('vehicle').doc(transData.vehicleID).get().then(snap => {
+                                if (snap.exists) {
+                                    licensePlate = snap.data().licensePlate || "N/A";
+                                    carMake = snap.data().carMake || "N/A";
+                                    carModel = snap.data().carModel || "N/A";
+                                }
+                            }));
                         }
-
                         if (transData.entryLprRecordID) {
-                            const entryLpSnap = await db.collection('lprRecord').doc(transData.entryLprRecordID).get();
-                            if (entryLpSnap.exists) {
-                                const capturedAt = entryLpSnap.data().capturedAt;
-                                entryTimeStr = formatTimestamp(capturedAt);
-                                if (capturedAt && capturedAt.seconds) rawEntryTime = capturedAt.seconds * 1000;
-                            }
+                            tasks.push(db.collection('lprRecord').doc(transData.entryLprRecordID).get().then(snap => {
+                                if (snap.exists) {
+                                    const capturedAt = snap.data().capturedAt;
+                                    entryTimeStr = formatTimestamp(capturedAt);
+                                    if (capturedAt?.seconds) rawEntryTime = capturedAt.seconds * 1000;
+                                }
+                            }));
                         }
-
                         if (transData.exitLprRecordID) {
-                            const exitLpSnap = await db.collection('lprRecord').doc(transData.exitLprRecordID).get();
-                            if (exitLpSnap.exists) {
-                                const capturedAt = exitLpSnap.data().capturedAt;
-                                exitTimeStr = formatTimestamp(capturedAt);
-                                if (capturedAt && capturedAt.seconds) rawExitTime = capturedAt.seconds * 1000;
-                            }
+                            tasks.push(db.collection('lprRecord').doc(transData.exitLprRecordID).get().then(snap => {
+                                if (snap.exists) {
+                                    const capturedAt = snap.data().capturedAt;
+                                    exitTimeStr = formatTimestamp(capturedAt);
+                                    if (capturedAt?.seconds) rawExitTime = capturedAt.seconds * 1000;
+                                }
+                            }));
                         }
 
-                        const formattedAmount = typeof transData.tariffRate === 'number'
-                            ? transData.tariffRate.toFixed(2)
-                            : '0.00';
-
-                        tempCompiledList.push({
+                        await Promise.all(tasks);
+                        return {
                             transactionID: transData.tollTransactionID || transData.id || 'N/A',
                             commuterID: transData.commuterID || 'N/A',
-                            vehicleID: transData.vehicleID || 'N/A',
-                            licensePlate: licensePlate,
-                            carMake: carMake,
-                            carModel: carModel,
+                            licensePlate, carMake, carModel,
                             entryTimestamp: entryTimeStr,
                             exitTimestamp: exitTimeStr,
-                            amount: formattedAmount,
-                            rawEntryTime: rawEntryTime,
-                            rawExitTime: rawExitTime
-                        });
-                    }
+                            amount: typeof transData.tariffRate === 'number' ? transData.tariffRate.toFixed(2) : '0.00',
+                            rawEntryTime, rawExitTime
+                        };
+                    }));
 
-                    compiledRecords = tempCompiledList;
                     renderRecordsTable();
-
                 } catch (error) {
                     console.error("CRITICAL EXCEPTION RUNNING LOG GENERATOR:", error);
-                    tableBody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i> Processing failed for chosen parameter scope.</td></tr>`;
+                    tableBody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i> Processing failed.</td></tr>`;
                 }
             }
 
-            // Bind explicitly onto location dropdown alteration updates
             locationSelect.addEventListener('change', fetchAndCacheRecords);
 
-            // Setup sort heading elements action listeners
             document.querySelectorAll('.sortable-header').forEach(header => {
                 header.addEventListener('click', () => {
                     const selectedKey = header.getAttribute('data-sort-key');
@@ -499,26 +441,61 @@
                 });
             });
 
-            // Run initial database load routines
+            // Standard Architecture Export Worker Trigger Task
+            btnExportPDF.addEventListener('click', async () => {
+                try {
+                    if (!compiledRecords.length) {
+                        alert("No data available for export.");
+                        return;
+                    }
+
+                    const targetLoc = exportLocationSelect.value || "ALL";
+                    const startDateVal = document.getElementById('exportStartDate').value;
+                    const endDateVal = document.getElementById('exportEndDate').value;
+
+                    if (!startDateVal || !endDateVal) {
+                        alert("Please select a valid Start Date and End Date.");
+                        return;
+                    }
+
+                    const payload = {
+                        module: "LPR_TRANSACTION_REPORT",
+                        location: targetLoc,
+                        startDate: startDateVal,
+                        endDate: endDateVal,
+                        records: compiledRecords.map(r => ({
+                            transactionID: r.transactionID,
+                            commuterID: r.commuterID,
+                            licensePlate: r.licensePlate,
+                            carMake: r.carMake,
+                            carModel: r.carModel,
+                            entryTimestamp: r.entryTimestamp,
+                            exitTimestamp: r.exitTimestamp,
+                            amount: r.amount
+                        }))
+                    };
+
+                    sessionStorage.setItem("pdf_export_payload", JSON.stringify(payload));
+                    window.open("pdf-export.html", "_blank");
+                } catch (err) {
+                    console.error(err);
+                    alert("Export failed: " + err.message);
+                }
+            });
+
             await loadLocationOptions();
         });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Toggle sidebar on mobile viewports
         document.querySelector('.sidebar-toggler').addEventListener('click', function () {
             document.getElementById('sidebar').classList.toggle('show');
         });
-
-        // Close sidebar when clicking outside boundaries on mobile device displays
         document.addEventListener('click', function (event) {
             const sidebar = document.getElementById('sidebar');
             const toggler = document.querySelector('.sidebar-toggler');
-
-            if (window.innerWidth < 992 &&
-                !sidebar.contains(event.target) &&
-                !toggler.contains(event.target)) {
+            if (window.innerWidth < 992 && !sidebar.contains(event.target) && !toggler.contains(event.target)) {
                 sidebar.classList.remove('show');
             }
         });
