@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PLUS — Sign In</title>
+    <link rel="icon" type="image/x-icon" href="../images/plus-logo.ico">
+
+    <link rel="stylesheet" href="../lib/master-layout.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+</head>
+
+<body>
+    <header class="navbar navbar-expand-lg navbar-dark bg-light fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="../images/plus-logo.png" alt="PLUS HIGHWAYS" height="40" />
+            </a>
+        </div>
+    </header>
+
+    <div class="container d-flex justify-content-center align-items-center" style="min-height: 65vh; pt-5;">
+        <div class="card p-4 shadow-sm" style="width: 100%; max-width: 600px;">
+            <div class="text-center mb-4">
+                <h2 class="fw-bold">Sign In with Email</h2>
+                <p class="text-muted">Welcome to the PLUS HIGHWAYS Administration Portal.</p>
+            </div>
+
+            <form id="signInForm">
+                <div class="form-group row">
+                    <label for="inputEmailAddress" class="col-sm-4 col-form-label">Email Address</label>
+                    <div class="col-sm-8" style="width: 350px;">
+                        <input type="text" class="form-control" id="inputEmailAddress" placeholder="example@domain.com"
+                            required>
+                        <div id="emailHelp" class="form-text text-muted small mt-1"
+                            style="display: none; font-size: 11px;">
+                            • Must be a valid email structure
+                        </div>
+                    </div>
+                </div>
+                <div style="padding-bottom: 10px;"></div>
+
+                <div class="form-group row">
+                    <label for="inputPassword" class="col-sm-4 col-form-label">Password</label>
+                    <div class="col-sm-8" style="width: 350px;">
+                        <div class="position-relative">
+                            <input type="password" class="form-control pe-5" id="inputPassword" placeholder="Password" required>
+                            <i class="bi bi-eye-slash position-absolute top-50 end-0 translate-middle-y me-3" 
+                               id="togglePassword" 
+                               style="cursor: pointer; z-index: 10;"></i>
+                        </div>
+                        <div id="passwordHelp" class="form-text text-muted small mt-1"
+                            style="display: none; font-size: 11px;">
+                            • Enter your secure account authentication password
+                        </div>
+                        <div class="d-flex justify-content-end mt-1">
+                            <a href="#" id="forgotPasswordLink" style="font-size: 15px; text-decoration: none;">Forgot Password?</a>
+                        </div>
+                    </div>
+                </div>
+                <div style="padding-bottom: 20px;"></div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" id="SignInBtn" class="btn btn-primary">
+                        <span id="btnSpinner" class="spinner-border spinner-border-sm d-none me-2" role="status"></span>
+                        Log Now
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="feedbackModalLabel">Notification</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="feedbackModalBody">
+                    </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <img src="../images/plus-logo.png" alt="PLUS HIGHWAYS" height="80"/>
+        <p class="text-center" style="padding-top: 20px;">&copy; 2026 PLUS HIGHWAYS SDN. BHD. All rights reserved.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script type="module">
+        import { initializeFirebase } from '/lib/firebase_init.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const signInForm = document.getElementById('signInForm');
+            const signInBtn = document.getElementById('SignInBtn');
+            const btnSpinner = document.getElementById('btnSpinner');
+            const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+            
+            const passwordInput = document.getElementById('inputPassword');
+            const togglePasswordIcon = document.getElementById('togglePassword');
+
+            const feedbackModalEl = document.getElementById('feedbackModal');
+            const feedbackModalBody = document.getElementById('feedbackModalBody');
+            const feedbackModalLabel = document.getElementById('feedbackModalLabel');
+            const bootstrapModal = new bootstrap.Modal(feedbackModalEl);
+
+            function showSystemModal(title, bodyText) {
+                feedbackModalLabel.textContent = title;
+                feedbackModalBody.innerHTML = bodyText;
+                bootstrapModal.show();
+            }
+
+            const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+
+            function validateEmailFormat(value) {
+                if (!value || value.trim() === '') {
+                    return 'Required';
+                }
+                if (!emailRegex.test(value)) {
+                    return 'Invalid email format';
+                }
+                return null;
+            }
+
+            const focusHelpMap = [
+                { inputId: 'inputEmailAddress', helpId: 'emailHelp' },
+                { inputId: 'inputPassword', helpId: 'passwordHelp' }
+            ];
+
+            focusHelpMap.forEach(item => {
+                const element = document.getElementById(item.inputId);
+                const helpBlock = document.getElementById(item.helpId);
+                if (element && helpBlock) {
+                    element.addEventListener('focus', () => helpBlock.style.display = 'block');
+                    element.addEventListener('blur', () => helpBlock.style.display = 'none');
+                }
+            });
+
+            togglePasswordIcon.addEventListener('click', () => {
+                const currentType = passwordInput.getAttribute('type');
+                const newType = currentType === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', newType);
+                
+                togglePasswordIcon.classList.toggle('bi-eye');
+                togglePasswordIcon.classList.toggle('bi-eye-slash');
+            });
+
+            async function handleLogin(email, password) {
+                const emailValidationError = validateEmailFormat(email);
+                if (emailValidationError) {
+                    showSystemModal("Invalid Email", `<p class="m-0">Please check your email address. It looks like it is missing or typed incorrectly.</p>`);
+                    document.getElementById('inputEmailAddress').focus();
+                    return;
+                }
+
+                signInBtn.disabled = true;
+                btnSpinner.classList.remove('d-none');
+
+                try {
+                    const { db } = await initializeFirebase();
+                    const auth = firebase.auth();
+
+                    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                    const uid = userCredential.user.uid;
+
+                    const staffCheck = await db.collection('staff').where('uid', '==', uid).get();
+
+                    if (!staffCheck.empty) {
+                        const staffData = staffCheck.docs[0].data();
+
+                        if (staffData.status === "Terminated" || staffData.status === "Suspended") {
+                            await auth.signOut();
+                            showSystemModal("Account Suspended", "Your staff account is currently inactive. Please reach out to your HR department or system administrator for help.");
+                            finalizeLoading();
+                            return;
+                        }
+
+                        sessionStorage.setItem('positionID', staffData.positionID || '');
+                        sessionStorage.setItem('loginUser', staffData.staffID || '');
+
+                        window.location.href = "profile-info.html";
+                        return;
+                    }
+
+                    await auth.signOut();
+                    showSystemModal("Access Denied", "We couldn't find a staff account matching your profile. Please make sure you are registering or logging in using your registered staff account details.");
+                    finalizeLoading();
+
+                } catch (error) {
+                    console.error("Login failure:", error);
+                    showSystemModal("Login Failed", `Incorrect email or password. Please try typing your password again carefully.`);
+                    finalizeLoading();
+                }
+            }
+
+            function finalizeLoading() {
+                signInBtn.disabled = false;
+                btnSpinner.classList.add('d-none');
+            }
+
+            signInForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('inputEmailAddress').value.trim();
+                const password = document.getElementById('inputPassword').value;
+
+                if (email && password) {
+                    await handleLogin(email, password);
+                }
+            });
+
+            forgotPasswordLink.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const emailInput = document.getElementById('inputEmailAddress').value.trim();
+
+                const emailValidationError = validateEmailFormat(emailInput);
+                if (emailValidationError) {
+                    showSystemModal("Email Address Needed", `Please type a valid email address into the input field above first before requesting a password link.`);
+                    document.getElementById('inputEmailAddress').focus();
+                    return;
+                }
+
+                try {
+                    const { db } = await initializeFirebase();
+                    const auth = firebase.auth();
+                    
+                    const emailCheck = await db.collection('staff').where('emailAddress', '==', emailInput).get();
+                    
+                    if (emailCheck.empty) {
+                        showSystemModal("Email Not Found", "The email address you entered isn't registered in our system. Please double-check your spelling or contact your administrator.");
+                        return;
+                    }
+
+                    await auth.sendPasswordResetEmail(emailInput);
+                    showSystemModal("Email Sent Successfully", `We have sent a link to change your password directly to: <br><strong class="text-success">${emailInput}</strong>. Please check your inbox or spam folder.`);
+                } catch (error) {
+                    console.error("Password reset failure:", error);
+                    showSystemModal("Could Not Send Link", `Something went wrong while trying to send the reset email. Please try again in a few minutes.`);
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
