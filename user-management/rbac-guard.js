@@ -123,8 +123,8 @@ function initApp() {
     const loginUser = document.getElementById("profile-name");
     
     // Fetch the individual pieces from session storage
-    const localFullName = sessionStorage.getItem("fullName");
-    const localStaffID = sessionStorage.getItem("loginUser");
+    const localFullName = localStorage.getItem("fullName");
+    const localStaffID = localStorage.getItem("loginUser");
 
     // Verify the UI element exists and we have at least the full name
     if (loginUser && localFullName) {
