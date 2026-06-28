@@ -104,18 +104,125 @@
         <h1>CCTV Streaming</h1>
         <p>Access high-definition video feeds from strategic traffic cameras for real-time visual monitoring.</p>
 
-        <!-- Your page content will go here -->
-        <div class="container-fluid">
-            <!-- Content rows/columns -->
+<div class="row g-4" id="cctvGrid">
+            <div class="col-12 col-md-6 col-xl-4 cctv-card-wrapper" data-location="Penang Bridge">
+                <div class="card h-100 shadow-sm border-0 bg-dark text-white overflow-hidden position-relative">
+                    <div class="video-container position-relative" style="cursor: pointer;" onclick="toggleFullScreen(this)">
+                        <video class="w-100 d-block" autoplay loop muted playsinline preload="auto">
+                            <source src="streaming-videos/penangBridge.mp4" type="video/mp4">
+                        </video>
+                        <span class="position-absolute top-0 end-0 m-3 badge bg-danger d-flex align-items-center gap-1 z-3 shadow-sm">
+                            <span class="spinner-grow spinner-grow-sm text-light" style="animation-duration: 1.5s;" role="status"></span> LIVE
+                        </span>
+                    </div>
+                    <div class="card-body bg-light text-dark p-3">
+                        <h5 class="card-title mb-1 fs-6 text-uppercase fw-bold text-secondary">TLID00001</h5>
+                        <p class="card-text fw-semibold m-0">Penang Bridge</p>
+                    </div>
+                </div>
+            </div>
 
+            <div class="col-12 col-md-6 col-xl-4 cctv-card-wrapper" data-location="Batu Kawan">
+                <div class="card h-100 shadow-sm border-0 bg-dark text-white overflow-hidden position-relative">
+                    <div class="video-container position-relative" style="cursor: pointer;" onclick="toggleFullScreen(this)">
+                        <video class="w-100 d-block" autoplay loop muted playsinline preload="auto">
+                            <source src="streaming-videos/batuKawan.mp4" type="video/mp4">
+                        </video>
+                        <span class="position-absolute top-0 end-0 m-3 badge bg-danger d-flex align-items-center gap-1 z-3 shadow-sm">
+                            <span class="spinner-grow spinner-grow-sm text-light" style="animation-duration: 1.5s;"></span> LIVE
+                        </span>
+                    </div>
+                    <div class="card-body bg-light text-dark p-3">
+                        <h5 class="card-title mb-1 fs-6 text-uppercase fw-bold text-secondary">TLID00002</h5>
+                        <p class="card-text fw-semibold m-0">Batu Kawan</p>
+                    </div>
+                </div>
+            </div>
 
-            <p> search location and video playing</p>
+            <div class="col-12 col-md-6 col-xl-4 cctv-card-wrapper" data-location="Juru">
+                <div class="card h-100 shadow-sm border-0 bg-dark text-white overflow-hidden position-relative">
+                    <div class="video-container position-relative" style="cursor: pointer;" onclick="toggleFullScreen(this)">
+                        <video class="w-100 d-block" autoplay loop muted playsinline preload="auto">
+                            <source src="streaming-videos/juru.mp4" type="video/mp4">
+                        </video>
+                        <span class="position-absolute top-0 end-0 m-3 badge bg-danger d-flex align-items-center gap-1 z-3 shadow-sm">
+                            <span class="spinner-grow spinner-grow-sm text-light" style="animation-duration: 1.5s;"></span> LIVE
+                        </span>
+                    </div>
+                    <div class="card-body bg-light text-dark p-3">
+                        <h5 class="card-title mb-1 fs-6 text-uppercase fw-bold text-secondary">TLID00003</h5>
+                        <p class="card-text fw-semibold m-0">Juru</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-xl-4 cctv-card-wrapper" data-location="Sungai Dua">
+                <div class="card h-100 shadow-sm border-0 bg-dark text-white overflow-hidden position-relative">
+                    <div class="video-container position-relative" style="cursor: pointer;" onclick="toggleFullScreen(this)">
+                        <video class="w-100 d-block" autoplay loop muted playsinline preload="auto">
+                            <source src="streaming-videos/sungaiDua.mp4" type="video/mp4">
+                        </video>
+                        <span class="position-absolute top-0 end-0 m-3 badge bg-danger d-flex align-items-center gap-1 z-3 shadow-sm">
+                            <span class="spinner-grow spinner-grow-sm text-light" style="animation-duration: 1.5s;"></span> LIVE
+                        </span>
+                    </div>
+                    <div class="card-body bg-light text-dark p-3">
+                        <h5 class="card-title mb-1 fs-6 text-uppercase fw-bold text-secondary">TLID00004</h5>
+                        <p class="card-text fw-semibold m-0">Sungai Dua</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-xl-4 cctv-card-wrapper" data-location="Sungai Petani">
+                <div class="card h-100 shadow-sm border-0 bg-dark text-white overflow-hidden position-relative">
+                    <div class="video-container position-relative" style="cursor: pointer;" onclick="toggleFullScreen(this)">
+                        <video class="w-100 d-block" autoplay loop muted playsinline preload="auto">
+                            <source src="streaming-videos/sungaiPetani.mp4" type="video/mp4">
+                        </video>
+                        <span class="position-absolute top-0 end-0 m-3 badge bg-danger d-flex align-items-center gap-1 z-3 shadow-sm">
+                            <span class="spinner-grow spinner-grow-sm text-light" style="animation-duration: 1.5s;"></span> LIVE
+                        </span>
+                    </div>
+                    <div class="card-body bg-light text-dark p-3">
+                        <h5 class="card-title mb-1 fs-6 text-uppercase fw-bold text-secondary">TLID00005</h5>
+                        <p class="card-text fw-semibold m-0">Sungai Petani</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <footer>
+        <footer class="mt-5">
             <p class="text-center">&copy; 2026 PLUS HIGHWAYS SDN. BHD. All rights reserved.</p>
         </footer>
     </div>
+
+<script>
+        // Efficient play trigger once window resources are ready
+        window.addEventListener("load", () => {
+            document.querySelectorAll("video").forEach(video => {
+                video.play().catch(() => { /* Silent catch if browser policies block */ });
+            });
+        });
+
+        // Click to Toggle Native Fullscreen View
+        function toggleFullScreen(element) {
+            const videoElement = element.querySelector('video');
+
+            if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+                if (videoElement.requestFullscreen) {
+                    videoElement.requestFullscreen();
+                } else if (videoElement.webkitRequestFullscreen) { /* Safari */
+                    videoElement.webkitRequestFullscreen();
+                } else if (videoElement.msRequestFullscreen) { /* IE11 */
+                    videoElement.msRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+    </script>
 
     <!-- Bootstrap JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
