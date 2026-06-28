@@ -185,8 +185,9 @@
 
                         sessionStorage.setItem('positionID', staffData.positionID || '');
                         sessionStorage.setItem('loginUser', staffData.staffID || '');
+                        sessionStorage.setItem('fullName', staffData.fullName || '');
 
-                        window.location.href = "profile-info.html";
+                        window.location.href = "user-management/profile-info.html";
                         return;
                     }
 
