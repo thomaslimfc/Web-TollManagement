@@ -40,7 +40,10 @@ function enforceSidebarLinks(currentRoleID) {
 
 // 3. Master Page Guard Logic Engine
 function checkPageAuthorization() {
-    let currentRoleID = sessionStorage.getItem('positionID');
+    let currentRoleID = localStorage.getItem('positionID');
+    let localFullName = localStorage.getItem('fullName');
+    let localStaffID = localStorage.getItem('staffID');
+    // let currentRoleID = sessionStorage.getItem('positionID');
     
     // Extract current clean file name from location path (e.g., "user-management.html")
     const fullPath = window.location.pathname;
@@ -120,17 +123,17 @@ function initApp() {
     const loginUser = document.getElementById("profile-name");
     
     // Fetch the individual pieces from session storage
-    const sessionFullName = sessionStorage.getItem("fullName");
-    const sessionStaffID = sessionStorage.getItem("loginUser");
+    const localFullName = sessionStorage.getItem("fullName");
+    const localStaffID = sessionStorage.getItem("loginUser");
 
     // Verify the UI element exists and we have at least the full name
-    if (loginUser && sessionFullName) {
-        if (sessionStaffID) {
+    if (loginUser && localFullName) {
+        if (localStaffID) {
             // Formats exactly to: Full Name (ID12345)
-            loginUser.textContent = `${sessionFullName} (${sessionStaffID})`;
+            loginUser.textContent = `${localFullName} (${localStaffID})`;
         } else {
             // Fallback if staffID isn't found for some reason
-            loginUser.textContent = sessionFullName;
+            loginUser.textContent = localFullName;
         }
     }
 }

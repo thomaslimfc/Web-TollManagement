@@ -187,6 +187,10 @@
                         sessionStorage.setItem('loginUser', staffData.staffID || '');
                         sessionStorage.setItem('fullName', staffData.fullName || '');
 
+                        localStorage.setItem('positionID', staffData.positionID || '');
+                        localStorage.setItem('loginUser', staffData.staffID || '');
+                        localStorage.setItem('fullName', staffData.fullName || '');
+
                         window.location.href = "user-management/profile-info.html";
                         return;
                     }

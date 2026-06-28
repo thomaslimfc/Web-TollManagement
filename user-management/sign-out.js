@@ -9,11 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // 1. Terminate native structural link jumping behaviors safely
             e.preventDefault();
 
-            // 2. Clear out all position tracking keys inside the active Session Engine
+            localStorage.clear();
             sessionStorage.clear(); 
-            // sessionStorage.removeItem('positionID');
-            // sessionStorage.removeItem('loginUser');
-            // alert("Session cleared");
 
             window.location.href = "/sign-in.html"; 
         });
