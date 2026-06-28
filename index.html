@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLUS Highways System Gateway</title>
+
+    <meta http-equiv="refresh" content="0;url=sign-in.html">
+
+    <script>
+        // Performs a replacement redirect so the user cannot click "Back" to this blank page
+        window.location.replace("sign-in.html");
+    </script>
+</head>
+
+<body style="background-color: #f8f9fa;">
+</body>
+
+<script>
+    // 4. Runtime Lifecycle Initialization Trigger
+    function initApp() {
+        // A. Run your security validation layer first
+        checkPageAuthorization();
+
+        // B. Safely locate the placeholder container inside the dropdown link
+        const profileSpan = document.getElementById("profile-name");
+
+        // Fetch the stored workspace parameters from session memory
+        const sessionFullName = sessionStorage.getItem("fullName");
+        const sessionStaffID = sessionStorage.getItem("staffID");
+
+        // Render the data cleanly if the layout element exists
+        if (profileSpan && sessionFullName) {
+            if (sessionStaffID) {
+                // Formats to: John Doe (STF12345)
+                profileSpan.textContent = `${sessionFullName} (${sessionStaffID})`;
+            } else {
+                // Fallback string if staffID is missing
+                profileSpan.textContent = sessionFullName;
+            }
+        }
+
+        // C. Bind your Sign Out event engine
+        const signOutBtn = document.getElementById('signOutBtn');
+        if (signOutBtn) {
+            signOutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                sessionStorage.clear();
+                const rootPrefix = getProjectRootPrefix();
+                window.location.href = `${rootPrefix}sign-in.html`;
+            });
+        }
+    }
+
+    // Lifecycle monitor deployment
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initApp);
+    } else {
+        initApp();
+    }
+</script>
+
+</html>
