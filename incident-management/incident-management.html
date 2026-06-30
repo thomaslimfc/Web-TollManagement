@@ -117,7 +117,7 @@
     <div class="main-content" id="mainContent">
         <div class="mb-3">
             <h1>Incident Management</h1>
-            <p class="mb-0">Real-time monitoring of highway operations and performance metrics.</p>
+            <p class="mb-0">Real-time monitoring of highway operations and dispatch assignments.</p>
         </div>
 
         <div class="row g-3 mb-4">
@@ -152,7 +152,7 @@
                 <div class="card border-0 shadow-sm mb-4">
                     <div class="card-header bg-white py-3 border-bottom border-light">
                         <h5 class="card-title mb-0 fw-bold text-danger d-flex align-items-center gap-2">
-                            <i class="bi bi-exclamation-octagon-fill"></i> Current Pending Incidents (All-Time)
+                            <i class="bi bi-exclamation-octagon-fill"></i> Current Active Incidents (All-Time)
                         </h5>
                     </div>
                     <div class="card-body p-0">
@@ -167,8 +167,8 @@
                                             style="cursor: pointer;">Incident Type <i
                                                 class="bi bi-arrow-down-up sort-icon" id="icon-active-type"></i></th>
                                         <th class="sortable-header" data-table="active" data-sort-key="priority"
-                                            style="cursor: pointer;">Priority Level <i
-                                                class="bi bi-arrow-down-up sort-icon" id="icon-active-priority"></i>
+                                            style="cursor: pointer;">Priority <i class="bi bi-arrow-down-up sort-icon"
+                                                id="icon-active-priority"></i>
                                         </th>
                                         <th class="sortable-header" data-table="active" data-sort-key="location"
                                             style="cursor: pointer;">Highway Location <i
@@ -178,9 +178,10 @@
                                             style="cursor: pointer;">Log Entry Time <i
                                                 class="bi bi-arrow-down-up sort-icon" id="icon-active-createdAt"></i>
                                         </th>
-                                        <th class="sortable-header" data-table="active" data-sort-key="status"
-                                            style="cursor: pointer;">Operational Status <i
-                                                class="bi bi-arrow-down-up sort-icon" id="icon-active-status"></i></th>
+                                        <th class="sortable-header" data-table="active" data-sort-key="assignedTo"
+                                            style="cursor: pointer;">Operational Assignment <i
+                                                class="bi bi-arrow-down-up sort-icon" id="icon-active-assignedTo"></i>
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody id="activeTableBody">
@@ -196,7 +197,9 @@
                         </div>
                     </div>
                 </div>
+            </div>
 
+            <div class="col-12">
                 <div class="card border-0 shadow-sm">
                     <div
                         class="card-header bg-white py-3 border-bottom border-light d-flex justify-content-between align-items-center flex-wrap gap-3">
@@ -225,8 +228,8 @@
                                             style="cursor: pointer;">Incident Type <i
                                                 class="bi bi-arrow-down-up sort-icon" id="icon-range-type"></i></th>
                                         <th class="sortable-header" data-table="range" data-sort-key="priority"
-                                            style="cursor: pointer;">Priority Level <i
-                                                class="bi bi-arrow-down-up sort-icon" id="icon-range-priority"></i></th>
+                                            style="cursor: pointer;">Priority <i class="bi bi-arrow-down-up sort-icon"
+                                                id="icon-range-priority"></i></th>
                                         <th class="sortable-header" data-table="range" data-sort-key="location"
                                             style="cursor: pointer;">Highway Location <i
                                                 class="bi bi-arrow-down-up sort-icon" id="icon-range-location"></i></th>
@@ -234,9 +237,10 @@
                                             style="cursor: pointer;">Log Entry Time <i
                                                 class="bi bi-arrow-down-up sort-icon" id="icon-range-createdAt"></i>
                                         </th>
-                                        <th class="sortable-header" data-table="range" data-sort-key="status"
-                                            style="cursor: pointer;">Operational Status <i
-                                                class="bi bi-arrow-down-up sort-icon" id="icon-range-status"></i></th>
+                                        <th class="sortable-header" data-table="range" data-sort-key="assignedTo"
+                                            style="cursor: pointer;">Operational Assignment <i
+                                                class="bi bi-arrow-down-up sort-icon" id="icon-range-assignedTo"></i>
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody id="rangeLogTableBody">
@@ -274,9 +278,10 @@
             const kpiRoadblocks = document.getElementById('kpiActiveRoadblocks');
             const kpiResolveRate = document.getElementById('kpiResolveRate');
 
-            // Dynamic State Storage Configuration
+            // Internal Data Storage States
             let rawActiveRecords = [];
             let rawRangeRecords = [];
+            let staffMap = {}; // Holds complete structural profiles mapped by staffID keys
 
             let sortState = {
                 active: { key: 'createdAt', order: 'desc' },
@@ -309,30 +314,80 @@
                 return `<span class="badge bg-secondary">${status || 'Unknown'}</span>`;
             }
 
+            // Enhanced Row Parsing supporting Dynamic Dropdown Cross-Check Verification Rules
             function generateRowHtml(item) {
+                const isUnassigned = !item.assignedTo || item.assignedTo.trim() === "";
+                const isResolved = ['resolved', 'closed'].includes(String(item.status).toLowerCase());
+                const incidentType = String(item.type || '').toLowerCase();
+
+                let dispatchActionHtml = "";
+
+                if (isResolved) {
+                    const staffName = staffMap[item.assignedTo]?.fullName || item.assignedTo;
+                    dispatchActionHtml = `
+                        <div>${getStatusBadge(item.status)}</div>
+                        <div class="small text-muted mt-1" style="font-size: 0.78rem;">
+                            <i class="bi bi-person-check-fill text-success me-1"></i> Resolved by: <strong>${staffName}</strong>
+                        </div>`;
+                } else if (isUnassigned) {
+                    let optionsHtml = `<option value="" selected disabled>Assign Staff...</option>`;
+
+                    // Cross-Check Verification: Identify emergency field operation types
+                    const isEmergencyType = ['sos', 'accident', 'roadblock'].includes(incidentType);
+
+                    if (isEmergencyType) {
+                        // Strict Enforcer Rule: Only allow positionID === "PID00002"
+                        let patrolStaffCount = 0;
+                        for (const [staffID, staffData] of Object.entries(staffMap)) {
+                            if (staffData.positionID === "PID00002") {
+                                optionsHtml += `<option value="${staffID}">${staffData.fullName} (${staffID})</option>`;
+                                patrolStaffCount++;
+                            }
+                        }
+                        if (patrolStaffCount === 0) {
+                            optionsHtml = `<option value="" selected disabled>No Patrol Officers Available</option>`;
+                        }
+                    } else {
+                        // Fallback option: Display alternative open administrative options for alternative incidents
+                        for (const [staffID, staffData] of Object.entries(staffMap)) {
+                            optionsHtml += `<option value="${staffID}">${staffData.fullName} (${staffID}) - ${staffData.positionName}</option>`;
+                        }
+                    }
+
+                    dispatchActionHtml = `
+                        <div class="mb-1">${getStatusBadge(item.status)}</div>
+                        <div class="input-group input-group-sm" style="max-width: 260px;">
+                            <select class="form-select form-select-sm assignment-select" data-alert-id="${item.emergencyAlertID || item.id}">
+                                ${optionsHtml}
+                            </select>
+                            <button class="btn btn-sm btn-dark btn-assign" type="button"><i class="bi bi-send-check"></i></button>
+                        </div>`;
+                } else {
+                    const staffName = staffMap[item.assignedTo]?.fullName || item.assignedTo;
+                    dispatchActionHtml = `
+                        <div class="mb-1">${getStatusBadge(item.status)}</div>
+                        <div class="small text-dark" style="font-size: 0.78rem;">
+                            <i class="bi bi-person-badge me-1"></i> Assigned To: <strong class="text-primary">${staffName}</strong>
+                        </div>`;
+                }
+
                 return `
-                <tr>
-                    <td class="text-secondary small fw-bold">${item.emergencyAlertID}</td>
-                    <td>
-                        <span class="badge bg-dark font-monospace px-2 py-1">${item.type || 'Incident'}</span>
-                        <div class="small text-muted mt-1" style="font-size: 0.78rem;">
-                            <i class="bi bi-megaphone me-1"></i> ${item.reportedBy || 'System'}
-                        </div>
-                    </td>
-                    <td>${getPriorityBadge(item.priority)}</td>
-                    <td class="fw-semibold text-dark"><i class="bi bi-geo-alt-fill text-muted me-1"></i>${item.location || 'Expressway (Main)'}</td>
-                    <td class="text-muted small">${formatTimestamp(item.rawCreatedAt)}</td>
-                    <td>
-                        ${getStatusBadge(item.status)}
-                        <div class="small text-muted mt-1" style="font-size: 0.78rem;">
-                            <i class="bi bi-person-badge me-1"></i> ${item.assignedTo || 'Unassigned'}
-                        </div>
-                    </td>
-                </tr>
-            `;
+                    <tr>
+                        <td class="text-secondary small fw-bold">${item.emergencyAlertID}</td>
+                        <td>
+                            <span class="badge bg-light text-dark border px-2 py-1 inquiry-category-badge">${item.type || 'Incident'}</span>
+                            <div class="small text-muted mt-1" style="font-size: 0.78rem;">
+                                <i class="bi bi-megaphone me-1"></i> Reported by: ${item.reportedBy || 'System'}
+                            </div>
+                        </td>
+                        <td>${getPriorityBadge(item.priority)}</td>
+                        <td class="text-secondary small"><i class="bi bi-geo-alt-fill text-muted me-1"></i>${item.location || 'Expressway (Main)'}</td>
+                        <td class="text-secondary small">${formatTimestamp(item.rawCreatedAt)}</td>
+                        <td>${dispatchActionHtml}</td>
+                    </tr>
+                `;
             }
 
-            // Universal alphanumeric/timestamp sorter function
             function sortArray(array, config) {
                 return array.sort((a, b) => {
                     let valA = a[config.key];
@@ -366,7 +421,6 @@
                 }
             }
 
-            // Render functions parsing local state to visual tables
             function renderActiveTable() {
                 if (rawActiveRecords.length === 0) {
                     activeTableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted"><i class="bi bi-check-circle text-success me-1"></i> No active incidents right now.</td></tr>`;
@@ -387,11 +441,10 @@
                 rangeLogTableBody.innerHTML = sorted.map(item => generateRowHtml(item)).join('');
                 updateSortIcons('range');
 
-                // Calculate exact resolve rate metric
                 kpiResolveRate.textContent = totalInWindow > 0 ? `${Math.round((resolvedInWindow / totalInWindow) * 100)}%` : '0%';
             }
 
-            // Configure default boundaries
+            // Configure Default Range Filters Bound to Server Clock
             const todayLocal = new Date();
             const todayString = `${todayLocal.getFullYear()}-${String(todayLocal.getMonth() + 1).padStart(2, '0')}-${String(todayLocal.getDate()).padStart(2, '0')}`;
             startInput.value = todayString;
@@ -400,7 +453,34 @@
             try {
                 const { db } = await initializeFirebase();
 
-                // 1. Live stream binding for Global Unresolved entries
+                // 1. Compile Structural Map Index across Multi-Collections on Startup
+                async function loadStaffAndPositions() {
+                    try {
+                        const positionSnapshot = await db.collection("position").get();
+                        const positionsCache = {};
+                        positionSnapshot.forEach(doc => {
+                            const data = doc.data();
+                            positionsCache[data.positionID] = data.positionName;
+                        });
+
+                        const staffSnapshot = await db.collection("staff").where("status", "==", "Active").get();
+                        staffMap = {};
+
+                        staffSnapshot.forEach(doc => {
+                            const data = doc.data();
+                            staffMap[data.staffID] = {
+                                fullName: data.fullName,
+                                positionID: data.positionID,
+                                positionName: positionsCache[data.positionID] || "Staff Member"
+                            };
+                        });
+                        console.log("Operational Staff validation dictionary generated successfully.");
+                    } catch (err) {
+                        console.error("Critical Failure initializing entity relational caching mapping collections:", err);
+                    }
+                }
+
+                // 2. Realtime Continuous Sync Pipeline for Active Incidents
                 function streamGlobalActive() {
                     unsubscribeActiveStream = db.collection("emergencyAlert")
                         .onSnapshot((snapshot) => {
@@ -416,6 +496,7 @@
 
                                 if (status !== 'resolved' && status !== 'closed') {
                                     rawActiveRecords.push({
+                                        id: doc.id,
                                         emergencyAlertID: data.emergencyAlertID || doc.id,
                                         rawCreatedAt: data.createdAt,
                                         ...data
@@ -433,12 +514,11 @@
 
                             renderActiveTable();
                         }, (error) => {
-                            console.error("Active Sync Error:", error);
-                            activeTableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-danger">Failed to sync live data.</td></tr>`;
+                            console.error("Active Stream Sync Error:", error);
                         });
                 }
 
-                // 2. Live stream binding for Timeline tracking entries
+                // 3. Realtime Boundary Filtered Query Stream
                 function streamRangeLog() {
                     if (unsubscribeRangeStream) unsubscribeRangeStream();
 
@@ -466,6 +546,7 @@
                                 }
 
                                 rawRangeRecords.push({
+                                    id: doc.id,
                                     emergencyAlertID: data.emergencyAlertID || doc.id,
                                     rawCreatedAt: data.createdAt,
                                     ...data
@@ -474,14 +555,47 @@
 
                             renderRangeTable(totalInWindow, resolvedInWindow);
                         }, (error) => {
-                            console.error("Range Window Sync Error:", error);
+                            console.error("Historical Range Sync Error:", error);
                         });
                 }
+
+                // Dynamic Global Click Dispatch Update Event Delegation Handler
+                document.addEventListener('click', async (e) => {
+                    const btn = e.target.closest('.btn-assign');
+                    if (btn) {
+                        const inputGroup = btn.closest('.input-group');
+                        const selectEl = inputGroup.querySelector('.assignment-select');
+                        const alertId = selectEl.getAttribute('data-alert-id');
+                        const selectedStaffId = selectEl.value;
+
+                        if (!selectedStaffId) {
+                            alert("Please assign a valid tactical field team member unit first.");
+                            return;
+                        }
+
+                        try {
+                            btn.disabled = true;
+                            btn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status"></span>`;
+
+                            // Execute Atomic Write Update operation into remote target Firestore reference document
+                            await db.collection("emergencyAlert").doc(alertId).update({
+                                assignedTo: selectedStaffId,
+                                status: "in progress"
+                            });
+
+                        } catch (error) {
+                            console.error("Write update transaction failed:", error);
+                            alert("Assignment write failed: " + error.message);
+                            btn.disabled = false;
+                            btn.innerHTML = `<i class="bi bi-send-check"></i>`;
+                        }
+                    }
+                });
 
                 startInput.addEventListener('change', streamRangeLog);
                 endInput.addEventListener('change', streamRangeLog);
 
-                // Universal event listener delegator assigned to sortable table headers
+                // Column Sorter Header Click Event Handler Configuration
                 document.querySelectorAll('.sortable-header').forEach(header => {
                     header.addEventListener('click', () => {
                         const tableName = header.getAttribute('data-table');
@@ -498,7 +612,6 @@
                         if (tableName === 'active') {
                             renderActiveTable();
                         } else {
-                            // Re-render historical data using current array cache states
                             const total = rawRangeRecords.length;
                             const resolved = rawRangeRecords.filter(r => ['resolved', 'closed'].includes(String(r.status).toLowerCase())).length;
                             renderRangeTable(total, resolved);
@@ -506,11 +619,13 @@
                     });
                 });
 
+                // Execution Chain Pipeline Starts
+                await loadStaffAndPositions();
                 streamGlobalActive();
                 streamRangeLog();
 
             } catch (err) {
-                console.error("Core Runtime Exception Encountered:", err);
+                console.error("Core Module Runtime Error:", err);
             }
         });
     </script>
