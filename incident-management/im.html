@@ -4,11 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
     <title>Incident Management Center</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <script src="incident-management.js"></script>
     
     <style>
         body {
@@ -21,333 +22,187 @@
             color: white;
         }
 
-        .map-placeholder {
-            height: 400px;
-            background: #e9ecef;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: #6c757d;
-        }
-
         .section-title {
             font-weight: 600;
             margin-bottom: 12px;
+            color: #333;
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
     </style>
-
 </head>
 
 <body>
 
-        <header class="navbar navbar-expand-lg navbar-dark bg-light fixed-top">
-        <div class="container-fluid">
-            <button class="navbar-toggler sidebar-toggler d-lg-none me-2" type="button" style="display: none;">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <a class="navbar-brand" href="#">
-                <img src="../images/plus-logo.png" alt="PLUS HIGHWAYS" height="40">
-            </a>
-
-            <div class="ms-auto d-flex align-items-center">
-                <div class="dropdown">
-                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
-                        id="dropdownUser" data-bs-toggle="dropdown">
-                        <img src="../images/profile-icon.png" alt="Profile" width="32" height="32"
-                            class="rounded-circle me-2">
-                        <span>Admin</span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="../user-management/profile-info.html">Profile</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li><a class="dropdown-item" href="#">Sign out</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </header>
-
-        <div class="sidebar" id="sidebar">
-        <ul class="nav flex-column">
-            <li class="nav-item" data-roles="PID00003">
-                <a class="nav-link active" href="../user-management/user-management.html">
-                    <i class="bi bi-people"></i> User Management
-                </a>
-            </li>
-            <li class="nav-item" data-roles="PID00001, PID00003">
-                <a class="nav-link" href="../toll-rates/toll-rates.html">
-                    <i class="bi bi-cash-coin"></i> Toll Tariff
-                </a>
-            </li>
-            <li class="nav-item" data-roles="PID00001, PID00002, PID00003">
-                <a class="nav-link" href="../license-plate-entry-exit/license-plate-entry-exit.html">
-                    <i class="bi bi-car-front"></i> License Plate Entry/Exit
-                </a>
-            </li>
-            <li class="nav-item" data-roles="PID00001, PID00002, PID00003">
-                <a class="nav-link" href="../cctv-streaming/cctv-streaming.html">
-                    <i class="bi bi-camera-video"></i> CCTV Streaming
-                </a>
-            </li>
-            <li class="nav-item" data-roles="PID00001, PID00002, PID00003">
-                <a class="nav-link" href="../weather-data/weather-data.html">
-                    <i class="bi bi-cloud-sun"></i> Weather Data
-                </a>
-            </li>
-            <li class="nav-item" data-roles="PID00001, PID00002, PID00003">
-                <a class="nav-link" href="../incident-management/incident-management.html">
-                    <i class="bi bi-exclamation-triangle"></i> Incident Management
-                </a>
-            </li>
-            <li class="nav-item" data-roles="PID00001, PID00003">
-                <a class="nav-link" href="../vehicle-verifications/vehicle-verifications.html">
-                    <i class="bi bi-shield-check"></i> Vehicle Verifications
-                </a>
-            </li>
-            <li class="nav-item" data-roles="PID00001, PID00003">
-                <a class="nav-link" href="../revenue-management/revenue-management.html">
-                    <i class="bi bi-graph-up-arrow"></i> Revenue Management
-                </a>
-            </li>
-            <li class="nav-item" data-roles="PID00001, PID00002, PID00003">
-                <a class="nav-link" href="../inquiry-reply/inquiry-reply.html">
-                    <i class="bi bi-chat-left-text"></i> Inquiry Reply
-                </a>
-            </li>
-        </ul>
-    </div>
-
-    <!-- NAVBAR -->
     <nav class="navbar navbar-dark bg-dark px-3">
         <span class="navbar-brand">
-            <i class="bi bi-exclamation-triangle-fill"></i>
+            <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>
             Incident Management Center
         </span>
         <div>
-            <button class="btn btn-outline-light btn-sm">Live</button>
+            <button class="btn btn-outline-light btn-sm" id="connectionStatusBtn">
+                Connecting...
+            </button>
         </div>
     </nav>
 
     <div class="container-fluid mt-4">
 
-        <!-- KPI CARDS -->
-        <div class="row g-3">
-
-            <div class="col-md-2">
+        <div class="row g-3 mb-4">
+            <div class="col-md-2 col-sm-4">
                 <div class="card kpi-card bg-danger p-3">
-                    <div>Active SOS</div>
-                    <h3>5</h3>
+                    <div class="text-white-50 small text-uppercase fw-bold">Active SOS</div>
+                    <h3 class="fw-bold mb-0" id="kpiActiveSos">-</h3>
                 </div>
             </div>
 
-            <div class="col-md-2">
+            <div class="col-md-2 col-sm-4">
                 <div class="card kpi-card bg-warning p-3 text-dark">
-                    <div>Congestion</div>
-                    <h3>12</h3>
+                    <div class="text-dark-50 small text-uppercase fw-bold">Congestion</div>
+                    <h3 class="fw-bold mb-0" id="kpiCongestion">-</h3>
                 </div>
             </div>
 
-            <div class="col-md-2">
+            <div class="col-md-2 col-sm-4">
                 <div class="card kpi-card bg-primary p-3">
-                    <div>Accidents</div>
-                    <h3>3</h3>
+                    <div class="text-white-50 small text-uppercase fw-bold">Accidents</div>
+                    <h3 class="fw-bold mb-0" id="kpiAccidents">-</h3>
                 </div>
             </div>
 
-            <div class="col-md-2">
+            <div class="col-md-2 col-sm-4">
                 <div class="card kpi-card bg-info p-3">
-                    <div>Weather Alerts</div>
-                    <h3>4</h3>
+                    <div class="text-white-50 small text-uppercase fw-bold">Weather Alerts</div>
+                    <h3 class="fw-bold mb-0" id="kpiWeather">-</h3>
                 </div>
             </div>
 
-            <div class="col-md-2">
+            <div class="col-md-2 col-sm-4">
                 <div class="card kpi-card bg-secondary p-3">
-                    <div>Roadblocks</div>
-                    <h3>2</h3>
+                    <div class="text-white-50 small text-uppercase fw-bold">Roadblocks</div>
+                    <h3 class="fw-bold mb-0" id="kpiRoadblocks">-</h3>
                 </div>
             </div>
 
-            <div class="col-md-2">
+            <div class="col-md-2 col-sm-4">
                 <div class="card kpi-card bg-success p-3">
-                    <div>Resolved</div>
-                    <h3>18</h3>
+                    <div class="text-white-50 small text-uppercase fw-bold">Resolved</div>
+                    <h3 class="fw-bold mb-0" id="kpiResolved">-</h3>
                 </div>
             </div>
-
         </div>
 
-        <!-- MAP + FILTER -->
-        <div class="row mt-4 g-3">
+        <div class="row g-4">
+            
+            <div class="col-lg-9 col-md-8">
+                
+                <div class="row g-4">
+                    <div class="col-12 col-xl-6">
+                        <div class="section-title">
+                            <i class="bi bi-shield-fill-exclamation text-danger me-2"></i>Emergency (SOS & Accidents)
+                        </div>
+                        <div class="card overflow-hidden">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-danger">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Type</th>
+                                            <th>Priority</th>
+                                            <th>Location</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="emergencyTableBody">
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted py-4">Awaiting real-time stream updates...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
 
-            <div class="col-md-8">
-                <div class="section-title">Live Incident Map</div>
-                <div class="map-placeholder">
-                    MAP VIEW (Google Maps / Leaflet Integration)
+                    <div class="col-12 col-xl-6">
+                        <div class="section-title">
+                            <i class="bi bi-car-front-fill text-warning me-2"></i>Traffic Analytics & Congestion
+                        </div>
+                        <div class="card overflow-hidden">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-warning">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Type</th>
+                                            <th>Priority</th>
+                                            <th>Location</th>
+                                            <th>Flow Metrics</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="trafficTableBody">
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted py-4">Awaiting analytical vehicle data...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="section-title"><i class="bi bi-clock-history me-2"></i>Incident Timeline & Weather Snapshots</div>
+                        <div class="card p-3">
+                            <ul class="list-group list-group-flush" id="timelineContainer">
+                                <li class="list-group-item text-center text-muted py-3">No data loaded.</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
+
             </div>
 
-            <div class="col-md-4">
-
-                <div class="section-title">Filters</div>
-
+            <div class="col-lg-3 col-md-4">
+                <div class="section-title"><i class="bi bi-sliders me-2"></i>Control Filters</div>
+                
                 <div class="card p-3 mb-3">
-                    <label class="form-label">Priority</label>
-                    <select class="form-select">
-                        <option>All</option>
-                        <option>Critical</option>
-                        <option>High</option>
-                        <option>Medium</option>
-                        <option>Low</option>
+                    <label class="form-label fw-bold small text-uppercase text-muted">Priority Level</label>
+                    <select class="form-select" id="filterPriority">
+                        <option value="ALL">All Priorities</option>
+                        <option value="HIGH">HIGH Only</option>
+                        <option value="MED">MED Only</option>
+                        <option value="LOW">LOW Only</option>
                     </select>
                 </div>
 
                 <div class="card p-3">
-                    <label class="form-label">Type</label>
+                    <label class="form-label fw-bold small text-uppercase text-muted mb-3">Alert Type</label>
 
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" checked>
-                        <label class="form-check-label">Emergency (SOS)</label>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input filter-type" type="checkbox" id="checkEmergency" value="emergency" checked>
+                        <label class="form-check-label" for="checkEmergency">Emergency (SOS / Accident)</label>
                     </div>
 
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" checked>
-                        <label class="form-check-label">Traffic Congestion</label>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input filter-type" type="checkbox" id="checkCongestion" value="congestion" checked>
+                        <label class="form-check-label" for="checkCongestion">Traffic Bottlenecks</label>
                     </div>
 
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox">
-                        <label class="form-check-label">Weather Alerts</label>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input filter-type" type="checkbox" id="checkWeather" value="weather" checked>
+                        <label class="form-check-label" for="checkWeather">Weather Monitoring</label>
                     </div>
-
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox">
-                        <label class="form-check-label">System Alerts</label>
-                    </div>
-
                 </div>
-
             </div>
 
         </div>
-
-        <!-- INCIDENT TABLES -->
-        <div class="row mt-4 g-3">
-
-            <!-- EMERGENCY -->
-            <div class="col-md-6">
-                <div class="section-title">Emergency (SOS & Accidents)</div>
-
-                <div class="card">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-danger">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Type</th>
-                                    <th>Location</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>SOS001</td>
-                                    <td>Breakdown</td>
-                                    <td>Penang Bridge</td>
-                                    <td><span class="badge bg-warning">Dispatching</span></td>
-                                </tr>
-                                <tr>
-                                    <td>ACC002</td>
-                                    <td>Accident</td>
-                                    <td>Juru Toll</td>
-                                    <td><span class="badge bg-danger">Critical</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TRAFFIC -->
-            <div class="col-md-6">
-                <div class="section-title">Traffic & Congestion</div>
-
-                <div class="card">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-warning">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Type</th>
-                                    <th>Location</th>
-                                    <th>Level</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>TRF001</td>
-                                    <td>Congestion</td>
-                                    <td>Penang Bridge</td>
-                                    <td><span class="badge bg-warning text-dark">High</span></td>
-                                </tr>
-                                <tr>
-                                    <td>TRF002</td>
-                                    <td>Roadblock</td>
-                                    <td>Sungai Dua</td>
-                                    <td><span class="badge bg-secondary">Medium</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
-
-        <!-- ACTIVITY LOG -->
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="section-title">Incident Timeline</div>
-
-                <div class="card p-3">
-
-                    <ul class="list-group list-group-flush">
-
-                        <li class="list-group-item">
-                            <i class="bi bi-exclamation-circle text-danger"></i>
-                            10:01 Accident reported at Juru Toll
-                        </li>
-
-                        <li class="list-group-item">
-                            <i class="bi bi-person-check text-primary"></i>
-                            10:03 SOS request received
-                        </li>
-
-                        <li class="list-group-item">
-                            <i class="bi bi-truck text-warning"></i>
-                            10:12 Tow truck dispatched
-                        </li>
-
-                        <li class="list-group-item">
-                            <i class="bi bi-check-circle text-success"></i>
-                            10:25 Incident resolved
-                        </li>
-
-                    </ul>
-
-                </div>
-
-            </div>
-        </div>
-
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
 </body>
 
 </html>
