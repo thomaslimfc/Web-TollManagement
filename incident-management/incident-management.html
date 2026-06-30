@@ -20,9 +20,11 @@
             color: white;
             transition: transform 0.2s;
         }
+
         .kpi-card:hover {
             transform: translateY(-3px);
         }
+
         .section-title {
             font-weight: 600;
             margin-bottom: 15px;
@@ -46,12 +48,15 @@
                 <div class="dropdown">
                     <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
                         id="dropdownUser" data-bs-toggle="dropdown">
-                        <img src="../images/profile-icon.png" alt="Profile" width="32" height="32" class="rounded-circle me-2">
+                        <img src="../images/profile-icon.png" alt="Profile" width="32" height="32"
+                            class="rounded-circle me-2">
                         <span id="profile-name">Loading...</span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li><a class="dropdown-item" href="../user-management/profile-info.html">Profile</a></li>
-                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
                         <li><a class="dropdown-item" href="#" id="signOutBtn">Sign out</a></li>
                     </ul>
                 </div>
@@ -110,25 +115,9 @@
     </div>
 
     <div class="main-content" id="mainContent">
-        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-3">
-            <div>
-                <h1>Incident Management</h1>
-                <p class="mb-0">Real-time monitoring of incidents and emergencies.</p>
-            </div>
-            
-            <div class="d-flex flex-wrap align-items-center gap-3 ms-auto">
-                <div class="d-flex align-items-center gap-2">
-                    <span class="text-secondary small text-nowrap">
-                        <i class="bi bi-calendar-range"></i> Duration:
-                    </span>
-                    <input type="date" class="form-control form-control-sm" id="startDateFilter" style="width: 140px;">
-                    <span class="text-muted small">to</span>
-                    <input type="date" class="form-control form-control-sm" id="endDateFilter" style="width: 140px;">
-                </div>
-                <button type="button" class="btn btn-sm btn-primary d-flex align-items-center gap-1 fw-medium" id="btnExportPDF">
-                    <i class="bi bi-file-earmark-pdf-fill"></i> Export PDF
-                </button>
-            </div>
+        <div class="mb-3">
+            <h1>Incident Management</h1>
+            <p class="mb-0">Real-time monitoring of highway operations and performance metrics.</p>
         </div>
 
         <div class="row g-3 mb-4">
@@ -141,18 +130,18 @@
             <div class="col-6 col-lg-3">
                 <div class="card kpi-card bg-warning text-dark p-3 shadow-sm">
                     <div class="text-dark-50 small text-uppercase fw-bold">Active Accidents</div>
-                    <h3 class="fw-bold mb-0 text-dark" id="kpiAccidents">0</h3>
+                    <h3 class="fw-bold mb-0 text-dark" id="kpiActiveAccidents">0</h3>
                 </div>
             </div>
             <div class="col-6 col-lg-3">
                 <div class="card kpi-card bg-primary p-3 shadow-sm">
                     <div class="text-white-50 small text-uppercase fw-bold">Active Roadblocks</div>
-                    <h3 class="fw-bold mb-0" id="kpiRoadblocks">0</h3>
+                    <h3 class="fw-bold mb-0" id="kpiActiveRoadblocks">0</h3>
                 </div>
             </div>
             <div class="col-6 col-lg-3">
                 <div class="card kpi-card bg-success p-3 shadow-sm">
-                    <div class="text-white-50 small text-uppercase fw-bold">Incident Resolve Rate</div>
+                    <div class="text-white-50 small text-uppercase fw-bold">Incident Resolve Rate (Filtered)</div>
                     <h3 class="fw-bold mb-0" id="kpiResolveRate">0%</h3>
                 </div>
             </div>
@@ -160,10 +149,10 @@
 
         <div class="row g-4">
             <div class="col-12">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-white py-3 border-bottom border-light d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-0 fw-bold text-dark d-flex align-items-center gap-2">
-                            <i class="bi bi-shield-fill-exclamation text-danger"></i> Emergency Incidents Log
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3 border-bottom border-light">
+                        <h5 class="card-title mb-0 fw-bold text-danger d-flex align-items-center gap-2">
+                            <i class="bi bi-exclamation-octagon-fill"></i> Current Pending Incidents (All-Time)
                         </h5>
                     </div>
                     <div class="card-body p-0">
@@ -171,19 +160,91 @@
                             <table class="table table-hover table-striped align-middle mb-0 text-nowrap">
                                 <thead class="table-light text-secondary uppercase font-weight-bold small">
                                     <tr>
-                                        <th>Alert ID</th>
-                                        <th>Incident Type</th>
-                                        <th>Priority Level</th>
-                                        <th>Highway Location</th>
-                                        <th>Log Entry Time</th>
-                                        <th>Operational Status</th>
+                                        <th class="sortable-header" data-table="active" data-sort-key="emergencyAlertID"
+                                            style="cursor: pointer;">Alert ID <i class="bi bi-arrow-down-up sort-icon"
+                                                id="icon-active-emergencyAlertID"></i></th>
+                                        <th class="sortable-header" data-table="active" data-sort-key="type"
+                                            style="cursor: pointer;">Incident Type <i
+                                                class="bi bi-arrow-down-up sort-icon" id="icon-active-type"></i></th>
+                                        <th class="sortable-header" data-table="active" data-sort-key="priority"
+                                            style="cursor: pointer;">Priority Level <i
+                                                class="bi bi-arrow-down-up sort-icon" id="icon-active-priority"></i>
+                                        </th>
+                                        <th class="sortable-header" data-table="active" data-sort-key="location"
+                                            style="cursor: pointer;">Highway Location <i
+                                                class="bi bi-arrow-down-up sort-icon" id="icon-active-location"></i>
+                                        </th>
+                                        <th class="sortable-header" data-table="active" data-sort-key="createdAt"
+                                            style="cursor: pointer;">Log Entry Time <i
+                                                class="bi bi-arrow-down-up sort-icon" id="icon-active-createdAt"></i>
+                                        </th>
+                                        <th class="sortable-header" data-table="active" data-sort-key="status"
+                                            style="cursor: pointer;">Operational Status <i
+                                                class="bi bi-arrow-down-up sort-icon" id="icon-active-status"></i></th>
                                     </tr>
                                 </thead>
-                                <tbody id="emergencyTableBody">
+                                <tbody id="activeTableBody">
                                     <tr>
                                         <td colspan="6" class="text-center py-4 text-muted">
-                                            <div class="spinner-border spinner-border-sm me-2 text-primary" role="status"></div>
-                                            Establishing Firebase real-time sync stream...
+                                            <div class="spinner-border spinner-border-sm me-2 text-danger"
+                                                role="status"></div>
+                                            Streaming active emergency issues...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm">
+                    <div
+                        class="card-header bg-white py-3 border-bottom border-light d-flex justify-content-between align-items-center flex-wrap gap-3">
+                        <h5 class="card-title mb-0 fw-bold text-dark d-flex align-items-center gap-2">
+                            <i class="bi bi-calendar-week-fill text-primary"></i> Timeline Logs & Performance
+                        </h5>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="text-secondary small text-nowrap"><i class="bi bi-calendar-range"></i>
+                                Range:</span>
+                            <input type="date" class="form-control form-control-sm" id="startDateFilter"
+                                style="width: 140px;">
+                            <span class="text-muted small">to</span>
+                            <input type="date" class="form-control form-control-sm" id="endDateFilter"
+                                style="width: 140px;">
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped align-middle mb-0 text-nowrap">
+                                <thead class="table-light text-secondary uppercase font-weight-bold small">
+                                    <tr>
+                                        <th class="sortable-header" data-table="range" data-sort-key="emergencyAlertID"
+                                            style="cursor: pointer;">Alert ID <i class="bi bi-arrow-down-up sort-icon"
+                                                id="icon-range-emergencyAlertID"></i></th>
+                                        <th class="sortable-header" data-table="range" data-sort-key="type"
+                                            style="cursor: pointer;">Incident Type <i
+                                                class="bi bi-arrow-down-up sort-icon" id="icon-range-type"></i></th>
+                                        <th class="sortable-header" data-table="range" data-sort-key="priority"
+                                            style="cursor: pointer;">Priority Level <i
+                                                class="bi bi-arrow-down-up sort-icon" id="icon-range-priority"></i></th>
+                                        <th class="sortable-header" data-table="range" data-sort-key="location"
+                                            style="cursor: pointer;">Highway Location <i
+                                                class="bi bi-arrow-down-up sort-icon" id="icon-range-location"></i></th>
+                                        <th class="sortable-header" data-table="range" data-sort-key="createdAt"
+                                            style="cursor: pointer;">Log Entry Time <i
+                                                class="bi bi-arrow-down-up sort-icon" id="icon-range-createdAt"></i>
+                                        </th>
+                                        <th class="sortable-header" data-table="range" data-sort-key="status"
+                                            style="cursor: pointer;">Operational Status <i
+                                                class="bi bi-arrow-down-up sort-icon" id="icon-range-status"></i></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="rangeLogTableBody">
+                                    <tr>
+                                        <td colspan="6" class="text-center py-4 text-muted">
+                                            <div class="spinner-border spinner-border-sm me-2 text-primary"
+                                                role="status"></div>
+                                            Awaiting date window selection parameters...
                                         </td>
                                     </tr>
                                 </tbody>
@@ -203,18 +264,27 @@
         import { initializeFirebase } from '/lib/firebase_init.js';
 
         document.addEventListener('DOMContentLoaded', async () => {
-            const tableBody = document.getElementById('emergencyTableBody');
+            const activeTableBody = document.getElementById('activeTableBody');
+            const rangeLogTableBody = document.getElementById('rangeLogTableBody');
             const startInput = document.getElementById('startDateFilter');
             const endInput = document.getElementById('endDateFilter');
 
-            // KPI Indicators Element Bindings
             const kpiSos = document.getElementById('kpiActiveSos');
-            const kpiAccidents = document.getElementById('kpiAccidents');
-            const kpiRoadblocks = document.getElementById('kpiRoadblocks');
+            const kpiAccidents = document.getElementById('kpiActiveAccidents');
+            const kpiRoadblocks = document.getElementById('kpiActiveRoadblocks');
             const kpiResolveRate = document.getElementById('kpiResolveRate');
 
-            // Active Snapshot stream unsubscribing reference hook
-            let unsubscribeStream = null;
+            // Dynamic State Storage Configuration
+            let rawActiveRecords = [];
+            let rawRangeRecords = [];
+
+            let sortState = {
+                active: { key: 'createdAt', order: 'desc' },
+                range: { key: 'createdAt', order: 'desc' }
+            };
+
+            let unsubscribeActiveStream = null;
+            let unsubscribeRangeStream = null;
 
             function formatTimestamp(timestamp) {
                 if (!timestamp) return 'N/A';
@@ -224,153 +294,223 @@
                 return String(timestamp);
             }
 
-            // Set up local calendar default string representation (YYYY-MM-DD)
-            const todayLocal = new Date();
-            const year = todayLocal.getFullYear();
-            const month = String(todayLocal.getMonth() + 1).padStart(2, '0');
-            const day = String(todayLocal.getDate()).padStart(2, '0');
-            const todayString = `${year}-${month}-${day}`;
+            function getPriorityBadge(priority) {
+                const p = String(priority || '').toUpperCase();
+                if (p === 'HIGH') return `<span class="badge bg-danger">HIGH</span>`;
+                if (p === 'MED' || p === 'MEDIUM') return `<span class="badge bg-warning text-dark">MED</span>`;
+                return `<span class="badge bg-secondary">LOW</span>`;
+            }
 
-            // Sync structural parameters inside layouts
+            function getStatusBadge(status) {
+                const s = String(status || '').toLowerCase();
+                if (s === 'active' || s === 'critical') return `<span class="badge bg-danger px-2.5 py-1.5 border">Active</span>`;
+                if (s === 'dispatching' || s === 'in progress') return `<span class="badge bg-warning text-dark px-2.5 py-1.5 border">In Progress</span>`;
+                if (s === 'resolved' || s === 'closed') return `<span class="badge bg-success px-2.5 py-1.5 border">Resolved</span>`;
+                return `<span class="badge bg-secondary">${status || 'Unknown'}</span>`;
+            }
+
+            function generateRowHtml(item) {
+                return `
+                <tr>
+                    <td class="text-secondary small fw-bold">${item.emergencyAlertID}</td>
+                    <td>
+                        <span class="badge bg-dark font-monospace px-2 py-1">${item.type || 'Incident'}</span>
+                        <div class="small text-muted mt-1" style="font-size: 0.78rem;">
+                            <i class="bi bi-megaphone me-1"></i> ${item.reportedBy || 'System'}
+                        </div>
+                    </td>
+                    <td>${getPriorityBadge(item.priority)}</td>
+                    <td class="fw-semibold text-dark"><i class="bi bi-geo-alt-fill text-muted me-1"></i>${item.location || 'Expressway (Main)'}</td>
+                    <td class="text-muted small">${formatTimestamp(item.rawCreatedAt)}</td>
+                    <td>
+                        ${getStatusBadge(item.status)}
+                        <div class="small text-muted mt-1" style="font-size: 0.78rem;">
+                            <i class="bi bi-person-badge me-1"></i> ${item.assignedTo || 'Unassigned'}
+                        </div>
+                    </td>
+                </tr>
+            `;
+            }
+
+            // Universal alphanumeric/timestamp sorter function
+            function sortArray(array, config) {
+                return array.sort((a, b) => {
+                    let valA = a[config.key];
+                    let valB = b[config.key];
+
+                    if (config.key === 'createdAt') {
+                        valA = a.rawCreatedAt?.seconds || 0;
+                        valB = b.rawCreatedAt?.seconds || 0;
+                    } else {
+                        valA = String(valA || '').toLowerCase();
+                        valB = String(valB || '').toLowerCase();
+                    }
+
+                    if (valA < valB) return config.order === 'asc' ? -1 : 1;
+                    if (valA > valB) return config.order === 'asc' ? 1 : -1;
+                    return 0;
+                });
+            }
+
+            function updateSortIcons(tableName) {
+                document.querySelectorAll(`.sortable-header[data-table="${tableName}"] .sort-icon`).forEach(icon => {
+                    icon.className = "bi bi-arrow-down-up sort-icon text-muted";
+                });
+
+                const current = sortState[tableName];
+                const activeIcon = document.getElementById(`icon-${tableName}-${current.key}`);
+                if (activeIcon) {
+                    activeIcon.className = current.order === 'asc'
+                        ? "bi bi-sort-alpha-down sort-icon text-primary"
+                        : "bi bi-sort-alpha-down-alt sort-icon text-primary";
+                }
+            }
+
+            // Render functions parsing local state to visual tables
+            function renderActiveTable() {
+                if (rawActiveRecords.length === 0) {
+                    activeTableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted"><i class="bi bi-check-circle text-success me-1"></i> No active incidents right now.</td></tr>`;
+                    return;
+                }
+                const sorted = sortArray([...rawActiveRecords], sortState.active);
+                activeTableBody.innerHTML = sorted.map(item => generateRowHtml(item)).join('');
+                updateSortIcons('active');
+            }
+
+            function renderRangeTable(totalInWindow, resolvedInWindow) {
+                if (rawRangeRecords.length === 0) {
+                    rangeLogTableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted"><i class="bi bi-info-circle me-1"></i> No activity entries recorded within this date selection window.</td></tr>`;
+                    kpiResolveRate.textContent = '0%';
+                    return;
+                }
+                const sorted = sortArray([...rawRangeRecords], sortState.range);
+                rangeLogTableBody.innerHTML = sorted.map(item => generateRowHtml(item)).join('');
+                updateSortIcons('range');
+
+                // Calculate exact resolve rate metric
+                kpiResolveRate.textContent = totalInWindow > 0 ? `${Math.round((resolvedInWindow / totalInWindow) * 100)}%` : '0%';
+            }
+
+            // Configure default boundaries
+            const todayLocal = new Date();
+            const todayString = `${todayLocal.getFullYear()}-${String(todayLocal.getMonth() + 1).padStart(2, '0')}-${String(todayLocal.getDate()).padStart(2, '0')}`;
             startInput.value = todayString;
             endInput.value = todayString;
 
             try {
                 const { db } = await initializeFirebase();
 
-                // Dynamic Firestore real-time processing stream generator
-                function establishIncidentStream() {
-                    // Tear down previous listeners to block memory leak duplications
-                    if (unsubscribeStream) {
-                        unsubscribeStream();
-                    }
-
-                    tableBody.innerHTML = `
-                        <tr>
-                            <td colspan="6" class="text-center py-4 text-muted">
-                                <div class="spinner-border spinner-border-sm me-2 text-primary" role="status"></div>
-                                Syncing selected operational records...
-                            </td>
-                        </tr>`;
-
-                    let startBoundary;
-                    let endBoundary;
-
-                    // Compute floor limitations based on selection context
-                    if (startInput.value === todayString) {
-                        // DEFAULT: 1:00 AM Today floor boundary logic
-                        startBoundary = new Date();
-                        startBoundary.setHours(1, 0, 0, 0);
-                    } else {
-                        // PAST SELECTION: Midnight floor rule
-                        startBoundary = new Date(startInput.value);
-                        startBoundary.setHours(0, 0, 0, 0);
-                    }
-
-                    // Always maximize window boundary up to 11:59:59.999 PM of selected end date
-                    endBoundary = new Date(endInput.value);
-                    endBoundary.setHours(23, 59, 59, 999);
-
-                    // Initialize stream attaching the target compound parameters
-                    unsubscribeStream = db.collection("emergencyAlert")
-                        .where("createdAt", ">=", startBoundary)
-                        .where("createdAt", "<=", endBoundary)
-                        .orderBy("createdAt", "desc")
+                // 1. Live stream binding for Global Unresolved entries
+                function streamGlobalActive() {
+                    unsubscribeActiveStream = db.collection("emergencyAlert")
                         .onSnapshot((snapshot) => {
-                            let rowsHtml = "";
+                            rawActiveRecords = [];
                             let counterSos = 0;
                             let counterAccident = 0;
                             let counterRoadblock = 0;
-                            let counterResolved = 0;
-                            let totalIncidents = 0;
 
                             snapshot.forEach((doc) => {
                                 const data = doc.data();
-                                totalIncidents++;
-
-                                const type = String(data.type || '').toLowerCase();
                                 const status = String(data.status || '').toLowerCase();
+                                const type = String(data.type || '').toLowerCase();
 
-                                if (status === 'resolved' || status === 'closed') {
-                                    counterResolved++;
-                                } else {
+                                if (status !== 'resolved' && status !== 'closed') {
+                                    rawActiveRecords.push({
+                                        emergencyAlertID: data.emergencyAlertID || doc.id,
+                                        rawCreatedAt: data.createdAt,
+                                        ...data
+                                    });
+
                                     if (type === 'sos') counterSos++;
                                     if (type === 'accident') counterAccident++;
                                     if (type === 'roadblock') counterRoadblock++;
                                 }
                             });
 
-                            const resolveRateText = totalIncidents > 0 
-                                ? `${Math.round((counterResolved / totalIncidents) * 100)}%` 
-                                : '0%';
-
                             kpiSos.textContent = counterSos;
                             kpiAccidents.textContent = counterAccident;
                             kpiRoadblocks.textContent = counterRoadblock;
-                            kpiResolveRate.textContent = resolveRateText;
 
-                            if (snapshot.empty) {
-                                tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted"><i class="bi bi-check-circle text-success me-1"></i> No matching records found for the selected timeline.</td></tr>`;
-                                return;
-                            }
-
-                            snapshot.forEach((doc) => {
-                                const item = doc.data();
-
-                                let priorityBadge = `<span class="badge bg-secondary">LOW</span>`;
-                                const p = String(item.priority || '').toUpperCase();
-                                if (p === 'HIGH') priorityBadge = `<span class="badge bg-danger">HIGH</span>`;
-                                if (p === 'MED' || p === 'MEDIUM') priorityBadge = `<span class="badge bg-warning text-dark">MED</span>`;
-
-                                let statusBadge = `<span class="badge bg-secondary">${item.status || 'Active'}</span>`;
-                                const s = String(item.status || '').toLowerCase();
-                                if (s === 'active' || s === 'critical') statusBadge = `<span class="badge bg-danger px-2.5 py-1.5 border">Active</span>`;
-                                if (s === 'dispatching' || s === 'in progress') statusBadge = `<span class="badge bg-warning text-dark px-2.5 py-1.5 border">In Progress</span>`;
-                                if (s === 'resolved' || s === 'closed') statusBadge = `<span class="badge bg-success px-2.5 py-1.5 border">Resolved</span>`;
-
-                                // Table Row Parsing using updated reportedBy & assignedTo variables safely
-                                rowsHtml += `
-                                    <tr>
-                                        <td class="text-secondary small fw-bold">${item.emergencyAlertID || doc.id}</td>
-                                        <td>
-                                            <span class="badge bg-dark font-monospace px-2 py-1">${item.type || 'Incident'}</span>
-                                            <div class="small text-muted mt-1" style="font-size: 0.78rem;">
-                                                <i class="bi bi-megaphone me-1"></i> ${item.reportedBy || 'System'}
-                                            </div>
-                                        </td>
-                                        <td>${priorityBadge}</td>
-                                        <td class="fw-semibold text-dark"><i class="bi bi-geo-alt-fill text-muted me-1"></i>${item.location || 'Expressway (Main)'}</td>
-                                        <td class="text-muted small">${formatTimestamp(item.createdAt)}</td>
-                                        <td>
-                                            ${statusBadge}
-                                            <div class="small text-muted mt-1" style="font-size: 0.78rem;">
-                                                <i class="bi bi-person-badge me-1"></i> ${item.assignedTo || 'Unassigned'}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                `;
-                            });
-
-                            tableBody.innerHTML = rowsHtml;
-
+                            renderActiveTable();
                         }, (error) => {
-                            console.error("Firestore Range Streaming Failure: ", error);
-                            if(error.code === 'failed-precondition') {
-                                tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i> Missing Composite Index. Check DevTools Console (F12) to create it.</td></tr>`;
-                            }
+                            console.error("Active Sync Error:", error);
+                            activeTableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-danger">Failed to sync live data.</td></tr>`;
                         });
                 }
 
-                // Attach dynamic recalculation change hooks to user input actions
-                startInput.addEventListener('change', establishIncidentStream);
-                endInput.addEventListener('change', establishIncidentStream);
+                // 2. Live stream binding for Timeline tracking entries
+                function streamRangeLog() {
+                    if (unsubscribeRangeStream) unsubscribeRangeStream();
 
-                // Initial process kick-off trigger
-                establishIncidentStream();
+                    let startBoundary = new Date(startInput.value);
+                    startBoundary.setHours(0, 0, 0, 0);
+
+                    let endBoundary = new Date(endInput.value);
+                    endBoundary.setHours(23, 59, 59, 999);
+
+                    unsubscribeRangeStream = db.collection("emergencyAlert")
+                        .where("createdAt", ">=", startBoundary)
+                        .where("createdAt", "<=", endBoundary)
+                        .onSnapshot((snapshot) => {
+                            rawRangeRecords = [];
+                            let totalInWindow = 0;
+                            let resolvedInWindow = 0;
+
+                            snapshot.forEach((doc) => {
+                                const data = doc.data();
+                                const status = String(data.status || '').toLowerCase();
+
+                                totalInWindow++;
+                                if (status === 'resolved' || status === 'closed') {
+                                    resolvedInWindow++;
+                                }
+
+                                rawRangeRecords.push({
+                                    emergencyAlertID: data.emergencyAlertID || doc.id,
+                                    rawCreatedAt: data.createdAt,
+                                    ...data
+                                });
+                            });
+
+                            renderRangeTable(totalInWindow, resolvedInWindow);
+                        }, (error) => {
+                            console.error("Range Window Sync Error:", error);
+                        });
+                }
+
+                startInput.addEventListener('change', streamRangeLog);
+                endInput.addEventListener('change', streamRangeLog);
+
+                // Universal event listener delegator assigned to sortable table headers
+                document.querySelectorAll('.sortable-header').forEach(header => {
+                    header.addEventListener('click', () => {
+                        const tableName = header.getAttribute('data-table');
+                        const selectedKey = header.getAttribute('data-sort-key');
+                        const current = sortState[tableName];
+
+                        if (current.key === selectedKey) {
+                            current.order = current.order === 'asc' ? 'desc' : 'asc';
+                        } else {
+                            current.key = selectedKey;
+                            current.order = 'asc';
+                        }
+
+                        if (tableName === 'active') {
+                            renderActiveTable();
+                        } else {
+                            // Re-render historical data using current array cache states
+                            const total = rawRangeRecords.length;
+                            const resolved = rawRangeRecords.filter(r => ['resolved', 'closed'].includes(String(r.status).toLowerCase())).length;
+                            renderRangeTable(total, resolved);
+                        }
+                    });
+                });
+
+                streamGlobalActive();
+                streamRangeLog();
 
             } catch (err) {
-                console.error("Initialization error:", err);
-                tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-danger"><i class="bi bi-exclamation-octagon-fill me-1"></i> Firebase Integration Error: ${err.message}</td></tr>`;
+                console.error("Core Runtime Exception Encountered:", err);
             }
         });
     </script>
