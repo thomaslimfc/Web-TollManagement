@@ -110,10 +110,24 @@
     </div>
 
     <div class="main-content" id="mainContent">
-        <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-3">
             <div>
-                <h1>Incident Management Dashboard</h1>
-                <p>Real-time telemetry feeds for expressway critical alerts, roadblocks, and hazards.</p>
+                <h1>Incident Management</h1>
+                <p class="mb-0">Real-time monitoring of incidents and emergencies.</p>
+            </div>
+            
+            <div class="d-flex flex-wrap align-items-center gap-3 ms-auto">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="text-secondary small text-nowrap">
+                        <i class="bi bi-calendar-range"></i> Duration:
+                    </span>
+                    <input type="date" class="form-control form-control-sm" id="startDateFilter" style="width: 140px;">
+                    <span class="text-muted small">to</span>
+                    <input type="date" class="form-control form-control-sm" id="endDateFilter" style="width: 140px;">
+                </div>
+                <button type="button" class="btn btn-sm btn-primary d-flex align-items-center gap-1 fw-medium" id="btnExportPDF">
+                    <i class="bi bi-file-earmark-pdf-fill"></i> Export PDF
+                </button>
             </div>
         </div>
 
@@ -126,7 +140,7 @@
             </div>
             <div class="col-6 col-lg-3">
                 <div class="card kpi-card bg-warning text-dark p-3 shadow-sm">
-                    <div class="text-dark-50 small text-uppercase fw-bold">Accidents Reported</div>
+                    <div class="text-dark-50 small text-uppercase fw-bold">Active Accidents</div>
                     <h3 class="fw-bold mb-0 text-dark" id="kpiAccidents">0</h3>
                 </div>
             </div>
@@ -138,8 +152,8 @@
             </div>
             <div class="col-6 col-lg-3">
                 <div class="card kpi-card bg-success p-3 shadow-sm">
-                    <div class="text-white-50 small text-uppercase fw-bold">Resolved Incidents</div>
-                    <h3 class="fw-bold mb-0" id="kpiResolved">0</h3>
+                    <div class="text-white-50 small text-uppercase fw-bold">Incident Resolve Rate</div>
+                    <h3 class="fw-bold mb-0" id="kpiResolveRate">0%</h3>
                 </div>
             </div>
         </div>
@@ -190,13 +204,17 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             const tableBody = document.getElementById('emergencyTableBody');
-            const syncBadge = document.getElementById('syncStatusBadge');
+            const startInput = document.getElementById('startDateFilter');
+            const endInput = document.getElementById('endDateFilter');
 
             // KPI Indicators Element Bindings
             const kpiSos = document.getElementById('kpiActiveSos');
             const kpiAccidents = document.getElementById('kpiAccidents');
             const kpiRoadblocks = document.getElementById('kpiRoadblocks');
-            const kpiResolved = document.getElementById('kpiResolved');
+            const kpiResolveRate = document.getElementById('kpiResolveRate');
+
+            // Active Snapshot stream unsubscribing reference hook
+            let unsubscribeStream = null;
 
             function formatTimestamp(timestamp) {
                 if (!timestamp) return 'N/A';
@@ -206,91 +224,149 @@
                 return String(timestamp);
             }
 
+            // Set up local calendar default string representation (YYYY-MM-DD)
+            const todayLocal = new Date();
+            const year = todayLocal.getFullYear();
+            const month = String(todayLocal.getMonth() + 1).padStart(2, '0');
+            const day = String(todayLocal.getDate()).padStart(2, '0');
+            const todayString = `${year}-${month}-${day}`;
+
+            // Sync structural parameters inside layouts
+            startInput.value = todayString;
+            endInput.value = todayString;
+
             try {
-                // Initialize using your platform's shared modular handler
                 const { db } = await initializeFirebase();
 
-                // Setup live data synchronizer using onSnapshot mapping
-                db.collection("emergencyAlert").onSnapshot((snapshot) => {
-                    let rowsHtml = "";
-                    let alertsList = [];
-
-                    // Calculate state management metrics
-                    let counterSos = 0;
-                    let counterAccident = 0;
-                    let counterRoadblock = 0;
-                    let counterResolved = 0;
-
-                    snapshot.forEach((doc) => {
-                        const data = doc.data();
-                        alertsList.push(data);
-
-                        const type = String(data.type || '').toLowerCase();
-                        const status = String(data.status || '').toLowerCase();
-
-                        // Metric tally classification
-                        if (status === 'resolved' || status === 'closed') {
-                            counterResolved++;
-                        } else {
-                            if (type === 'sos') counterSos++;
-                            if (type === 'accident') counterAccident++;
-                            if (type === 'roadblock') counterRoadblock++;
-                        }
-                    });
-
-                    // Update metrics counters inside layout elements safely
-                    kpiSos.textContent = counterSos;
-                    kpiAccidents.textContent = counterAccident;
-                    kpiRoadblocks.textContent = counterRoadblock;
-                    kpiResolved.textContent = counterResolved;
-
-                    if (snapshot.empty) {
-                        tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted"><i class="bi bi-check-circle text-success me-1"></i> No incident reports detected on highway networks.</td></tr>`;
-                        syncBadge.className = "badge bg-success px-3 py-2 fs-6 border shadow-sm";
-                        syncBadge.innerHTML = `<i class="bi bi-cloud-check-fill me-1"></i> Live Stream Connected`;
-                        return;
+                // Dynamic Firestore real-time processing stream generator
+                function establishIncidentStream() {
+                    // Tear down previous listeners to block memory leak duplications
+                    if (unsubscribeStream) {
+                        unsubscribeStream();
                     }
 
-                    // Loop render pipeline
-                    snapshot.forEach((doc) => {
-                        const item = doc.data();
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">
+                                <div class="spinner-border spinner-border-sm me-2 text-primary" role="status"></div>
+                                Syncing selected operational records...
+                            </td>
+                        </tr>`;
 
-                        // Priority styling maps
-                        let priorityBadge = `<span class="badge bg-secondary">LOW</span>`;
-                        const p = String(item.priority || '').toUpperCase();
-                        if (p === 'HIGH') priorityBadge = `<span class="badge bg-danger">HIGH</span>`;
-                        if (p === 'MED' || p === 'MEDIUM') priorityBadge = `<span class="badge bg-warning text-dark">MED</span>`;
+                    let startBoundary;
+                    let endBoundary;
 
-                        // Status badge styling maps
-                        let statusBadge = `<span class="badge bg-secondary">${item.status || 'Active'}</span>`;
-                        const s = String(item.status || '').toLowerCase();
-                        if (s === 'active' || s === 'critical') statusBadge = `<span class="badge bg-danger px-2.5 py-1.5 border">Active</span>`;
-                        if (s === 'dispatching' || s === 'in progress') statusBadge = `<span class="badge bg-warning text-dark px-2.5 py-1.5 border">In Progress</span>`;
-                        if (s === 'resolved' || s === 'closed') statusBadge = `<span class="badge bg-success px-2.5 py-1.5 border">Resolved</span>`;
+                    // Compute floor limitations based on selection context
+                    if (startInput.value === todayString) {
+                        // DEFAULT: 1:00 AM Today floor boundary logic
+                        startBoundary = new Date();
+                        startBoundary.setHours(1, 0, 0, 0);
+                    } else {
+                        // PAST SELECTION: Midnight floor rule
+                        startBoundary = new Date(startInput.value);
+                        startBoundary.setHours(0, 0, 0, 0);
+                    }
 
-                        rowsHtml += `
-                            <tr>
-                                <td class="text-secondary small fw-bold">${item.emergencyAlertID || doc.id}</td>
-                                <td><span class="badge bg-dark font-monospace px-2 py-1">${item.type || 'Incident'}</span></td>
-                                <td>${priorityBadge}</td>
-                                <td class="fw-semibold text-dark"><i class="bi bi-geo-alt-fill text-muted me-1"></i>${item.location || 'Expressway (Main)'}</td>
-                                <td class="text-muted small">${formatTimestamp(item.createdAt)}</td>
-                                <td>${statusBadge}</td>
-                            </tr>
-                        `;
-                    });
+                    // Always maximize window boundary up to 11:59:59.999 PM of selected end date
+                    endBoundary = new Date(endInput.value);
+                    endBoundary.setHours(23, 59, 59, 999);
 
-                    tableBody.innerHTML = rowsHtml;
-                    
-                    // Update connection display panel state updates
-                    syncBadge.className = "badge bg-success px-3 py-2 fs-6 border shadow-sm";
-                    syncBadge.innerHTML = `<i class="bi bi-cloud-check-fill me-1"></i> Live Stream Connected`;
+                    // Initialize stream attaching the target compound parameters
+                    unsubscribeStream = db.collection("emergencyAlert")
+                        .where("createdAt", ">=", startBoundary)
+                        .where("createdAt", "<=", endBoundary)
+                        .orderBy("createdAt", "desc")
+                        .onSnapshot((snapshot) => {
+                            let rowsHtml = "";
+                            let counterSos = 0;
+                            let counterAccident = 0;
+                            let counterRoadblock = 0;
+                            let counterResolved = 0;
+                            let totalIncidents = 0;
 
-                }, (error) => {
-                    console.error("Firestore Streaming Loop Failed: ", error);
-                    syncBadge.className = "badge bg-danger px-3 py-2 fs-6 border shadow-sm";
-                    syncBadge.innerHTML = `<i class="bi bi-cloud-slash-fill me-1"></i> Stream Disconnected`;
-                });
+                            snapshot.forEach((doc) => {
+                                const data = doc.data();
+                                totalIncidents++;
+
+                                const type = String(data.type || '').toLowerCase();
+                                const status = String(data.status || '').toLowerCase();
+
+                                if (status === 'resolved' || status === 'closed') {
+                                    counterResolved++;
+                                } else {
+                                    if (type === 'sos') counterSos++;
+                                    if (type === 'accident') counterAccident++;
+                                    if (type === 'roadblock') counterRoadblock++;
+                                }
+                            });
+
+                            const resolveRateText = totalIncidents > 0 
+                                ? `${Math.round((counterResolved / totalIncidents) * 100)}%` 
+                                : '0%';
+
+                            kpiSos.textContent = counterSos;
+                            kpiAccidents.textContent = counterAccident;
+                            kpiRoadblocks.textContent = counterRoadblock;
+                            kpiResolveRate.textContent = resolveRateText;
+
+                            if (snapshot.empty) {
+                                tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted"><i class="bi bi-check-circle text-success me-1"></i> No matching records found for the selected timeline.</td></tr>`;
+                                return;
+                            }
+
+                            snapshot.forEach((doc) => {
+                                const item = doc.data();
+
+                                let priorityBadge = `<span class="badge bg-secondary">LOW</span>`;
+                                const p = String(item.priority || '').toUpperCase();
+                                if (p === 'HIGH') priorityBadge = `<span class="badge bg-danger">HIGH</span>`;
+                                if (p === 'MED' || p === 'MEDIUM') priorityBadge = `<span class="badge bg-warning text-dark">MED</span>`;
+
+                                let statusBadge = `<span class="badge bg-secondary">${item.status || 'Active'}</span>`;
+                                const s = String(item.status || '').toLowerCase();
+                                if (s === 'active' || s === 'critical') statusBadge = `<span class="badge bg-danger px-2.5 py-1.5 border">Active</span>`;
+                                if (s === 'dispatching' || s === 'in progress') statusBadge = `<span class="badge bg-warning text-dark px-2.5 py-1.5 border">In Progress</span>`;
+                                if (s === 'resolved' || s === 'closed') statusBadge = `<span class="badge bg-success px-2.5 py-1.5 border">Resolved</span>`;
+
+                                // Table Row Parsing using updated reportedBy & assignedTo variables safely
+                                rowsHtml += `
+                                    <tr>
+                                        <td class="text-secondary small fw-bold">${item.emergencyAlertID || doc.id}</td>
+                                        <td>
+                                            <span class="badge bg-dark font-monospace px-2 py-1">${item.type || 'Incident'}</span>
+                                            <div class="small text-muted mt-1" style="font-size: 0.78rem;">
+                                                <i class="bi bi-megaphone me-1"></i> ${item.reportedBy || 'System'}
+                                            </div>
+                                        </td>
+                                        <td>${priorityBadge}</td>
+                                        <td class="fw-semibold text-dark"><i class="bi bi-geo-alt-fill text-muted me-1"></i>${item.location || 'Expressway (Main)'}</td>
+                                        <td class="text-muted small">${formatTimestamp(item.createdAt)}</td>
+                                        <td>
+                                            ${statusBadge}
+                                            <div class="small text-muted mt-1" style="font-size: 0.78rem;">
+                                                <i class="bi bi-person-badge me-1"></i> ${item.assignedTo || 'Unassigned'}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `;
+                            });
+
+                            tableBody.innerHTML = rowsHtml;
+
+                        }, (error) => {
+                            console.error("Firestore Range Streaming Failure: ", error);
+                            if(error.code === 'failed-precondition') {
+                                tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i> Missing Composite Index. Check DevTools Console (F12) to create it.</td></tr>`;
+                            }
+                        });
+                }
+
+                // Attach dynamic recalculation change hooks to user input actions
+                startInput.addEventListener('change', establishIncidentStream);
+                endInput.addEventListener('change', establishIncidentStream);
+
+                // Initial process kick-off trigger
+                establishIncidentStream();
 
             } catch (err) {
                 console.error("Initialization error:", err);
@@ -301,7 +377,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Sidebar responsive display state alterations toggle interactions hooks
         document.querySelector('.sidebar-toggler').addEventListener('click', function () {
             document.getElementById('sidebar').classList.toggle('show');
         });

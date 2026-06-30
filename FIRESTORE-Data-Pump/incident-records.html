@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PLUS — Emergency Alert Dispatch Editor</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 30px;
+            padding-bottom: 50px;
+        }
+
+        .card {
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+        }
+
+        .table-responsive {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        thead th {
+            position: sticky;
+            top: 0;
+            background-color: #212529 !important;
+            color: #fff !important;
+            z-index: 1;
+        }
+
+        /* Styling editable text fields to blend in naturally */
+        .editable-cell {
+            border: 1px solid transparent;
+            background: transparent;
+            padding: 4px 8px;
+            border-radius: 4px;
+            width: 100%;
+            transition: all 0.2s ease;
+        }
+
+        .editable-cell:focus {
+            border-color: #ea868f;
+            outline: 0;
+            background-color: #fff;
+            box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+        }
+
+        .doc-id-field {
+            font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            background-color: #f1f3f5;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container-fluid px-lg-5">
+        <div class="row justify-content-center">
+            <div class="col-12">
+
+                <div class="d-flex align-items-center justify-content-between mb-4 border-bottom pb-3">
+                    <div>
+                        <h1 class="h3 mb-1"><i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>Emergency Alert Database Manager</h1>
+                        <p class="text-muted mb-0">Modify emergencyAlert schema values inline. Supports timestamp preservation and automated validation routines.</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button id="refreshBtn" class="btn btn-outline-secondary btn-lg shadow-sm">
+                            <i class="bi bi-arrow-clockwise"></i> Refresh
+                        </button>
+                        <button id="saveBtn" class="btn btn-danger btn-lg shadow-sm" disabled>
+                            <i class="bi bi-cloud-check-fill me-2"></i>Commit Incident Updates
+                        </button>
+                    </div>
+                </div>
+
+                <div id="statusMessage" class="alert d-none mb-4" role="alert"></div>
+
+                <div class="card">
+                    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
+                        <h5 class="mb-0 card-title h6"><i class="bi bi-table me-2"></i>Active Incident Grid Workspace (<span id="payloadCount">0</span> records)</h5>
+                        <span class="badge bg-danger">Collection Context: emergencyAlert</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0" id="editorTable">
+                                <thead id="tableHeader">
+                                </thead>
+                                <tbody id="previewTableBody">
+                                    <tr>
+                                        <td class="text-center text-muted py-5">
+                                            <div class="spinner-border spinner-border-sm me-2" role="status"></div> Establishing connection and building schema matrix...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, writeBatch, doc, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // ══════〔 🔴 REPLACE WITH YOUR WEB APP CONFIG DETAILS 〕══════
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "plus-370c3.firebaseapp.com",
+            projectId: "plus-370c3",
+            storageBucket: "plus-370c3.appspot.com",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize connection integrations
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Runtime Global State Arrays
+        let localSnapshotData = []; 
+        let globalFieldsList = [];
+
+        // Fetch schema and build out table matrix dynamically
+        async function fetchAndBuildTable() {
+            const saveBtn = document.getElementById('saveBtn');
+            const tableHead = document.getElementById('tableHeader');
+            const tableBody = document.getElementById('previewTableBody');
+            const counter = document.getElementById('payloadCount');
+
+            saveBtn.disabled = true;
+            tableBody.innerHTML = `<tr><td class="text-center py-5 text-muted"><div class="spinner-border spinner-border-sm me-2" role="status"></div>Downloading incident records...</td></tr>`;
+
+            try {
+                const querySnapshot = await getDocs(collection(db, "emergencyAlert"));
+                localSnapshotData = [];
+                let fieldsSet = new Set();
+
+                querySnapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    Object.keys(data).forEach(key => fieldsSet.add(key));
+                    localSnapshotData.push({
+                        id: docSnap.id,
+                        originalId: docSnap.id,
+                        fields: data
+                    });
+                });
+
+                // Guarantee structure order matching parameters
+                const prioritizedFields = ["emergencyAlertID", "type", "location", "priority", "status", "createdAt"];
+                globalFieldsList = Array.from(fieldsSet).sort((a, b) => {
+                    let idxA = prioritizedFields.indexOf(a);
+                    let idxB = prioritizedFields.indexOf(b);
+                    if (idxA === -1) idxA = 99;
+                    if (idxB === -1) idxB = 99;
+                    return idxA - idxB;
+                });
+
+                counter.innerText = localSnapshotData.length;
+
+                if (localSnapshotData.length === 0) {
+                    tableHead.innerHTML = '';
+                    tableBody.innerHTML = `<tr><td class="text-center py-5 text-muted">No records populated inside "emergencyAlert" database cluster.</td></tr>`;
+                    return;
+                }
+
+                // Assemble Table Headers dynamically
+                let headerRow = `<tr><th scope="col" class="ps-3" style="width: 200px;">Document ID (Key)</th>`;
+                globalFieldsList.forEach(field => {
+                    headerRow += `<th scope="col">${field}</th>`;
+                });
+                headerRow += `</tr>`;
+                tableHead.innerHTML = headerRow;
+
+                // Render dynamic table input content rows
+                tableBody.innerHTML = "";
+                localSnapshotData.forEach((record, index) => {
+                    let tr = document.createElement('tr');
+                    
+                    // Column Cell 1: Editable Document ID Key
+                    let tdId = document.createElement('td');
+                    tdId.className = "ps-3";
+                    tdId.innerHTML = `<input type="text" class="form-control form-control-sm doc-id-field editable-cell" data-row="${index}" data-type="doc-id" value="${record.id}">`;
+                    tr.appendChild(tdId);
+
+                    // Document Data Payload Field Columns
+                    globalFieldsList.forEach(field => {
+                        let tdField = document.createElement('td');
+                        let currentVal = record.fields[field];
+                        let displayedString = "";
+
+                        if (currentVal instanceof Timestamp || (currentVal && typeof currentVal.toDate === 'function')) {
+                            // Convert Firestore Timestamp cleanly to ISO String variant for clean input
+                            displayedString = currentVal.toDate().toISOString();
+                        } else if (currentVal !== undefined && currentVal !== null) {
+                            displayedString = typeof currentVal === 'object' ? JSON.stringify(currentVal) : currentVal;
+                        }
+
+                        tdField.innerHTML = `<input type="text" class="editable-cell" data-row="${index}" data-field="${field}" value="${displayedString}">`;
+                        tr.appendChild(tdField);
+                    });
+
+                    tableBody.appendChild(tr);
+                });
+
+                setupInputEventListeners();
+                saveBtn.disabled = false;
+
+            } catch (err) {
+                console.error("Pipeline failure fetching target items: ", err);
+                document.getElementById('statusMessage').className = "alert alert-danger d-block";
+                document.getElementById('statusMessage').innerText = "Database connection timed out or failed to initialize schema: " + err.message;
+            }
+        }
+
+        // Listen for user changes inside text inputs and update local session data array
+        function setupInputEventListeners() {
+            const table = document.getElementById('editorTable');
+            
+            table.querySelectorAll('input').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    const rowIndex = e.target.getAttribute('data-row');
+                    const fieldName = e.target.getAttribute('data-field');
+                    const isDocId = e.target.getAttribute('data-type') === 'doc-id';
+                    const value = e.target.value;
+
+                    if (isDocId) {
+                        localSnapshotData[rowIndex].id = value;
+                    } else {
+                        let preparedVal = value;
+                        
+                        // Smart parsing logic for booleans, numbers, and dates
+                        if(value !== '' && !isNaN(value)) {
+                            preparedVal = Number(value);
+                        } else if (value.toLowerCase() === 'true') {
+                            preparedVal = true;
+                        } else if (value.toLowerCase() === 'false') {
+                            preparedVal = false;
+                        } else if (fieldName === 'createdAt' && !isNaN(Date.parse(value))) {
+                            // Turn compliant ISO/Date strings back into Native Javascript Date targets
+                            preparedVal = new Date(value);
+                        }
+                        
+                        localSnapshotData[rowIndex].fields[fieldName] = preparedVal;
+                    }
+                });
+            });
+        }
+
+        // Save changes and dynamically map schema updates
+        document.getElementById('saveBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('saveBtn');
+            const msgBox = document.getElementById('statusMessage');
+
+            btn.disabled = true;
+            btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Synchronizing Cloud Logs...`;
+            msgBox.className = "alert d-none";
+
+            try {
+                const batch = writeBatch(db);
+
+                for (const record of localSnapshotData) {
+                    // Check if Document ID changed
+                    if (record.id !== record.originalId) {
+                        const oldRef = doc(db, "emergencyAlert", record.originalId);
+                        batch.delete(oldRef);
+                    }
+                    
+                    const updatedFields = {};
+                    
+                    // Build up payload map cleanly
+                    Object.keys(record.fields).forEach(key => {
+                        let val = record.fields[key];
+                        if (val instanceof Date) {
+                            // Transform Date back to explicit cloud Firestore timestamp formats
+                            updatedFields[key] = Timestamp.fromDate(val);
+                        } else {
+                            updatedFields[key] = val;
+                        }
+                    });
+
+                    // Dynamic alert sanitation validation rule block
+                    if (updatedFields['priority']) {
+                        updatedFields['priority'] = String(updatedFields['priority']).toLowerCase().trim();
+                    }
+                    if (updatedFields['status']) {
+                        updatedFields['status'] = String(updatedFields['status']).toLowerCase().trim();
+                    }
+                    
+                    const targetRef = doc(db, "emergencyAlert", record.id);
+                    batch.set(targetRef, updatedFields);
+                }
+
+                await batch.commit();
+
+                msgBox.className = "alert alert-success d-block";
+                msgBox.innerHTML = `<i class="bi bi-check-circle-fill me-2"></i><strong>Incident logs updated successfully!</strong> Operations batch successfully committed to cluster database.`;
+                
+                await fetchAndBuildTable();
+
+            } catch (error) {
+                console.error("Batch Transaction Error pipeline: ", error);
+                msgBox.className = "alert alert-danger d-block";
+                msgBox.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-2"></i><strong>Transaction Aborted:</strong> ${error.message}`;
+                btn.disabled = false;
+                btn.innerHTML = `<i class="bi bi-cloud-check-fill me-2"></i>Retry Save`;
+            }
+        });
+
+        document.getElementById('refreshBtn').addEventListener('click', fetchAndBuildTable);
+        window.addEventListener('DOMContentLoaded', fetchAndBuildTable);
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
