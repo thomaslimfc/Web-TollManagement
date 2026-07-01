@@ -166,10 +166,13 @@
                                         <th class="sortable-header" data-table="active" data-sort-key="type"
                                             style="cursor: pointer;">Incident Type <i
                                                 class="bi bi-arrow-down-up sort-icon" id="icon-active-type"></i></th>
+                                        <th class="sortable-header" data-table="active" data-sort-key="description"
+                                            style="cursor: pointer;">Description <i
+                                                class="bi bi-arrow-down-up sort-icon" id="icon-active-description"></i>
+                                        </th>
                                         <th class="sortable-header" data-table="active" data-sort-key="priority"
                                             style="cursor: pointer;">Priority <i class="bi bi-arrow-down-up sort-icon"
-                                                id="icon-active-priority"></i>
-                                        </th>
+                                                id="icon-active-priority"></i></th>
                                         <th class="sortable-header" data-table="active" data-sort-key="location"
                                             style="cursor: pointer;">Highway Location <i
                                                 class="bi bi-arrow-down-up sort-icon" id="icon-active-location"></i>
@@ -186,7 +189,7 @@
                                 </thead>
                                 <tbody id="activeTableBody">
                                     <tr>
-                                        <td colspan="6" class="text-center py-4 text-muted">
+                                        <td colspan="7" class="text-center py-4 text-muted">
                                             <div class="spinner-border spinner-border-sm me-2 text-danger"
                                                 role="status"></div>
                                             Streaming active emergency issues...
@@ -227,6 +230,10 @@
                                         <th class="sortable-header" data-table="range" data-sort-key="type"
                                             style="cursor: pointer;">Incident Type <i
                                                 class="bi bi-arrow-down-up sort-icon" id="icon-range-type"></i></th>
+                                        <th class="sortable-header" data-table="range" data-sort-key="description"
+                                            style="cursor: pointer;">Description <i
+                                                class="bi bi-arrow-down-up sort-icon" id="icon-range-description"></i>
+                                        </th>
                                         <th class="sortable-header" data-table="range" data-sort-key="priority"
                                             style="cursor: pointer;">Priority <i class="bi bi-arrow-down-up sort-icon"
                                                 id="icon-range-priority"></i></th>
@@ -245,7 +252,7 @@
                                 </thead>
                                 <tbody id="rangeLogTableBody">
                                     <tr>
-                                        <td colspan="6" class="text-center py-4 text-muted">
+                                        <td colspan="7" class="text-center py-4 text-muted">
                                             <div class="spinner-border spinner-border-sm me-2 text-primary"
                                                 role="status"></div>
                                             Awaiting date window selection parameters...
@@ -278,10 +285,9 @@
             const kpiRoadblocks = document.getElementById('kpiActiveRoadblocks');
             const kpiResolveRate = document.getElementById('kpiResolveRate');
 
-            // Internal Data Storage States
             let rawActiveRecords = [];
             let rawRangeRecords = [];
-            let staffMap = {}; // Holds complete structural profiles mapped by staffID keys
+            let staffMap = {};
 
             let sortState = {
                 active: { key: 'createdAt', order: 'desc' },
@@ -314,11 +320,15 @@
                 return `<span class="badge bg-secondary">${status || 'Unknown'}</span>`;
             }
 
-            // Enhanced Row Parsing supporting Dynamic Dropdown Cross-Check Verification Rules
             function generateRowHtml(item) {
                 const isUnassigned = !item.assignedTo || item.assignedTo.trim() === "";
                 const isResolved = ['resolved', 'closed'].includes(String(item.status).toLowerCase());
                 const incidentType = String(item.type || '').toLowerCase();
+
+                // Check for null, undefined, or empty/blank string description
+                const displayDescription = (item.description && item.description.trim() !== "")
+                    ? item.description
+                    : 'N/A';
 
                 let dispatchActionHtml = "";
 
@@ -331,12 +341,9 @@
                         </div>`;
                 } else if (isUnassigned) {
                     let optionsHtml = `<option value="" selected disabled>Assign Staff...</option>`;
-
-                    // Cross-Check Verification: Identify emergency field operation types
                     const isEmergencyType = ['sos', 'accident', 'roadblock'].includes(incidentType);
 
                     if (isEmergencyType) {
-                        // Strict Enforcer Rule: Only allow positionID === "PID00002"
                         let patrolStaffCount = 0;
                         for (const [staffID, staffData] of Object.entries(staffMap)) {
                             if (staffData.positionID === "PID00002") {
@@ -348,7 +355,6 @@
                             optionsHtml = `<option value="" selected disabled>No Patrol Officers Available</option>`;
                         }
                     } else {
-                        // Fallback option: Display alternative open administrative options for alternative incidents
                         for (const [staffID, staffData] of Object.entries(staffMap)) {
                             optionsHtml += `<option value="${staffID}">${staffData.fullName} (${staffID}) - ${staffData.positionName}</option>`;
                         }
@@ -379,6 +385,9 @@
                             <div class="small text-muted mt-1" style="font-size: 0.78rem;">
                                 <i class="bi bi-megaphone me-1"></i> Reported by: ${item.reportedBy || 'System'}
                             </div>
+                        </td>
+                        <td class="text-wrap text-secondary small" style="max-width: 240px; white-space: normal;">
+                            ${displayDescription}
                         </td>
                         <td>${getPriorityBadge(item.priority)}</td>
                         <td class="text-secondary small"><i class="bi bi-geo-alt-fill text-muted me-1"></i>${item.location || 'Expressway (Main)'}</td>
@@ -423,7 +432,7 @@
 
             function renderActiveTable() {
                 if (rawActiveRecords.length === 0) {
-                    activeTableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted"><i class="bi bi-check-circle text-success me-1"></i> No active incidents right now.</td></tr>`;
+                    activeTableBody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted"><i class="bi bi-check-circle text-success me-1"></i> No active incidents right now.</td></tr>`;
                     return;
                 }
                 const sorted = sortArray([...rawActiveRecords], sortState.active);
@@ -433,7 +442,7 @@
 
             function renderRangeTable(totalInWindow, resolvedInWindow) {
                 if (rawRangeRecords.length === 0) {
-                    rangeLogTableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted"><i class="bi bi-info-circle me-1"></i> No activity entries recorded within this date selection window.</td></tr>`;
+                    rangeLogTableBody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted"><i class="bi bi-info-circle me-1"></i> No activity entries recorded within this date selection window.</td></tr>`;
                     kpiResolveRate.textContent = '0%';
                     return;
                 }
@@ -444,7 +453,6 @@
                 kpiResolveRate.textContent = totalInWindow > 0 ? `${Math.round((resolvedInWindow / totalInWindow) * 100)}%` : '0%';
             }
 
-            // Configure Default Range Filters Bound to Server Clock
             const todayLocal = new Date();
             const todayString = `${todayLocal.getFullYear()}-${String(todayLocal.getMonth() + 1).padStart(2, '0')}-${String(todayLocal.getDate()).padStart(2, '0')}`;
             startInput.value = todayString;
@@ -453,7 +461,6 @@
             try {
                 const { db } = await initializeFirebase();
 
-                // 1. Compile Structural Map Index across Multi-Collections on Startup
                 async function loadStaffAndPositions() {
                     try {
                         const positionSnapshot = await db.collection("position").get();
@@ -480,7 +487,6 @@
                     }
                 }
 
-                // 2. Realtime Continuous Sync Pipeline for Active Incidents
                 function streamGlobalActive() {
                     unsubscribeActiveStream = db.collection("emergencyAlert")
                         .onSnapshot((snapshot) => {
@@ -518,7 +524,6 @@
                         });
                 }
 
-                // 3. Realtime Boundary Filtered Query Stream
                 function streamRangeLog() {
                     if (unsubscribeRangeStream) unsubscribeRangeStream();
 
@@ -559,7 +564,6 @@
                         });
                 }
 
-                // Dynamic Global Click Dispatch Update Event Delegation Handler
                 document.addEventListener('click', async (e) => {
                     const btn = e.target.closest('.btn-assign');
                     if (btn) {
@@ -577,7 +581,6 @@
                             btn.disabled = true;
                             btn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status"></span>`;
 
-                            // Execute Atomic Write Update operation into remote target Firestore reference document
                             await db.collection("emergencyAlert").doc(alertId).update({
                                 assignedTo: selectedStaffId,
                                 status: "in progress"
@@ -595,7 +598,6 @@
                 startInput.addEventListener('change', streamRangeLog);
                 endInput.addEventListener('change', streamRangeLog);
 
-                // Column Sorter Header Click Event Handler Configuration
                 document.querySelectorAll('.sortable-header').forEach(header => {
                     header.addEventListener('click', () => {
                         const tableName = header.getAttribute('data-table');
@@ -619,7 +621,6 @@
                     });
                 });
 
-                // Execution Chain Pipeline Starts
                 await loadStaffAndPositions();
                 streamGlobalActive();
                 streamRangeLog();
